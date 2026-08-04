@@ -1,11 +1,31 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/home/Hero";
-import { Sparkles, ArrowRight, Play, Wand2, Layers, Music, Video, Star } from "lucide-react";
+import { Sparkles, ArrowRight, Play, Wand2, Layers, Music, Video, ChevronRight } from "lucide-react";
 
 export default function Home() {
+  const inspirations = [
+    { title: "Marketing and Advertising", desc: "Campaign clips, product shots, and style visuals for brands and sellers" },
+    { title: "Film & Stories", desc: "Cinematic scenes, stills, and storyboards" },
+    { title: "Music Video", desc: "Visualizers, lyric videos, and album art" },
+    { title: "Animation & Illustration", desc: "Character-driven stories, anime, illustration, and 3D art" },
+    { title: "UGC", desc: "AI Influencer, UGC, Social Media Content" },
+    { title: "Micro Drama", desc: "Intense melodrama, shocking twists, and cliffhangers" },
+    { title: "Anime", desc: "Anime-style portraits and videos, characters" },
+    { title: "Gaming and Concept Art", desc: "Game environments, fantasy worlds, weapon/armor design, character sheets, sci-fi landscapes" },
+    { title: "Explainer", desc: "Videos to explain a product, service or a concept" },
+    { title: "Mood and Atmosphere", desc: "Cinematic art, visual art, scenic imagery" },
+  ];
+
   return (
     <main className="min-h-screen bg-black pb-24">
       <Navbar />
+      
+      {/* Hot Summer Sale Banner */}
+      <div className="bg-gradient-to-r from-orange-500 via-pink-500 to-primary text-white text-center py-2.5 px-4 text-[13px] md:text-sm font-medium mt-16 flex items-center justify-center gap-2">
+        <span>🔥 Hot Summer Sale for the hottest models! Upgrade by August 7 to lock in up to 40% OFF for the rest of 2026</span>
+        <button className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full font-bold transition ml-2">Upgrade</button>
+      </div>
+
       <Hero />
       
       {/* Create From Claude/ChatGPT Banner */}
@@ -62,6 +82,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Unlock Unlimited */}
+      <section className="px-4 md:px-6 max-w-[1200px] mx-auto mb-20">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-2">Unlock Unlimited</h2>
+            <p className="text-text-icon-neutral-secondary">Up to 40% OFF for the hottest models</p>
+          </div>
+          <button className="text-text-icon-neutral-secondary hover:text-white transition flex items-center gap-1 font-medium">
+            Upgrade to unlock <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa">
+            <img src="https://cdn.openart.ai/assets/internal/uploads/image_iLDTHFIk_720x402_1782316634275.webp" className="w-full aspect-video object-cover" alt="MiniMax H3" />
+            <div className="p-5">
+              <h3 className="font-bold text-white text-[17px] mb-2">Unlimited MiniMax H3</h3>
+              <p className="text-[14px] text-text-icon-neutral-secondary mb-5 h-10">Create Videos, Refine Every Detail, Repeat Until Perfect</p>
+              <button className="bg-white text-black px-4 py-2.5 rounded-[10px] font-bold w-full hover:bg-gray-200 transition">Try Now</button>
+            </div>
+          </div>
+          
+          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa">
+            <img src="https://cdn.openart.ai/assets/internal/uploads/image_GPTImage2_1920x1080_1776806802000.webp" className="w-full aspect-video object-cover" alt="Seedance" />
+            <div className="p-5">
+              <h3 className="font-bold text-white text-[17px] mb-2">Seedance 2.0 Mini</h3>
+              <p className="text-[14px] text-text-icon-neutral-secondary mb-5 h-10">2x Faster • 50% Cheaper</p>
+              <button className="bg-white text-black px-4 py-2.5 rounded-[10px] font-bold w-full hover:bg-gray-200 transition">Try Now</button>
+            </div>
+          </div>
+          
+          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa">
+            <div className="w-full aspect-video bg-gradient-to-br from-[#1a1a2e] to-[#16213e] flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.8)_0%,transparent_70%)]" />
+              <Sparkles className="w-16 h-16 text-white/50" />
+            </div>
+            <div className="p-5">
+              <h3 className="font-bold text-white text-[17px] mb-2">GPT Image 2.0</h3>
+              <p className="text-[14px] text-text-icon-neutral-secondary mb-5 h-10">A New Era of Image Generation</p>
+              <button className="bg-white text-black px-4 py-2.5 rounded-[10px] font-bold w-full hover:bg-gray-200 transition">Try Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* OpenArt Suite */}
       <section className="px-4 md:px-6 max-w-[1200px] mx-auto mb-20">
         <div className="flex items-center justify-between mb-8">
@@ -115,6 +180,23 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-4">
                 <h3 className="text-white font-bold text-[15px]">{item.title}</h3>
                 <p className="text-[13px] text-text-icon-neutral-secondary">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Inspirations */}
+      <section className="px-4 md:px-6 max-w-[1200px] mx-auto mb-20 border-t border-normal-border pt-16">
+        <h2 className="text-3xl font-bold text-white mb-10 text-center">Inspirations</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {inspirations.map((insp, i) => (
+            <div key={i} className="bg-background-neutral-soft border border-normal-border rounded-[16px] p-6 hover:border-normal-border-hover transition group cursor-pointer flex flex-col h-full shadow-oa">
+              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">{insp.title}</h3>
+              <p className="text-[14px] text-text-icon-neutral-secondary mb-6 flex-1">{insp.desc}</p>
+              <div className="flex items-center text-[14px] font-bold text-white">
+                See all <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           ))}
