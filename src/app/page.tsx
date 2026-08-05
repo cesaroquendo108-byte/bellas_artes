@@ -31,23 +31,55 @@ export default function Home() {
 
       <Hero />
       
-      {/* Create From Claude/ChatGPT Banner */}
+      {/* Promo Grid (Claude, 40% Off, MiniMax) */}
       <section className="px-4 md:px-6 max-w-[1200px] mx-auto mt-8 mb-16">
-        <div className="bg-background-neutral-soft border border-normal-border rounded-[20px] p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-oa overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent pointer-events-none" />
-          <div className="flex-1 z-10">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold text-white tracking-wider uppercase">Crea desde Claude/ChatGPT</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* Claude Card */}
+          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] p-5 flex flex-col justify-between group cursor-pointer hover:border-normal-border-hover transition shadow-oa relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 w-32 h-32 opacity-20 pointer-events-none">
+              <Sparkles className="w-full h-full text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-4">Genera imágenes, video y personajes sin salir del chat.</h2>
-            <button className="bg-white text-black px-5 py-2.5 rounded-[12px] font-bold shadow-oa hover:bg-gray-100 transition">
-              Configurar MCP
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-white font-bold text-lg">Crea desde</span>
+                <span className="text-[#ff6b6b] font-bold text-lg flex items-center gap-1"><Sparkles className="w-4 h-4"/> Claude</span>
+                <span className="text-text-icon-neutral-secondary">/</span>
+                <span className="text-white font-bold text-lg">ChatGPT</span>
+              </div>
+              <p className="text-text-icon-neutral-secondary text-sm mb-6 max-w-[90%]">
+                Genera imágenes, video y personajes sin salir del chat.
+              </p>
+            </div>
+            <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-bold w-max transition">
+              Configurar MCP ↗
             </button>
           </div>
-          <div className="flex-1 z-10 flex justify-end">
-            <img src="https://cdn.openart.ai/assets/internal/uploads/image_ZhIc8shX_874x491_1784212536451.webp" alt="Claude Integration" className="rounded-[12px] border border-normal-border shadow-oa w-full max-w-sm" />
+
+          {/* 40% OFF Card */}
+          <div className="bg-gradient-to-br from-[#1a2f3f] to-[#0f1b29] border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa relative">
+            <img src="https://cdn.openart.ai/assets/internal/uploads/image_fRBhQME2_1200x675_1785398945074.webp" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt="Sale" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <div className="relative h-full p-5 flex flex-col justify-end">
+              <div className="bg-white/20 backdrop-blur-md rounded-full px-3 py-1 w-max mb-2">
+                <span className="text-white text-[10px] font-bold uppercase tracking-wider">Mejora para desbloquear</span>
+              </div>
+              <h3 className="font-bold text-white text-xl leading-tight">Hasta 40% de DESCUENTO en los mejores modelos</h3>
+            </div>
           </div>
+
+          {/* MiniMax H3 Card */}
+          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa relative">
+            <img src="https://cdn.openart.ai/assets/internal/uploads/image_iLDTHFIk_720x402_1782316634275.webp" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="MiniMax H3" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+            <div className="relative h-full p-5 flex flex-col justify-end">
+              <div className="bg-white/20 backdrop-blur-md rounded-full px-3 py-1 w-max mb-2">
+                <span className="text-white text-[10px] font-bold uppercase tracking-wider">Desbloquea Ilimitado</span>
+              </div>
+              <h3 className="font-bold text-white text-lg leading-tight">MiniMax H3 Ilimitado: Crea Videos, Refina, Repite</h3>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -85,50 +117,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Unlock Unlimited */}
-      <section className="px-4 md:px-6 max-w-[1200px] mx-auto mb-20">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Desbloquea Uso Ilimitado</h2>
-            <p className="text-text-icon-neutral-secondary">Hasta 40% de DESCUENTO en los mejores modelos</p>
-          </div>
-          <button className="text-text-icon-neutral-secondary hover:text-white transition flex items-center gap-1 font-medium">
-            Mejorar Plan <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa">
-            <img src="https://cdn.openart.ai/assets/internal/uploads/image_iLDTHFIk_720x402_1782316634275.webp" className="w-full aspect-video object-cover" alt="MiniMax H3" />
-            <div className="p-5">
-              <h3 className="font-bold text-white text-[17px] mb-2">MiniMax H3 Ilimitado</h3>
-              <p className="text-[14px] text-text-icon-neutral-secondary mb-5 h-10">Crea videos, refina cada detalle, repite hasta que sea perfecto</p>
-              <button className="bg-white text-black px-4 py-2.5 rounded-[10px] font-bold w-full hover:bg-gray-200 transition">Probar Ahora</button>
-            </div>
-          </div>
-          
-          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa">
-            <img src="https://cdn.openart.ai/assets/internal/uploads/image_GPTImage2_1920x1080_1776806802000.webp" className="w-full aspect-video object-cover" alt="Seedance" />
-            <div className="p-5">
-              <h3 className="font-bold text-white text-[17px] mb-2">Seedance 2.0 Mini</h3>
-              <p className="text-[14px] text-text-icon-neutral-secondary mb-5 h-10">2x Más Rápido • 50% Más Barato</p>
-              <button className="bg-white text-black px-4 py-2.5 rounded-[10px] font-bold w-full hover:bg-gray-200 transition">Probar Ahora</button>
-            </div>
-          </div>
-          
-          <div className="bg-background-neutral-soft border border-normal-border rounded-[16px] overflow-hidden group cursor-pointer hover:border-normal-border-hover transition shadow-oa">
-            <div className="w-full aspect-video bg-gradient-to-br from-[#1a1a2e] to-[#16213e] flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.8)_0%,transparent_70%)]" />
-              <Sparkles className="w-16 h-16 text-white/50" />
-            </div>
-            <div className="p-5">
-              <h3 className="font-bold text-white text-[17px] mb-2">GPT Image 2.0</h3>
-              <p className="text-[14px] text-text-icon-neutral-secondary mb-5 h-10">Una Nueva Era de Generación de Imágenes</p>
-              <button className="bg-white text-black px-4 py-2.5 rounded-[10px] font-bold w-full hover:bg-gray-200 transition">Probar Ahora</button>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* OpenArt Suite */}
       <section className="px-4 md:px-6 max-w-[1200px] mx-auto mb-20">
