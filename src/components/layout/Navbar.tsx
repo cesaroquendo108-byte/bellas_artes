@@ -21,7 +21,7 @@ export function Navbar() {
             <Search className="w-4 h-4 text-text-icon-neutral-secondary absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
               type="text" 
-              placeholder="Search images, videos, models..." 
+              placeholder="Buscar imágenes, videos, modelos..." 
               className="bg-background-neutral-soft border border-normal-border hover:border-normal-border-hover text-white text-sm rounded-full pl-10 pr-4 py-2 w-64 md:w-96 outline-none transition-all focus:border-primary/50 focus:bg-background-container"
             />
           </div>
@@ -38,7 +38,7 @@ export function Navbar() {
             className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-full text-sm font-bold transition shadow-oa"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Upgrade</span>
+            <span>Mejorar Plan</span>
           </button>
           
           <div className="w-9 h-9 rounded-full bg-background-neutral-soft flex items-center justify-center border border-normal-border cursor-pointer hover:border-normal-border-hover transition">

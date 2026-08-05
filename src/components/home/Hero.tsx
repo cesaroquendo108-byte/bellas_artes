@@ -12,10 +12,10 @@ export function Hero() {
 
   const tabs = [
     { id: 'director', label: 'Director', icon: Clapperboard, isNew: true },
-    { id: 'image', label: 'Image', icon: ImageIcon },
+    { id: 'image', label: 'Imagen', icon: ImageIcon },
     { id: 'video', label: 'Video', icon: Video },
-    { id: 'character', label: 'Character', icon: User },
-    { id: 'world', label: 'World', icon: Globe },
+    { id: 'character', label: 'Personaje', icon: User },
+    { id: 'world', label: 'Mundo', icon: Globe },
     { id: 'audio', label: 'Audio', icon: Music },
   ];
 
@@ -39,10 +39,10 @@ export function Hero() {
       if (res.ok && data.success) {
         setResultUrl(data.outputUrl);
       } else {
-        setErrorMsg(data.error || 'Error generating content');
+        setErrorMsg(data.error || 'Error generando contenido');
       }
     } catch (err) {
-      setErrorMsg('Connection error');
+      setErrorMsg('Error de conexión');
     } finally {
       setGenerating(false);
     }
@@ -53,7 +53,7 @@ export function Hero() {
       
       <div className="relative mb-8 text-center mt-8">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8">
-          What would you like to create today?
+          ¿Qué te gustaría crear hoy?
         </h1>
         
         {/* Pointer decoration mimicking the OpenArt reference */}
@@ -80,7 +80,7 @@ export function Hero() {
             {tab.label}
             {tab.isNew && (
               <span className="absolute -top-2 -right-2 bg-[#8b5cf6] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                New
+                Nuevo
               </span>
             )}
           </button>
@@ -92,7 +92,7 @@ export function Hero() {
           type="text" 
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder={`Describe the ${activeTab} you want to generate...`} 
+          placeholder="Describe lo que quieres generar..." 
           className="flex-1 bg-transparent border-none text-white px-4 py-3 outline-none placeholder:text-text-icon-neutral-secondary text-[15px]"
           disabled={generating}
           onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
@@ -103,7 +103,7 @@ export function Hero() {
           className="bg-primary disabled:opacity-50 hover:bg-primary/90 text-white px-6 py-3 rounded-[14px] font-semibold transition flex items-center gap-2 shadow-oa"
         >
           {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          Generate
+          Generar
         </button>
       </div>
 

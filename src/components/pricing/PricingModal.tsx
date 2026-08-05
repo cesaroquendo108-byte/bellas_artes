@@ -12,7 +12,7 @@ const packages = [
 
 export function PricingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [selectedPkg, setSelectedPkg] = useState<string | null>(null);
-  const [bcvRate, setBcvRate] = useState<number>(45.5);
+  const [bcvRate, setBcvRate] = useState<number>(752.09);
   const [uploading, setUploading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'manual' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -90,7 +90,7 @@ export function PricingModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {packages.map((pkg) => {
-            const finalBsPrice = (pkg.priceUsd * bcvRate * 1.2).toFixed(2);
+            const finalBsPrice = (pkg.priceUsd * bcvRate).toFixed(2);
             return (
               <div 
                 key={pkg.id} 
@@ -113,7 +113,7 @@ export function PricingModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                   <span className="text-muted-foreground text-sm">USD</span>
                 </div>
                 <div className="text-sm font-medium text-green-400 mb-3 bg-green-400/10 px-2 py-1 rounded-md self-start">
-                  Bs. {finalBsPrice} <span className="text-xs text-green-400/70">(Tasa BCV +20%)</span>
+                  Bs. {finalBsPrice} <span className="text-xs text-green-400/70">(Tasa BCV del día)</span>
                 </div>
                 <p className="text-muted-foreground text-sm flex-1">{pkg.description}</p>
                 <div className="mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
@@ -162,7 +162,7 @@ export function PricingModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                     <span className="text-muted-foreground">Cédula:</span> <span>V-12345678</span>
                     <span className="text-muted-foreground">Monto exacto:</span> 
                     <span className="text-green-400 font-bold text-lg">
-                      Bs. {(packages.find(p => p.id === selectedPkg)!.priceUsd * bcvRate * 1.2).toFixed(2)}
+                      Bs. {(packages.find(p => p.id === selectedPkg)!.priceUsd * bcvRate).toFixed(2)}
                     </span>
                   </div>
                 </div>
