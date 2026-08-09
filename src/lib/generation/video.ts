@@ -34,7 +34,7 @@ export const videoGenerationRequestSchema = z
   .superRefine((value, context) => {
     const requirePrompt = value.operation === "t2v"
     if (requirePrompt && !value.prompt) {
-      context.addIssue({ code: "custom", path: ["prompt"], message: "Text to Video requiere un prompt." })
+      context.addIssue({ code: "custom", path: ["prompt"], message: "La operación de texto a video requiere una descripción." })
     }
 
     const sourceRequired = ["i2v", "v2v", "action-sync", "effects", "upscale", "lip-sync", "replace-character", "extend"].includes(value.operation)

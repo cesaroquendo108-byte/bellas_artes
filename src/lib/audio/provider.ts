@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getAudioProviderEnv } from "@/lib/env";
+import { getGenerationConfig, isGenerationRouteConfigured } from "@/lib/generation/config";
 import type { AudioJobKind, AudioProviderState } from "./types";
 
 export interface AudioProviderJobInput {
@@ -56,12 +57,21 @@ export function getAudioProvider(): AudioProvider {
 
 export function getAudioProviderStatus() {
   const config = getAudioProviderEnv();
+  const generation = getGenerationConfig();
+  const openSourceWorkflowConfigured = Boolean(
+    isGenerationRouteConfigured({ providerRoute: generation.route ?? "vast", workflowVersion: "audio/f5-tts-es-v1" })
+      || isGenerationRouteConfigured({ providerRoute: generation.route ?? "vast", workflowVersion: "audio/rvc-v1" }),
+  );
   return {
-    state: "provider_unconfigured" as const,
-    provider: config.provider,
-    credentialsPresent: config.apiKeyConfigured,
-    message: config.provider === "disabled"
-      ? "La generación de audio está deshabilitada hasta conectar un proveedor aprobado."
-      : "Hay configuración parcial, pero todavía no existe un adaptador de audio aprobado.",
+    state: openSourceWorkflowConfigured ? "configured" as const : "provider_unconfigured" as const,
+    provider: openSourceWorkflowConfigured ? "f5-tts/rvc" : config.provider,
+    credentialsPresent: openSourceWorkflowConfigured || config.apiKeyConfigured,
+    message: openSourceWorkflowConfigured
+      ? "Audio open source preparado con F5-TTS y RVC mediante el worker."
+      : config.provider === "disabled"
+        ? "La generación de audio está deshabilitada hasta conectar un workflow open source aprobado."
+        : generation.enabled
+          ? "Hay infraestructura de generación, pero falta el workflow de audio aprobado."
+          : "La generación de audio está deshabilitada hasta conectar un proveedor aprobado.",
   };
 }

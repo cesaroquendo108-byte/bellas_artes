@@ -36,7 +36,7 @@ const quickStarts: QuickStartItem[] = [
   },
   {
     title: "Crear mundo",
-    description: "Diseña un entorno por prompt",
+    description: "Diseña un entorno por descripción",
     href: "/world?mode=create",
     icon: Castle,
     gradient: "from-blue-600 to-violet-700",

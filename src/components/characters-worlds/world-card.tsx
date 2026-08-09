@@ -55,7 +55,7 @@ export function WorldCard({ asset }: { asset: CharacterWorldAsset }) {
         <DialogHeader>
           <DialogTitle>{asset.name}</DialogTitle>
           <DialogDescription>
-            Preview del mundo y metadata guardada.
+            Vista previa del mundo y metadatos guardados.
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4 aspect-video overflow-hidden rounded-xl bg-black">
@@ -72,7 +72,7 @@ export function WorldCard({ asset }: { asset: CharacterWorldAsset }) {
             </p>
           </div>
           <div>
-            <p className="text-slate-600">Seed</p>
+            <p className="text-slate-600">Semilla</p>
             <p className="mt-1 text-slate-300">
               {asset.seed ?? "No registrada"}
             </p>

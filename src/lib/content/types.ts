@@ -12,12 +12,12 @@ const contentBaseSchema = z.object({
 })
 
 export const blogMetadataSchema = contentBaseSchema.extend({
-  category: z.enum(["Featured", "Case Studies", "Bellas Artes Updates", "Feature Guides", "Video Guides", "Image Guides"]),
+  category: z.enum(["Destacados", "Casos de estudio", "Novedades de Bellas Artes", "Guías de funciones", "Guías de video", "Guías de imagen"]),
   featured: z.boolean().optional(),
 }).strict()
 
 export const tutorialMetadataSchema = contentBaseSchema.extend({
-  category: z.enum(["Image Generation", "Video", "Editing"]),
+  category: z.enum(["Generación de imágenes", "Video", "Edición"]),
   level: z.enum(["beginner", "pro"]),
   duration: z.string().trim().min(1).max(40),
   mediaType: z.enum(["video", "guide"]),
@@ -35,12 +35,12 @@ export interface ContentMetadataBase {
 }
 
 export interface EditorialMetadata extends ContentMetadataBase {
-  category: "Featured" | "Case Studies" | "Bellas Artes Updates" | "Feature Guides" | "Video Guides" | "Image Guides"
+  category: "Destacados" | "Casos de estudio" | "Novedades de Bellas Artes" | "Guías de funciones" | "Guías de video" | "Guías de imagen"
   featured?: boolean
 }
 
 export interface TutorialMetadata extends ContentMetadataBase {
-  category: "Image Generation" | "Video" | "Editing"
+  category: "Generación de imágenes" | "Video" | "Edición"
   level: "beginner" | "pro"
   duration: string
   mediaType: "video" | "guide"

@@ -36,12 +36,12 @@ const categories: {
   label: string;
   kind?: ResourceKind;
 }[] = [
-  { value: "all", label: "All" },
-  { value: "characters", label: "Characters", kind: "character" },
-  { value: "worlds", label: "Worlds", kind: "world" },
-  { value: "objects", label: "Objects", kind: "object" },
-  { value: "backgrounds", label: "Backgrounds", kind: "background" },
-  { value: "styles", label: "Styles", kind: "style" },
+  { value: "all", label: "Todos" },
+  { value: "characters", label: "Personajes", kind: "character" },
+  { value: "worlds", label: "Mundos", kind: "world" },
+  { value: "objects", label: "Objetos", kind: "object" },
+  { value: "backgrounds", label: "Fondos", kind: "background" },
+  { value: "styles", label: "Estilos", kind: "style" },
 ];
 
 function quickStarts(category: UnifiedCategory): QuickStartItem[] {
@@ -49,13 +49,13 @@ function quickStarts(category: UnifiedCategory): QuickStartItem[] {
     return [
       {
         title: "Crear mundo",
-        description: "Diseña un entorno por prompt",
+        description: "Diseña un entorno por descripción",
         href: "/world?mode=create",
         icon: Sparkles,
         gradient: "from-blue-600 to-violet-700",
       },
       {
-        title: "Browse Worlds",
+        title: "Explorar mundos",
         description: "Abre la biblioteca inmersiva",
         href: "/world",
         icon: Layers3,
@@ -73,13 +73,13 @@ function quickStarts(category: UnifiedCategory): QuickStartItem[] {
       },
       {
         title: "Crear mundo",
-        description: "Diseña un entorno por prompt",
+        description: "Diseña un entorno por descripción",
         href: "/world?mode=create",
         icon: Sparkles,
         gradient: "from-blue-600 to-violet-700",
       },
       {
-        title: "Image Studio",
+        title: "Estudio de imágenes",
         description: "Reutiliza recursos visuales",
         href: "/image",
         icon: ImageIcon,
@@ -228,7 +228,7 @@ export function CharactersAndWorldsHub({
                   />
                   <p className="mt-3 text-xs leading-5 text-slate-500">
                     {asset.prompt ??
-                      "No hay prompt disponible para este asset."}
+                      "No hay descripción disponible para este recurso."}
                   </p>
                 </DialogContent>
               </Dialog>
@@ -242,7 +242,7 @@ export function CharactersAndWorldsHub({
               No hay recursos reales en esta categoría
             </p>
             <p className="mt-1 text-xs text-slate-600">
-              Los assets sin metadata permanecen visibles únicamente en All.
+              Los recursos sin metadatos permanecen visibles únicamente en Todos.
             </p>
           </div>
         )}

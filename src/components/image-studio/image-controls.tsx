@@ -96,7 +96,7 @@ export function ImageControls({
               </div>
               <div>
                 <h1 className="text-base font-semibold tracking-tight text-white">
-                  Image Studio
+                  Estudio de imágenes
                 </h1>
                 <p className="text-[11px] text-slate-500">
                   Crea, explora y vuelve a imaginar
@@ -112,13 +112,13 @@ export function ImageControls({
             }
           >
             <TabsList className="w-full bg-white/[0.05]">
-              <TabsTrigger value="create">Create Image</TabsTrigger>
-              <TabsTrigger value="variation">Image Variations</TabsTrigger>
+              <TabsTrigger value="create">Crear imagen</TabsTrigger>
+              <TabsTrigger value="variation">Variaciones de imagen</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <div className="space-y-2">
-            <Label>Model</Label>
+            <Label>Modelo</Label>
             <Select
               value={settings.model}
               itemToStringLabel={(value) =>
@@ -142,7 +142,7 @@ export function ImageControls({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="image-prompt">Prompt</Label>
+              <Label htmlFor="image-prompt">Descripción</Label>
               <span className="text-[10px] text-slate-600">
                 {settings.prompt.length.toLocaleString("es-VE")} caracteres
               </span>
@@ -165,7 +165,7 @@ export function ImageControls({
           />
 
           <div className="space-y-2">
-            <Label>Saved Brand Kit</Label>
+            <Label>Kit de marca guardado</Label>
             <Select
               value={selectedBrandKitId ?? "none"}
               onValueChange={(value) =>
@@ -176,7 +176,7 @@ export function ImageControls({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="start">
-                <SelectItem value="none">Sin Brand Kit</SelectItem>
+                <SelectItem value="none">Sin kit de marca</SelectItem>
                 {brandKits.map((kit) => (
                   <SelectItem key={kit.id} value={kit.id}>
                     {kit.name} · {kit.assets.length} referencias
@@ -194,9 +194,9 @@ export function ImageControls({
 
           <div className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
             <div>
-              <Label htmlFor="auto-polish">Auto Polish</Label>
+              <Label htmlFor="auto-polish">Mejora automática</Label>
               <p className="mt-1 text-[10px] text-slate-500">
-                Mejora el prompt antes de generar
+                Mejora la descripción antes de generar
               </p>
             </div>
             <Switch
@@ -246,7 +246,7 @@ export function ImageControls({
             </CardHeader>
             <CardContent className="space-y-4 px-3">
               <SliderControl
-                label="CFG Scale"
+                label="Escala CFG"
                 value={settings.cfgScale}
                 min={1}
                 max={20}
@@ -296,7 +296,7 @@ export function ImageControls({
           ) : (
             <WandSparkles className="size-4" />
           )}
-          {isSubmitting ? "Preparando..." : "Generate Image"}
+          {isSubmitting ? "Preparando..." : "Generar imagen"}
           <Badge className="ml-auto border border-white/15 bg-black/20 text-[10px] text-white">
             <Coins className="size-3" /> 0 ahora
           </Badge>

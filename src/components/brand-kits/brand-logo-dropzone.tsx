@@ -67,7 +67,7 @@ export function BrandLogoDropzone({
         <div className="mt-4 flex items-center gap-3 rounded-xl border border-violet-400/20 bg-violet-500/[0.06] p-3">
           <img
             src={preview}
-            alt="Preview local"
+            alt="Vista previa local"
             className="size-12 rounded-lg object-contain"
           />
           <LoaderCircle className="ml-auto size-4 animate-spin text-violet-300" />

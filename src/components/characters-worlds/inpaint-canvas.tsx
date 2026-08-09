@@ -140,7 +140,7 @@ export function InpaintCanvas({ imageUrl }: { imageUrl?: string }) {
           </Button>
         </div>
         <div className="space-y-2">
-          <Label className="text-xs">Prompt de reemplazo</Label>
+          <Label className="text-xs">Descripción de reemplazo</Label>
           <Textarea
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}

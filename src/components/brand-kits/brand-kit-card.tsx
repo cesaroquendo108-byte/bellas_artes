@@ -35,7 +35,7 @@ export function BrandKitCard({ kit }: { kit: BrandKit }) {
               {kit.name}
             </h2>
             <p className="mt-1 text-[10px] text-slate-600">
-              {kit.assets.length} assets · {kit.colors.length} colores
+              {kit.assets.length} recursos · {kit.colors.length} colores
             </p>
           </div>
           <ArrowRight className="size-4 text-slate-600 transition group-hover:translate-x-1 group-hover:text-violet-300" />

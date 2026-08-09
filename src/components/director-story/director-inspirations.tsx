@@ -24,7 +24,7 @@ export function DirectorInspirations({
   return (
     <section className="mt-14 pb-12">
       <div className="mb-5">
-        <h2 className="text-xl font-semibold text-white">Inspirations</h2>
+        <h2 className="text-xl font-semibold text-white">Inspiraciones</h2>
         <p className="mt-1 text-xs text-slate-600">
           Historias publicadas por la comunidad.
         </p>

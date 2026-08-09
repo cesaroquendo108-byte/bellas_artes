@@ -16,7 +16,14 @@ import { cn } from "@/lib/utils";
 
 import type { ImageGalleryAsset } from "./types";
 
-const filters = ["Unsorted", "Labels", "Folders", "Templates", "All"] as const;
+const filters = ["unsorted", "labels", "folders", "templates", "all"] as const;
+const filterLabels: Record<(typeof filters)[number], string> = {
+  unsorted: "Sin clasificar",
+  labels: "Etiquetas",
+  folders: "Carpetas",
+  templates: "Plantillas",
+  all: "Todos",
+};
 type GalleryFilter = (typeof filters)[number];
 
 interface ImageGalleryProps {
@@ -27,10 +34,10 @@ interface ImageGalleryProps {
 
 export function ImageGallery({ assets, error, onRecreate }: ImageGalleryProps) {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<GalleryFilter>("All");
+  const [filter, setFilter] = useState<GalleryFilter>("all");
 
   const filteredAssets = useMemo(() => {
-    if (!["All", "Unsorted"].includes(filter)) return [];
+    if (!["all", "unsorted"].includes(filter)) return [];
     const normalizedQuery = query.trim().toLocaleLowerCase("es-VE");
     if (!normalizedQuery) return assets;
     return assets.filter((asset) =>
@@ -85,7 +92,7 @@ export function ImageGallery({ assets, error, onRecreate }: ImageGalleryProps) {
                   : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white",
               )}
             >
-              {item}
+              {filterLabels[item]}
             </button>
           ))}
         </div>
@@ -137,7 +144,7 @@ export function ImageGallery({ assets, error, onRecreate }: ImageGalleryProps) {
                     className="mt-3 w-full bg-white text-black hover:bg-slate-100"
                     onClick={() => onRecreate(asset)}
                   >
-                    <RotateCcw className="size-3.5" /> Recreate
+                    <RotateCcw className="size-3.5" /> Recrear
                   </Button>
                 </div>
               </article>
@@ -166,7 +173,7 @@ function EmptyGallery({
 }) {
   const isFiltered =
     hasAssets &&
-    (Boolean(query.trim()) || !["All", "Unsorted"].includes(filter));
+    (Boolean(query.trim()) || !["all", "unsorted"].includes(filter));
   return (
     <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-white/[0.09] bg-gradient-to-b from-white/[0.025] to-transparent px-6 text-center">
       <div className="max-w-sm">
@@ -184,7 +191,7 @@ function EmptyGallery({
         </h3>
         <p className="mt-2 text-xs leading-5 text-slate-500">
           {isFiltered
-            ? "Prueba otro término o vuelve al filtro All."
+            ? "Prueba otro término o vuelve al filtro Todos."
             : "Cuando conectemos el motor de generación, tus imágenes reales aparecerán en este espacio."}
         </p>
         {!isFiltered && (

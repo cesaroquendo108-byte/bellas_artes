@@ -131,7 +131,7 @@ export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
       </div>
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label className="text-xs text-slate-400">Prompt del mundo</Label>
+            <Label className="text-xs text-slate-400">Descripción del mundo</Label>
           <Textarea
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
@@ -178,7 +178,7 @@ export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-[10px]">
-            <Label>CFG Scale</Label>
+            <Label>Escala CFG</Label>
             <span className="text-violet-300">{cfgScale}</span>
           </div>
           <Slider
@@ -193,7 +193,7 @@ export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
         </div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <Label className="text-[10px]">Seed</Label>
+            <Label className="text-[10px]">Semilla</Label>
             <Switch checked={randomSeed} onCheckedChange={setRandomSeed} />
           </div>
           <Input
@@ -207,7 +207,7 @@ export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
           <div className="overflow-hidden rounded-xl border border-violet-400/20">
             <div className="flex items-center gap-2 p-2">
               <Badge className="text-[9px]">
-                {localReference ? "Vista previa local" : "Asset guardado"}
+                {localReference ? "Vista previa local" : "Recurso guardado"}
               </Badge>
               <span className="min-w-0 flex-1 truncate text-[9px] text-slate-500">
                 {localReference?.file.name ?? savedReference?.name}
@@ -258,7 +258,7 @@ export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
               >
                 <SelectTrigger className="w-full">
                   <FolderOpen className="size-3.5" />
-                  <SelectValue placeholder="Elegir asset guardado" />
+                  <SelectValue placeholder="Elegir recurso guardado" />
                 </SelectTrigger>
                 <SelectContent>
                   {imageAssets.map((asset) => (

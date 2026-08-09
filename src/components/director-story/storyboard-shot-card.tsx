@@ -95,7 +95,7 @@ export function StoryboardShotCard({
           }
         >
           <Copy />
-          <span className="sr-only">Duplicar shot</span>
+          <span className="sr-only">Duplicar plano</span>
         </Button>
         <Button
           type="button"
@@ -110,13 +110,13 @@ export function StoryboardShotCard({
           }
         >
           <Trash2 className="text-rose-400" />
-          <span className="sr-only">Eliminar shot</span>
+          <span className="sr-only">Eliminar plano</span>
         </Button>
       </div>
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_170px]">
         <div className="space-y-2">
           <Label className="text-[10px] text-slate-500">
-            Prompt y dirección
+          Descripción y dirección
           </Label>
           <Textarea
             value={shot.prompt}
@@ -231,7 +231,7 @@ export function StoryboardShotCard({
           >
             <SelectTrigger className="h-7 w-auto min-w-40">
               <ImagePlus className="size-3" />
-              <SelectValue placeholder="Añadir asset" />
+              <SelectValue placeholder="Añadir recurso" />
             </SelectTrigger>
             <SelectContent>
               {assets.map((asset) => (

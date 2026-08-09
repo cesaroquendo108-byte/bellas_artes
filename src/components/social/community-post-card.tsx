@@ -45,7 +45,7 @@ export function CommunityPostCard({ post }: { post: CommunityPost }) {
             )}
             <div className="absolute inset-0 bg-black/10 transition group-hover:bg-black/50" />
             <span className="absolute inset-0 m-auto flex h-fit w-fit rounded-lg bg-violet-600 px-4 py-2 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
-              Direct this
+              Dirigir esto
             </span>
             {!post.signedUrl && (
               <span className="absolute inset-0 flex items-center justify-center text-xs text-slate-600">

@@ -90,7 +90,7 @@ export function CommunityModeration({ posts }: { posts: CommunityPost[] }) {
                 )
               ) : (
                 <div className="flex size-full items-center justify-center text-xs text-amber-200">
-                  El asset no está disponible.
+                  El recurso no está disponible.
                 </div>
               )}
             </div>

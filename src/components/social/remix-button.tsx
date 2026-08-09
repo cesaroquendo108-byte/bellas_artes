@@ -58,7 +58,7 @@ export function RemixButton({
         className="bg-violet-600 text-white shadow-lg shadow-violet-500/20 hover:bg-violet-500"
       >
         {loading ? <LoaderCircle className="animate-spin" /> : <WandSparkles />}{" "}
-        Direct this
+        Dirigir esto
       </Button>
       {error && (
         <p role="status" className="mt-2 text-[10px] text-rose-300">

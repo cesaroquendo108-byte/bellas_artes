@@ -255,7 +255,7 @@ export function ImageStudio({
           <WandSparkles className="size-4 text-white" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-white">Image Studio</p>
+          <p className="text-sm font-semibold text-white">Estudio de imágenes</p>
           <p className="truncate text-[10px] text-slate-500">
             GPT Image 2 · {settings.aspectRatio} · {settings.resolution}
           </p>
@@ -303,7 +303,7 @@ export function ImageStudio({
           className="h-[92dvh] max-h-[92dvh] gap-0 overflow-hidden rounded-t-3xl border-white/10 bg-[#101012] p-0 text-white lg:hidden"
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Image Studio controls</SheetTitle>
+        <SheetTitle>Controles del estudio de imágenes</SheetTitle>
             <SheetDescription>
               Configura el modelo, las referencias y los parámetros de
               generación.

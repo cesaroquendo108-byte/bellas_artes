@@ -21,25 +21,25 @@ export interface MediaHubAsset {
 }
 
 const tools = [
-  { name: "Frame to Video", href: "/video/i2v", icon: ImagePlay, gradient: "from-pink-600 to-violet-700" },
-  { name: "Text to Video", href: "/video/t2v", icon: Clapperboard, gradient: "from-violet-600 to-indigo-700" },
-  { name: "Edit Video", href: "/video/v2v", icon: Layers3, gradient: "from-indigo-600 to-cyan-700" },
+  { name: "Imagen a video", href: "/video/i2v", icon: ImagePlay, gradient: "from-pink-600 to-violet-700" },
+  { name: "Texto a video", href: "/video/t2v", icon: Clapperboard, gradient: "from-violet-600 to-indigo-700" },
+  { name: "Editar video", href: "/video/v2v", icon: Layers3, gradient: "from-indigo-600 to-cyan-700" },
   { name: "VFX", href: "/video/effects", icon: WandSparkles, gradient: "from-rose-600 to-orange-600" },
-  { name: "Motion Sync", href: "/video/action-sync", icon: Orbit, gradient: "from-orange-500 to-fuchsia-700" },
-  { name: "Lip-Sync", href: "/video/lip-sync", icon: Mic2, gradient: "from-violet-600 to-pink-600" },
-  { name: "Upscale Video", href: "/video/upscale", icon: Maximize2, gradient: "from-emerald-600 to-cyan-600" },
-  { name: "Replace Character", href: "/video/replace-character", icon: Film, gradient: "from-amber-500 to-violet-700" },
-  { name: "Extend Video", href: "/video/extend", icon: Expand, gradient: "from-blue-600 to-violet-700" },
-  { name: "Smart Shot", icon: Sparkles, gradient: "from-slate-700 to-violet-800" },
-  { name: "Replace Background", icon: ImagePlay, gradient: "from-teal-700 to-slate-800" },
-  { name: "Add Sound Effect", icon: AudioLines, gradient: "from-fuchsia-700 to-blue-800" },
+  { name: "Sincronizar movimiento", href: "/video/action-sync", icon: Orbit, gradient: "from-orange-500 to-fuchsia-700" },
+  { name: "Sincronía labial", href: "/video/lip-sync", icon: Mic2, gradient: "from-violet-600 to-pink-600" },
+  { name: "Mejorar video", href: "/video/upscale", icon: Maximize2, gradient: "from-emerald-600 to-cyan-600" },
+  { name: "Reemplazar personaje", href: "/video/replace-character", icon: Film, gradient: "from-amber-500 to-violet-700" },
+  { name: "Extender video", href: "/video/extend", icon: Expand, gradient: "from-blue-600 to-violet-700" },
+  { name: "Toma inteligente", icon: Sparkles, gradient: "from-slate-700 to-violet-800" },
+  { name: "Reemplazar fondo", icon: ImagePlay, gradient: "from-teal-700 to-slate-800" },
+  { name: "Añadir efecto de sonido", icon: AudioLines, gradient: "from-fuchsia-700 to-blue-800" },
 ]
 
 const filters = [
-  { value: "all", label: "All" },
-  { value: "unsorted", label: "Unsorted" },
-  { value: "labels", label: "Labels" },
-  { value: "folders", label: "Folders" },
+  { value: "all", label: "Todos" },
+  { value: "unsorted", label: "Sin clasificar" },
+  { value: "labels", label: "Etiquetas" },
+  { value: "folders", label: "Carpetas" },
 ] as const
 
 type Filter = (typeof filters)[number]["value"]
@@ -102,8 +102,8 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
       <section className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-r from-purple-950/70 via-[#111114] to-black p-7 sm:p-10">
         <div className="absolute top-[-6rem] right-[-2rem] size-72 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="relative max-w-2xl">
-          <Badge className="border border-violet-400/20 bg-white/10 text-violet-100">Media Hub</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Free AI Video Creation</h1>
+          <Badge className="border border-violet-400/20 bg-white/10 text-violet-100">Centro de medios</Badge>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Creación gratuita de videos con IA</h1>
           <p className="mt-3 text-sm leading-6 text-slate-400">Accede a tus herramientas y organiza imágenes, videos y audio desde una única biblioteca privada.</p>
           <div className="mt-5 flex flex-wrap gap-2">{["Kling 3.0", "Seedance", "Sora 2", "Veo 3.1"].map((model) => <Badge key={model} variant="outline" className="border-white/10 bg-white/[0.06] text-slate-300">{model}</Badge>)}</div>
           <Button render={<Link href="/video/t2v" />} nativeButton={false} size="lg" className="mt-7 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"><Clapperboard /> Crear gratis</Button>
@@ -111,7 +111,7 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
       </section>
 
       <section className="mt-10">
-        <div className="mb-4"><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-300">Quick starts</p><h2 className="mt-2 text-xl font-semibold">Herramientas de video</h2></div>
+        <div className="mb-4"><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-300">Accesos rápidos</p><h2 className="mt-2 text-xl font-semibold">Herramientas de video</h2></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
           {tools.map(({ name, href, icon: Icon, gradient }) => {
             const content = <><div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-70 transition duration-300 group-hover:scale-110 group-hover:opacity-90`} /><Icon className="absolute top-4 left-4 size-6 text-white/90" /><div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 to-transparent p-3 pt-8"><p className="text-xs font-medium text-white">{name}</p>{!href && <span className="mt-1 block text-[9px] text-slate-400">Próximamente</span>}</div></>
@@ -124,12 +124,12 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
 
       <section className="mt-12 pb-24">
         <div className="flex flex-col gap-4 border-b border-white/[0.08] pb-4 lg:flex-row lg:items-end lg:justify-between">
-          <div><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-300">Your media</p><h2 className="mt-2 text-xl font-semibold">Biblioteca</h2></div>
+          <div><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-300">Tus medios</p><h2 className="mt-2 text-xl font-semibold">Biblioteca</h2></div>
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row">
             <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl border border-white/[0.08] bg-white/[0.025] p-1">
               {filters.map((item) => <button key={item.value} type="button" onClick={() => { setFilter(item.value); lastIndex.current = null }} className={cn("min-w-fit rounded-lg px-3 py-2 text-[11px] transition", filter === item.value ? "bg-violet-500 text-white" : "text-slate-500 hover:text-white")}>{item.label}</button>)}
             </div>
-            <label className="relative min-w-0 sm:w-64"><Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-600" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar assets…" className="w-full border-white/10 bg-white/[0.03] pl-9" /></label>
+          <label className="relative min-w-0 sm:w-64"><Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-600" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar recursos…" className="w-full border-white/10 bg-white/[0.03] pl-9" /></label>
           </div>
         </div>
 
@@ -149,7 +149,7 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
             })}
           </div>
         )}
-        {!libraryError && visibleAssets.length === 0 && <div className="mt-5 flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center"><FolderOpen className="size-8 text-slate-700" /><p className="mt-4 text-sm font-medium text-slate-400">{initialAssets.length ? "No hay assets con este filtro" : "Tu biblioteca está vacía"}</p><p className="mt-1 text-xs text-slate-600">Los resultados reales aparecerán aquí cuando guardes contenido.</p></div>}
+        {!libraryError && visibleAssets.length === 0 && <div className="mt-5 flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center"><FolderOpen className="size-8 text-slate-700" /><p className="mt-4 text-sm font-medium text-slate-400">{initialAssets.length ? "No hay recursos con este filtro" : "Tu biblioteca está vacía"}</p><p className="mt-1 text-xs text-slate-600">Los resultados reales aparecerán aquí cuando guardes contenido.</p></div>}
       </section>
 
       {selected.size > 0 && (

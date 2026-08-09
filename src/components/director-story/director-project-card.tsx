@@ -154,7 +154,7 @@ export function DirectorProjectCard({ project }: { project: CreativeProject }) {
           <DialogHeader>
             <DialogTitle>Eliminar “{project.title}”</DialogTitle>
             <DialogDescription>
-              Se eliminará el proyecto narrativo. Los assets vinculados
+              Se eliminará el proyecto narrativo. Los recursos vinculados
               permanecerán en tu biblioteca.
             </DialogDescription>
           </DialogHeader>

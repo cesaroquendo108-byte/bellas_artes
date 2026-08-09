@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server"
 
-import { worldGenerationRequestSchema, type CharacterWorldJobResponse } from "@/lib/generation/character-world"
-import { createClient } from "@/utils/supabase/server"
+import { worldGenerationRequestSchema } from "@/lib/generation/character-world"
+import { resolveWorldRoute } from "@/lib/generation/registry"
+import { enqueueGeneration, generationErrorResponse, requireGenerationUser } from "@/lib/generation/service"
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 })
+  let user
+  try {
+    user = await requireGenerationUser()
+  } catch (error) {
+    const result = generationErrorResponse(error)
+    return NextResponse.json(result.body, { status: result.status })
+  }
 
   const body = await request.json().catch(() => null)
   if (!body) return NextResponse.json({ errorCode: "INVALID_JSON", message: "El cuerpo de la solicitud no es JSON válido." }, { status: 400 })
@@ -21,13 +25,19 @@ export async function POST(request: Request) {
     }, { status: 422 })
   }
 
-  const response: CharacterWorldJobResponse = {
-    jobId: null,
-    kind: "world",
-    status: "not_configured",
-    creditsReserved: 0,
-    errorCode: "WORLD_PROVIDER_NOT_CONFIGURED",
-    message: "La generación de mundos todavía no está conectada.",
+  try {
+    const response = await enqueueGeneration({
+      userId: user.id,
+      kind: "world",
+      queueKind: "world",
+      route: resolveWorldRoute(parsed.data.model),
+      request: parsed.data,
+      assetIds: parsed.data.referenceAssetIds,
+      idempotencyKey: request.headers.get("idempotency-key") ?? undefined,
+    })
+    return NextResponse.json(response, { status: response.status === "not_configured" ? 503 : 202 })
+  } catch (error) {
+    const result = generationErrorResponse(error)
+    return NextResponse.json(result.body, { status: result.status })
   }
-  return NextResponse.json(response, { status: 503 })
 }

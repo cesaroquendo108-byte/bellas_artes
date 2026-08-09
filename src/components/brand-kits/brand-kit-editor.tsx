@@ -143,7 +143,7 @@ export function BrandKitEditor({ initialKit }: { initialKit: BrandKit }) {
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-semibold">{kit.name}</h1>
           <p className="text-[10px] text-slate-600">
-            Brand Kit privado · {kit.assets.length} recursos
+            Kit de marca privado · {kit.assets.length} recursos
           </p>
         </div>
         <span
@@ -216,9 +216,9 @@ export function BrandKitEditor({ initialKit }: { initialKit: BrandKit }) {
           <Tabs defaultValue="logos">
             <TabsList className="max-w-full overflow-x-auto bg-white/[0.04]">
               <TabsTrigger value="logos">Logos</TabsTrigger>
-              <TabsTrigger value="colors">Colors</TabsTrigger>
-              <TabsTrigger value="typography">Typography</TabsTrigger>
-              <TabsTrigger value="rules">Rules</TabsTrigger>
+              <TabsTrigger value="colors">Colores</TabsTrigger>
+              <TabsTrigger value="typography">Tipografía</TabsTrigger>
+              <TabsTrigger value="rules">Reglas</TabsTrigger>
             </TabsList>
             <TabsContent value="logos" className="mt-7">
               <BrandLogoDropzone
@@ -268,7 +268,7 @@ export function BrandKitEditor({ initialKit }: { initialKit: BrandKit }) {
           <DialogHeader>
             <DialogTitle>Eliminar “{kit.name}”</DialogTitle>
             <DialogDescription>
-              Se eliminará el kit y sus vínculos. Los assets originales
+              Se eliminará el kit y sus vínculos. Los recursos originales
               permanecerán en tu biblioteca.
             </DialogDescription>
           </DialogHeader>
@@ -282,7 +282,7 @@ export function BrandKitEditor({ initialKit }: { initialKit: BrandKit }) {
               disabled={busy}
               onClick={removeKit}
             >
-              Eliminar Brand Kit
+              Eliminar kit de marca
             </Button>
           </DialogFooter>
         </DialogContent>

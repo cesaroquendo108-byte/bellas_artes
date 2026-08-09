@@ -31,19 +31,19 @@ const dropzones: Array<{
 }> = [
   {
     category: "characters",
-    title: "From references",
+    title: "Desde referencias",
     description: "Personajes y sujetos",
     icon: UsersRound,
   },
   {
     category: "brandKit",
-    title: "From Brand Kit",
+    title: "Desde kit de marca",
     description: "Colores y marca",
     icon: Palette,
   },
   {
     category: "visual",
-    title: "Visual references",
+    title: "Referencias visuales",
     description: "Estilo y composición",
     icon: ImagePlus,
   },

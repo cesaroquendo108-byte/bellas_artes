@@ -34,7 +34,7 @@ export function StoryHub({
             Cada gran video comienza con una historia.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-            Transforma una idea en escenas, shots y referencias listas para
+            Transforma una idea en escenas, planos y referencias listas para
             producción.
           </p>
         </header>
@@ -49,7 +49,7 @@ export function StoryHub({
             <LayoutPanelTop className="size-6 text-violet-300" />
             <h2 className="mt-5 text-xl font-semibold">Crear storyboard</h2>
             <p className="mt-2 text-xs text-slate-500">
-              Divide tu narrativa en escenas y shots persistentes.
+              Divide tu narrativa en escenas y planos persistentes.
             </p>
             <ArrowRight className="absolute right-6 bottom-6 transition group-hover:translate-x-2" />
           </Link>

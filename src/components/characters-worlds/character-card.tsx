@@ -143,13 +143,13 @@ export function CharacterCard({
               </p>
             </div>
             <div>
-              <p className="text-slate-500">Prompt</p>
+              <p className="text-slate-500">Descripción</p>
               <p className="mt-1 leading-5 text-slate-300">
-                {asset.prompt ?? "No hay prompt guardado en la metadata."}
+                {asset.prompt ?? "No hay descripción guardada en los metadatos."}
               </p>
             </div>
             <div>
-              <p className="text-slate-500">Seed</p>
+              <p className="text-slate-500">Semilla</p>
               <p className="mt-1 text-slate-200">
                 {asset.seed ?? "No registrada"}
               </p>

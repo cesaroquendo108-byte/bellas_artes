@@ -100,7 +100,7 @@ export function VideoUploadDropzone({
             </div>
           )}
           <Badge className="absolute top-2 left-2 border border-white/10 bg-black/70 text-[10px] text-white">
-            {local ? "Preview local" : "Asset guardado"}
+            {local ? "Vista previa local" : "Recurso guardado"}
           </Badge>
         </div>
         <div className="flex items-center gap-2 p-2.5">

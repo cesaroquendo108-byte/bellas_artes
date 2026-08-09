@@ -14,8 +14,8 @@ import { Waveform } from "./waveform";
 const tabs = [
   ["all", "Mis audios"],
   ["tts", "TTS"],
-  ["voice_changer", "Voice Changer"],
-  ["voice_clone", "Voice Clone"],
+  ["voice_changer", "Cambiar voz"],
+  ["voice_clone", "Clonar voz"],
 ] as const;
 
 export function AudioLibrary({

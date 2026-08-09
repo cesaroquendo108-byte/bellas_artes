@@ -46,7 +46,7 @@ export function VideoPlayerStage() {
           variant="outline"
           className="ml-auto border-white/10 text-[10px] text-slate-400"
         >
-          Preview local
+          Vista previa local
         </Badge>
       </div>
 
@@ -81,7 +81,7 @@ export function VideoPlayerStage() {
                     Canvas de {meta.title}
                   </h2>
                   <p className="mt-2 max-w-md text-xs leading-5 text-slate-500">
-                    Configura los controles y añade los assets requeridos. Los
+                    Configura los controles y añade los recursos requeridos. Los
                     resultados reales aparecerán aquí cuando se conecte el motor
                     de video.
                   </p>

@@ -115,7 +115,7 @@ export function CharacterCanvas() {
           </DialogTrigger>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>Pose Editor</DialogTitle>
+              <DialogTitle>Editor de poses</DialogTitle>
               <DialogDescription>
                 Arrastra articulaciones para construir una pose local.
               </DialogDescription>
@@ -142,7 +142,7 @@ export function CharacterCanvas() {
             <DialogHeader>
               <DialogTitle>Inpaint local</DialogTitle>
               <DialogDescription>
-                Pinta una máscara y prepara un prompt de reemplazo.
+                Pinta una máscara y prepara una descripción de reemplazo.
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4">

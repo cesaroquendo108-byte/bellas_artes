@@ -23,7 +23,7 @@ export function VideoPromptComposer({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <Label htmlFor={`video-${key}`} className="text-[11px] text-slate-400">
-          {label ?? (negative ? "Prompt negativo" : "Prompt")}
+          {label ?? (negative ? "Descripción negativa" : "Descripción")}
         </Label>
         {!negative && <Sparkles className="size-3.5 text-violet-300" />}
       </div>

@@ -48,7 +48,7 @@ const initialState: CharacterBuilderState = {
   triggerWord: "@nuevo_personaje",
   lore: "",
   prompt: "",
-  negativePrompt: "low quality, blurry, deformed hands",
+  negativePrompt: "baja calidad, desenfoque, manos deformes",
   model: "flux-1-dev",
   aspectRatio: "4:5",
   cfgScale: 7,

@@ -66,10 +66,10 @@ export function BrandKitsDashboard({
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-300">
-            Brand systems
+            Sistemas de marca
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">
-            Your Brand Kits
+            Tus kits de marca
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
             Guarda logos, colores, tipografías y reglas para mantener
@@ -86,11 +86,11 @@ export function BrandKitsDashboard({
               />
             }
           >
-            <Plus /> Create New Brand Kit
+            <Plus /> Crear nuevo kit de marca
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Crear Brand Kit</DialogTitle>
+              <DialogTitle>Crear kit de marca</DialogTitle>
               <DialogDescription>
                 Comienza con un nombre. Podrás completar todos los elementos en
                 el editor.
@@ -136,7 +136,7 @@ export function BrandKitsDashboard({
         <div className="mt-9 flex min-h-[55vh] flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center">
           <SearchX className="size-8 text-slate-700" />
           <h2 className="mt-4 text-base font-medium text-slate-300">
-            No tienes Brand Kits
+            No tienes kits de marca
           </h2>
           <p className="mt-2 max-w-sm text-xs leading-5 text-slate-600">
             Crea una identidad reutilizable sin fabricar logos ni recursos

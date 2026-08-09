@@ -116,7 +116,7 @@ function CharacterControlPanel({
   const { state, setField } = useCharacterBuilder();
   const modes = [
     { value: "reference", label: "Referencia" },
-    { value: "prompt", label: "Prompt" },
+    { value: "prompt", label: "Descripción" },
     { value: "structured", label: "Constructor" },
   ] as const;
   return (
@@ -232,7 +232,7 @@ function CharacterControlPanel({
             </div>
           </div>
           <Range
-            label="CFG Scale"
+            label="Escala CFG"
             value={state.cfgScale}
             min={1}
             max={20}
@@ -248,7 +248,7 @@ function CharacterControlPanel({
           />
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label className="text-[10px] text-slate-400">Seed</Label>
+            <Label className="text-[10px] text-slate-400">Semilla</Label>
               <Switch
                 checked={state.randomSeed}
                 onCheckedChange={(checked) => setField("randomSeed", checked)}
@@ -368,7 +368,7 @@ function Workspace({ assets }: { assets: CharacterWorldAsset[] }) {
       setField("feedback", {
         tone: "error",
         message: state.localReference
-          ? "La referencia local sirve para preview, pero debe guardarse como asset antes de generar."
+          ? "La referencia local sirve para una vista previa, pero debe guardarse como recurso antes de generar."
           : "Selecciona una referencia guardada.",
       });
       return;

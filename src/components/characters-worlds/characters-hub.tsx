@@ -45,27 +45,27 @@ const quickStarts: QuickStartItem[] = [
   },
   {
     title: "Imagen del personaje",
-    description: "Lleva el personaje a Image Studio",
+    description: "Lleva el personaje al estudio de imágenes",
     href: "/image",
     icon: ImageIcon,
     gradient: "from-fuchsia-600 to-pink-700",
   },
   {
-    title: "Character Video",
+    title: "Video del personaje",
     description: "Anima una referencia guardada",
     href: "/video/i2v",
     icon: Video,
     gradient: "from-indigo-600 to-cyan-700",
   },
   {
-    title: "Talking Video",
+    title: "Video con voz",
     description: "Sincroniza rostro y voz",
     href: "/video/lip-sync",
     icon: Mic2,
     gradient: "from-violet-700 to-pink-600",
   },
   {
-    title: "Motion Sync",
+    title: "Sincronizar movimiento",
     description: "Transfiere una actuación",
     href: "/video/action-sync",
     icon: Sparkles,
@@ -199,7 +199,7 @@ export function CharactersHub({
                 : "Biblioteca de personajes"}
             </h2>
             <p className="mt-1 text-xs text-slate-600">
-              Sólo se muestran assets reales clasificados como character.
+              Sólo se muestran recursos reales clasificados como personaje.
             </p>
           </div>
           {initialView === "mine" && (

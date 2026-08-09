@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 import type { LibraryFilter } from "./types";
 
 const filters: { value: LibraryFilter; label: string }[] = [
-  { value: "unsorted", label: "Unsorted" },
-  { value: "labels", label: "Labels" },
-  { value: "folders", label: "Folders" },
-  { value: "templates", label: "Templates" },
-  { value: "all", label: "All" },
+  { value: "unsorted", label: "Sin clasificar" },
+  { value: "labels", label: "Etiquetas" },
+  { value: "folders", label: "Carpetas" },
+  { value: "templates", label: "Plantillas" },
+  { value: "all", label: "Todos" },
 ];
 
 export function AssetFilterToolbar({

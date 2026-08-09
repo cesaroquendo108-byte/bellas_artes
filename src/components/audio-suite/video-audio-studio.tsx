@@ -43,7 +43,7 @@ function createTrack(kind: Track["kind"], asset?: AudioLibraryItem): Track {
     id: crypto.randomUUID(),
     assetId: asset?.id ?? null,
     kind,
-    name: asset?.name ?? `${kindLabels[kind]} sin asset`,
+    name: asset?.name ?? `${kindLabels[kind]} sin recurso`,
     start: 0,
     width: 36,
     trimStart: 0,

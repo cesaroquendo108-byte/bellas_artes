@@ -35,7 +35,7 @@ export function InspireCategoryRow({
           href={`/inspire?category=${category}`}
           className="flex min-w-fit items-center gap-1 text-xs text-slate-500 hover:text-white"
         >
-          See all <ArrowRight className="size-3" />
+          Ver todo <ArrowRight className="size-3" />
         </Link>
       </div>
       {posts.length ? (

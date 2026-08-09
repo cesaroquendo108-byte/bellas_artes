@@ -21,9 +21,9 @@ import {
 } from "@/lib/social/contracts";
 
 const categoryLabels: Record<CommunityCategory, string> = {
-  "marketing-advertising": "Marketing & Advertising",
-  "film-stories": "Film & Stories",
-  "music-video": "Music Video",
+  "marketing-advertising": "Marketing y publicidad",
+  "film-stories": "Cine e historias",
+  "music-video": "Video musical",
   animation: "Animation",
   ugc: "UGC",
   anime: "Anime",
@@ -209,13 +209,13 @@ export function PublishCommunityForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="community-prompt">Contexto para Direct this</Label>
+          <Label htmlFor="community-prompt">Contexto para dirigir esto</Label>
           <Textarea
             id="community-prompt"
             maxLength={4000}
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
-            placeholder="Prompt opcional que el visitante podrá revisar en el estudio."
+            placeholder="Descripción opcional que el visitante podrá revisar en el estudio."
           />
         </div>
         {message && (

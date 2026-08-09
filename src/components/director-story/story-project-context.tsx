@@ -291,7 +291,7 @@ export function StoryProjectProvider({
     kind: project?.kind ?? kind,
     title:
       project?.title ??
-      (kind === "director" ? "Untitled Director Project" : "Untitled Story"),
+      (kind === "director" ? "Proyecto de director sin título" : "Historia sin título"),
     description: project?.description ?? "",
     storyType: project?.storyType ?? template,
     coverAssetId: project?.coverAssetId ?? null,

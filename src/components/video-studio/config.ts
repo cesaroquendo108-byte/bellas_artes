@@ -13,7 +13,7 @@ export interface VideoToolMeta {
 export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   t2v: {
     operation: "t2v",
-    title: "Text to Video",
+    title: "Texto a video",
     shortTitle: "T2V",
     description: "Convierte una idea escrita en una secuencia cinematográfica.",
     category: "create",
@@ -22,7 +22,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   i2v: {
     operation: "i2v",
-    title: "Image to Video",
+    title: "Imagen a video",
     shortTitle: "I2V",
     description: "Anima una imagen con movimiento, cámara y atmósfera.",
     category: "create",
@@ -31,7 +31,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   v2v: {
     operation: "v2v",
-    title: "Video to Video",
+    title: "Video a video",
     shortTitle: "V2V",
     description: "Reinterpreta un video manteniendo su estructura y movimiento.",
     category: "create",
@@ -40,8 +40,8 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   "action-sync": {
     operation: "action-sync",
-    title: "Action Sync",
-    shortTitle: "Motion",
+    title: "Sincronizar movimiento",
+    shortTitle: "Movimiento",
     description: "Transfiere una actuación o baile a un personaje de referencia.",
     category: "edit",
     defaultModel: "motion-sync-v2",
@@ -49,7 +49,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   effects: {
     operation: "effects",
-    title: "Video Effects",
+    title: "Efectos de video",
     shortTitle: "VFX",
     description: "Aplica efectos generativos con plantillas y dirección por texto.",
     category: "edit",
@@ -58,8 +58,8 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   upscale: {
     operation: "upscale",
-    title: "Video Upscale",
-    shortTitle: "Upscale",
+    title: "Mejora de video",
+    shortTitle: "Mejora",
     description: "Mejora detalle, nitidez y resolución hasta 4K.",
     category: "edit",
     defaultModel: "video-upscaler-v2",
@@ -67,8 +67,8 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   "lip-sync": {
     operation: "lip-sync",
-    title: "Lip-Sync Studio",
-    shortTitle: "Lip-Sync",
+    title: "Estudio de sincronía labial",
+    shortTitle: "Sincronía labial",
     description: "Sincroniza un rostro con texto o una pista de voz.",
     category: "edit",
     defaultModel: "lip-sync-v2.5",
@@ -76,8 +76,8 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   "replace-character": {
     operation: "replace-character",
-    title: "Replace Character",
-    shortTitle: "Replace",
+    title: "Reemplazar personaje",
+    shortTitle: "Reemplazar",
     description: "Sustituye un personaje conservando gesto, movimiento y fondo.",
     category: "edit",
     defaultModel: "character-swap-v2",
@@ -85,8 +85,8 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
   },
   extend: {
     operation: "extend",
-    title: "Extend Video",
-    shortTitle: "Extend",
+    title: "Extender video",
+    shortTitle: "Extender",
     description: "Amplía la duración o el encuadre de un video existente.",
     category: "edit",
     defaultModel: "kling-extend-v1.5",

@@ -298,9 +298,9 @@ function OperationControls() {
             field="effectTemplate"
             options={[
               { value: "portal", label: "Portal" },
-              { value: "levitation", label: "Levitation" },
-              { value: "melt", label: "Melt" },
-              { value: "explosion", label: "Explosion" },
+              { value: "levitation", label: "Levitación" },
+              { value: "melt", label: "Fusión" },
+              { value: "explosion", label: "Explosión" },
             ]}
           />
           <VideoPromptComposer
@@ -352,7 +352,7 @@ function OperationControls() {
           />
           <RangeField
             field="enhancement"
-            label="Enhancement"
+            label="Mejora"
             min={0}
             max={100}
             suffix="%"
@@ -366,16 +366,16 @@ function OperationControls() {
             field="characterMode"
             options={[
               { value: "reference", label: "Referencia" },
-              { value: "preset", label: "Preset" },
-              { value: "prompt", label: "Prompt" },
+              { value: "preset", label: "Preajuste" },
+              { value: "prompt", label: "Indicación" },
             ]}
           />
           <Segments
             field="maskMode"
             options={[
               { value: "auto", label: "Auto" },
-              { value: "brush", label: "Brush" },
-              { value: "smart", label: "Smart" },
+              { value: "brush", label: "Pincel" },
+              { value: "smart", label: "Inteligente" },
             ]}
           />
           {fields.maskMode === "brush" && (
@@ -407,8 +407,8 @@ function OperationControls() {
             field="maskMode"
             options={[
               { value: "auto", label: "Auto" },
-              { value: "brush", label: "Brush" },
-              { value: "smart", label: "Smart" },
+              { value: "brush", label: "Pincel" },
+              { value: "smart", label: "Inteligente" },
             ]}
           />
           {fields.maskMode === "brush" && (
@@ -445,7 +445,7 @@ function OperationControls() {
             field="extendMode"
             options={[
               { value: "time", label: "Tiempo" },
-              { value: "spatial", label: "Outpainting" },
+              { value: "spatial", label: "Extender encuadre" },
             ]}
           />
           {fields.extendMode === "time" ? (
@@ -482,10 +482,10 @@ function OperationControls() {
             field="aspectRatio"
             label="Ratio destino"
             options={[
-              { value: "16:9", label: "16:9 Landscape" },
-              { value: "9:16", label: "9:16 Portrait" },
-              { value: "1:1", label: "1:1 Square" },
-              { value: "4:3", label: "4:3 Classic" },
+              { value: "16:9", label: "16:9 Horizontal" },
+              { value: "9:16", label: "9:16 Vertical" },
+              { value: "1:1", label: "1:1 Cuadrado" },
+              { value: "4:3", label: "4:3 Clásico" },
             ]}
           />
           <ToggleField
@@ -505,7 +505,7 @@ function OperationControls() {
       {["t2v", "i2v", "v2v"].includes(operation) && (
         <Section title="Dirección creativa">
           <VideoPromptComposer
-            label={operation === "i2v" ? "Prompt de movimiento" : undefined}
+            label={operation === "i2v" ? "Descripción del movimiento" : undefined}
           />
           {operation === "t2v" && <VideoPromptComposer negative />}
           {operation === "v2v" && (
@@ -536,12 +536,12 @@ function TechnicalControls() {
       {operation !== "extend" && (
         <SelectField
           field="aspectRatio"
-          label="Aspect ratio"
+          label="Relación de aspecto"
           options={[
-            { value: "16:9", label: "16:9 Landscape" },
-            { value: "9:16", label: "9:16 Portrait" },
-            { value: "1:1", label: "1:1 Square" },
-            { value: "4:3", label: "4:3 Classic" },
+            { value: "16:9", label: "16:9 Horizontal" },
+            { value: "9:16", label: "9:16 Vertical" },
+            { value: "1:1", label: "1:1 Cuadrado" },
+            { value: "4:3", label: "4:3 Clásico" },
           ]}
         />
       )}
@@ -556,7 +556,7 @@ function TechnicalControls() {
           />
           <RangeField
             field="motionStrength"
-            label="Motion strength"
+            label="Intensidad del movimiento"
             min={1}
             max={10}
           />
@@ -565,8 +565,8 @@ function TechnicalControls() {
             label="Movimiento de cámara"
             options={[
               { value: "none", label: "Sin movimiento" },
-              { value: "pan-left", label: "Pan izquierda" },
-              { value: "zoom-in", label: "Zoom in" },
+              { value: "pan-left", label: "Desplazamiento a la izquierda" },
+              { value: "zoom-in", label: "Acercamiento" },
               { value: "orbit", label: "Órbita" },
             ]}
           />
@@ -585,14 +585,14 @@ function TechnicalControls() {
           />
           <RangeField
             field="cfgScale"
-            label="CFG Scale"
+            label="Escala CFG"
             min={1}
             max={20}
             step={0.5}
           />
           <ToggleField
             field="randomSeed"
-            label="Seed aleatorio"
+            label="Semilla aleatoria"
             description="Genera una variación distinta en cada solicitud."
           />
         </>
@@ -635,7 +635,7 @@ export function VideoControlPanel({
           ) : (
             <WandSparkles className="size-4" />
           )}
-          {state.submitting ? "Validando…" : "Generate Video"}
+          {state.submitting ? "Validando…" : "Generar video"}
         </Button>
         <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-slate-600">
           <Coins className="size-3" /> 0 créditos en esta fase{" "}
@@ -643,7 +643,7 @@ export function VideoControlPanel({
             variant="outline"
             className="h-4 border-white/10 px-1 text-[8px]"
           >
-            Preview
+            Vista previa
           </Badge>
         </div>
       </div>

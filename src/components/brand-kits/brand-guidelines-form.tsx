@@ -14,7 +14,7 @@ export function BrandGuidelinesForm({
   return (
     <div className="space-y-6">
       <div>
-        <Label>Brand Guidelines</Label>
+        <Label>Guías de marca</Label>
         <Textarea
           value={guidelines}
           onChange={(event) => onGuidelinesChange(event.target.value)}
@@ -23,7 +23,7 @@ export function BrandGuidelinesForm({
         />
       </div>
       <div>
-        <Label>Prompt negativo global</Label>
+        <Label>Descripción negativa global</Label>
         <Textarea
           value={negativePrompt}
           onChange={(event) => onNegativePromptChange(event.target.value)}

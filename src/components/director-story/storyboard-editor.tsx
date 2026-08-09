@@ -333,7 +333,7 @@ function EditorWorkspace() {
                 }
               >
                 <SelectTrigger className="mt-2 w-full">
-                  <SelectValue placeholder="Elegir asset" />
+                  <SelectValue placeholder="Elegir recurso" />
                 </SelectTrigger>
                 <SelectContent>
                   {assets
@@ -359,7 +359,7 @@ function EditorWorkspace() {
                 </span>
               </div>
               <div className="mt-2 flex justify-between">
-                <span className="text-slate-500">Assets disponibles</span>
+                <span className="text-slate-500">Recursos disponibles</span>
                 <span className="text-slate-300">{assets.length}</span>
               </div>
             </div>
@@ -396,7 +396,7 @@ function EditorWorkspace() {
             <div className="min-h-[55vh] rounded-2xl border border-white/[0.08] bg-black p-5">
               <div className="mx-auto max-w-3xl">
                 <Badge className="bg-violet-500/10 text-violet-300">
-                  Preview estructural
+                  Vista previa estructural
                 </Badge>
                 <h2 className="mt-4 text-2xl font-semibold">{state.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -426,7 +426,7 @@ function EditorWorkspace() {
                               {shot.title}
                             </p>
                             <p className="mt-1 line-clamp-3 text-[9px] leading-4 text-slate-600">
-                              {shot.prompt || "Prompt pendiente"}
+                              {shot.prompt || "Descripción pendiente"}
                             </p>
                           </div>
                         ))}

@@ -9,19 +9,20 @@ import type { TutorialMetadata } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
 import { CoverArt } from "./cover-art";
 
-const categories = ["All", "Image Generation", "Video", "Editing"] as const;
+const categories = ["Todos", "Generación de imágenes", "Video", "Edición"] as const;
+const levelLabels = { beginner: "Inicial", pro: "Profesional" } as const;
 export function TutorialsIndex({
   tutorials,
 }: {
   tutorials: TutorialMetadata[];
 }) {
-  const [filter, setFilter] = useState<(typeof categories)[number]>("All");
+  const [filter, setFilter] = useState<(typeof categories)[number]>("Todos");
   const [query, setQuery] = useState("");
   const visible = useMemo(
     () =>
       tutorials.filter(
         (item) =>
-          (filter === "All" || item.category === filter) &&
+          (filter === "Todos" || item.category === filter) &&
           (!query.trim() ||
             `${item.title} ${item.excerpt}`
               .toLowerCase()
@@ -33,7 +34,7 @@ export function TutorialsIndex({
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-7 sm:py-20">
       <header>
         <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
-          Learning Center
+          Centro de aprendizaje
         </Badge>
         <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
           Tutorials
@@ -97,7 +98,7 @@ export function TutorialsIndex({
                     {tutorial.category}
                   </Badge>
                   <span className="text-[9px] uppercase text-violet-300">
-                    {tutorial.level}
+                    {levelLabels[tutorial.level]}
                   </span>
                 </div>
                 <h2 className="mt-3 line-clamp-2 text-sm font-semibold">

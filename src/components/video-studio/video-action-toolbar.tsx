@@ -13,7 +13,7 @@ export function VideoActionToolbar() {
         disabled
         className="border-white/10 bg-white/[0.03]"
       >
-        <Download /> Download
+        <Download /> Descargar
       </Button>
       <Button
         render={<Link href="/video/upscale" />}
@@ -22,7 +22,7 @@ export function VideoActionToolbar() {
         size="sm"
         className="border-white/10 bg-white/[0.03]"
       >
-        <Maximize2 /> Upscale
+        <Maximize2 /> Mejorar
       </Button>
       <Button
         render={<Link href="/video/lip-sync" />}
@@ -31,7 +31,7 @@ export function VideoActionToolbar() {
         size="sm"
         className="border-white/10 bg-white/[0.03]"
       >
-        <Mic2 /> Lip-Sync
+        <Mic2 /> Sincronía labial
       </Button>
       <Button
         render={<Link href="/video/extend" />}
@@ -40,7 +40,7 @@ export function VideoActionToolbar() {
         size="sm"
         className="border-white/10 bg-white/[0.03]"
       >
-        <Sparkles /> Extend
+        <Sparkles /> Extender
       </Button>
     </div>
   );

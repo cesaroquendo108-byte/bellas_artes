@@ -257,7 +257,7 @@ export function VoiceChangerStudio({
                 <Play className="size-4 text-slate-600" />
               </div>
               {previewUrl ? (
-                <audio controls src={previewUrl} className="mt-5 w-full" aria-label="Preview de audio original" />
+                <audio controls src={previewUrl} className="mt-5 w-full" aria-label="Vista previa del audio original" />
               ) : (
                 <Waveform progress={0} />
               )}

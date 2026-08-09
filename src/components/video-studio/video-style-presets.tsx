@@ -9,13 +9,13 @@ import { useVideoStudio } from "./video-studio-context";
 const presets = [
   {
     value: "cinematic",
-    label: "Cinematic",
+    label: "Cinemático",
     gradient: "from-amber-700 to-slate-900",
   },
   { value: "anime", label: "Anime", gradient: "from-pink-600 to-cyan-600" },
   {
     value: "film-noir",
-    label: "Film Noir",
+    label: "Cine negro",
     gradient: "from-slate-300 to-black",
   },
   {

@@ -70,8 +70,8 @@ function Workspace({
       setFeedback({
         tone: "error",
         message: onlyLocal
-          ? "La previsualización local funciona, pero la generación real requiere guardar primero esos archivos como assets."
-          : "Selecciona los assets guardados requeridos antes de generar.",
+          ? "La previsualización local funciona, pero la generación real requiere guardar primero esos archivos como recursos."
+          : "Selecciona los recursos guardados requeridos antes de generar.",
       });
       return;
     }
@@ -178,7 +178,7 @@ function Workspace({
       <VideoStudioHeader onOpenControls={() => setControlsOpen(true)} />
       {assetsUnavailable && (
         <div className="border-b border-amber-400/20 bg-amber-500/[0.07] px-4 py-2 text-center text-[10px] text-amber-200">
-          La biblioteca no está disponible; puedes seguir diseñando con previews
+          La biblioteca no está disponible; puedes seguir diseñando con vistas previas
           locales.
         </div>
       )}
@@ -199,7 +199,7 @@ function Workspace({
               Controles · {VIDEO_TOOL_META[operation].shortTitle}
             </SheetTitle>
             <SheetDescription>
-              Configura la generación sin perder el preview.
+              Configura la generación sin perder la vista previa.
             </SheetDescription>
           </SheetHeader>
           <VideoControlPanel assets={assets} onSubmit={submit} />

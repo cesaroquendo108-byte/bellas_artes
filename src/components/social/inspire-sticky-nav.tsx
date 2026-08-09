@@ -5,9 +5,9 @@ import {
 } from "@/lib/social/contracts";
 
 const labels: Record<CommunityCategory, string> = {
-  "marketing-advertising": "Marketing & Advertising",
-  "film-stories": "Film & Stories",
-  "music-video": "Music Video",
+  "marketing-advertising": "Marketing y publicidad",
+  "film-stories": "Cine e historias",
+  "music-video": "Video musical",
   animation: "Animation",
   ugc: "UGC",
   anime: "Anime",
@@ -21,7 +21,7 @@ export function InspireStickyNav() {
           href="/inspire"
           className="rounded-full px-4 py-2 text-xs text-slate-500 transition hover:bg-white/[0.05] hover:text-white"
         >
-          All
+          Todo
         </Link>
         {communityCategories.map((category) => (
           <Link

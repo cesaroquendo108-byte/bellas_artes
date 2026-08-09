@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
-import { providerUnavailable } from "@/lib/audio/http";
-import { getAudioProvider } from "@/lib/audio/provider";
 import { mixRequestSchema } from "@/lib/audio/validation";
+import { resolveAudioRoute } from "@/lib/generation/registry";
+import { enqueueGeneration, generationErrorResponse, requireGenerationUser } from "@/lib/generation/service";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 });
+  let user;
+  try {
+    user = await requireGenerationUser();
+  } catch (error) {
+    const result = generationErrorResponse(error);
+    return NextResponse.json(result.body, { status: result.status });
+  }
   let body: unknown;
   try {
     body = await request.json();
@@ -19,6 +23,7 @@ export async function POST(request: Request) {
   }
   const parsed = mixRequestSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ errorCode: "INVALID_MIX_REQUEST", message: "Revisa el proyecto y el formato de salida." }, { status: 422 });
+  const supabase = await createClient();
   const { data: project, error: projectError } = await supabase
     .from("audio_projects")
     .select("id")
@@ -27,7 +32,18 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (projectError) return NextResponse.json({ errorCode: "PROJECT_LOOKUP_FAILED", message: "No se pudo verificar el proyecto." }, { status: 500 });
   if (!project) return NextResponse.json({ errorCode: "PROJECT_NOT_FOUND", message: "Proyecto no encontrado." }, { status: 404 });
-  const provider = getAudioProvider();
-  if (provider.state !== "configured") return providerUnavailable("video_mix");
-  return providerUnavailable("video_mix");
+  try {
+    const result = await enqueueGeneration({
+      userId: user.id,
+      kind: "audio",
+      queueKind: "audio",
+      route: resolveAudioRoute("video_mix", "f5-tts"),
+      request: { kind: "video_mix", ...parsed.data },
+      idempotencyKey: parsed.data.idempotencyKey,
+    });
+    return NextResponse.json({ ...result, kind: "video_mix" }, { status: result.status === "not_configured" ? 503 : 202 });
+  } catch (error) {
+    const result = generationErrorResponse(error);
+    return NextResponse.json({ ...result.body, kind: "video_mix", creditsReserved: 0 }, { status: result.status });
+  }
 }

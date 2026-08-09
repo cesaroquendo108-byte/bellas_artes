@@ -12,12 +12,6 @@ vi.mock("@supabase/ssr", () => ({ createServerClient }));
 import { NextRequest } from "next/server";
 import nextConfig from "../../../next.config";
 import { updateSession } from "../supabase/middleware";
-import {
-  getSupabasePublicEnv,
-  getSupabaseAdminEnv,
-  getR2Env,
-  getAudioProviderEnv,
-} from "../../lib/env";
 
 const validAnonKey = "a".repeat(48);
 

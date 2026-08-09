@@ -37,7 +37,7 @@ export function VideoHistoryGrid({ assets }: { assets: StudioAsset[] }) {
             Biblioteca e historial
           </h2>
           <p className="mt-0.5 text-[10px] text-slate-600">
-            Assets reales disponibles
+            Recursos reales disponibles
           </p>
         </div>
         <Clock3 className="size-4 text-slate-600" />
@@ -92,7 +92,7 @@ export function VideoHistoryGrid({ assets }: { assets: StudioAsset[] }) {
                   disabled={!slot}
                   onClick={() => slot && selectSavedAsset(slot, asset)}
                 >
-                  <Plus className="size-3" /> Usar asset
+                  <Plus className="size-3" /> Usar recurso
                 </Button>
               </div>
             </article>
@@ -106,7 +106,7 @@ export function VideoHistoryGrid({ assets }: { assets: StudioAsset[] }) {
             </p>
             <p className="mt-1 text-[10px] leading-4 text-slate-600">
               Puedes usar archivos locales para diseñar el estudio. Para enviar
-              la generación harán falta assets guardados.
+              la generación harán falta recursos guardados.
             </p>
           </div>
         )}

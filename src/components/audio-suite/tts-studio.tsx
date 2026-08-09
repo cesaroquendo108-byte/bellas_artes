@@ -193,7 +193,7 @@ export function TtsStudio({
                   {voices.find((voice) => voice.id === voiceId)?.name ?? "Selecciona una voz"}
                 </p>
               </div>
-              <Button variant="outline" size="icon" disabled aria-label="Preview no disponible">
+              <Button variant="outline" size="icon" disabled aria-label="Vista previa no disponible">
                 <Play />
               </Button>
             </div>

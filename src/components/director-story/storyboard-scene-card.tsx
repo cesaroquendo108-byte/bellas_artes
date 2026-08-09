@@ -111,7 +111,7 @@ export function StoryboardSceneCard({
             })
           }
         >
-          <Plus /> Añadir shot
+          <Plus /> Añadir plano
         </Button>
       </div>
     </section>

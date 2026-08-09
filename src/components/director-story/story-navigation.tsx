@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { href: "/story", label: "Create Story" },
-  { href: "/story/my", label: "My Stories" },
+  { href: "/story", label: "Crear historia" },
+  { href: "/story/my", label: "Mis historias" },
   { href: "/story/community", label: "Historias de la comunidad" },
 ];
 

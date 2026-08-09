@@ -17,7 +17,7 @@ export function StoryboardCanvas() {
         </div>
         <h2 className="mt-5 text-lg font-semibold">Tu storyboard está vacío</h2>
         <p className="mt-2 max-w-md text-xs leading-5 text-slate-600">
-          Crea una escena para comenzar a organizar shots, prompts y recursos
+          Crea una escena para comenzar a organizar planos, descripciones y recursos
           reales.
         </p>
         <Button

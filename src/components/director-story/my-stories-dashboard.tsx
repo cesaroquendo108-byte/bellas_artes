@@ -24,10 +24,10 @@ export function MyStoriesDashboard({
         <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
-              Private Library
+              Biblioteca privada
             </Badge>
             <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-              My Stories
+              Mis historias
             </h1>
             <p className="mt-2 text-sm text-slate-500">
               Borradores y producciones sincronizadas con Supabase.
@@ -39,7 +39,7 @@ export function MyStoriesDashboard({
             size="lg"
             className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"
           >
-            <Plus /> Create Story
+            <Plus /> Crear historia
           </Button>
         </header>
         {error && (
@@ -59,7 +59,7 @@ export function MyStoriesDashboard({
               <BookOpen className="size-8 text-violet-300" />
             </div>
             <h2 className="mt-6 text-xl font-semibold">
-              Start your storytelling journey
+              Comienza tu viaje narrativo
             </h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
               Crea tu primera historia y organiza cada escena dentro de un
@@ -71,7 +71,7 @@ export function MyStoriesDashboard({
               size="lg"
               className="mt-6 bg-violet-600 text-white"
             >
-              <Plus /> Create Story
+              <Plus /> Crear historia
             </Button>
           </div>
         )}
