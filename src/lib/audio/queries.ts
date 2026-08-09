@@ -12,7 +12,7 @@ export async function getAudioWorkspaceData() {
   const supabase = await createClient();
   const provider = getAudioProviderStatus();
 
-  const [jobsResult, assetsResult, projectsResult] = await Promise.all([
+  const [jobsResult, assetsResult, projectsResult, generationJobsResult] = await Promise.all([
     supabase
       .from("audio_jobs")
       .select("id,kind,status,output_asset_id,created_at,error_message")
@@ -33,9 +33,16 @@ export async function getAudioWorkspaceData() {
       .eq("user_id", profile.id)
       .order("updated_at", { ascending: false })
       .limit(12),
+    supabase
+      .from("generation_jobs")
+      .select("id,operation,status,created_at,error_message")
+      .eq("user_id", profile.id)
+      .eq("kind", "audio")
+      .order("created_at", { ascending: false })
+      .limit(30),
   ]);
 
-  const setupPending = jobsResult.error?.code === "42P01" || projectsResult.error?.code === "42P01";
+  const setupPending = jobsResult.error?.code === "42P01" || projectsResult.error?.code === "42P01" || generationJobsResult.error?.code === "42P01";
   const assets = assetsResult.error ? [] : await Promise.all((assetsResult.data ?? []).map(async (asset) => {
     let signedUrl: string | null = null;
     try {
@@ -55,7 +62,7 @@ export async function getAudioWorkspaceData() {
     };
   }));
 
-  const jobs: AudioLibraryItem[] = setupPending || jobsResult.error ? [] : (jobsResult.data ?? []).map((job) => ({
+  const legacyJobs: AudioLibraryItem[] = setupPending || jobsResult.error ? [] : (jobsResult.data ?? []).map((job) => ({
     id: job.id,
     name: job.kind === "tts" ? "Voz generada" : job.kind === "voice_changer" ? "Voz transformada" : "Mezcla de audio",
     kind: job.kind,
@@ -64,11 +71,20 @@ export async function getAudioWorkspaceData() {
     durationSeconds: null,
     signedUrl: null,
   }));
+  const generationJobs: AudioLibraryItem[] = setupPending || generationJobsResult.error ? [] : (generationJobsResult.data ?? []).map((job) => ({
+    id: job.id,
+    name: job.operation === "voice_changer" ? "Voz transformada" : job.operation === "video_mix" ? "Mezcla de audio" : "Voz generada",
+    kind: job.operation === "voice_changer" ? "voice_changer" : job.operation === "video_mix" ? "video_mix" : "tts",
+    status: job.status === "completed" ? "ready" : job.status === "canceled" ? "canceled" : job.status,
+    createdAt: job.created_at,
+    durationSeconds: null,
+    signedUrl: null,
+  }));
 
   return {
     provider,
     voices: audioVoiceCatalog,
-    jobs,
+    jobs: [...generationJobs, ...legacyJobs],
     assets,
     projects: setupPending || projectsResult.error ? [] : projectsResult.data ?? [],
     setupPending,

@@ -3,11 +3,12 @@ export const generationStatuses = [
   "processing",
   "completed",
   "failed",
+  "canceled",
   "not_configured",
 ] as const
 
 export type GenerationStatus = (typeof generationStatuses)[number]
-export type GenerationKind = "image" | "video"
+export type GenerationKind = "image" | "video" | "audio" | "character" | "world"
 
 export type VideoOperation =
   | "t2v"
@@ -26,6 +27,7 @@ export interface GenerationJobResponse {
   operation?: VideoOperation
   status: GenerationStatus
   creditsReserved: number
+  outputAssetIds?: string[]
   assetId?: string
   errorCode?: string
   message?: string

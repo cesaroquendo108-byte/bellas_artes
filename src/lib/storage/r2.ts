@@ -51,6 +51,13 @@ export async function getPrivateObjectUrl(key: string, expiresIn = 900) {
   );
 }
 
+export async function downloadPrivateObject(key: string) {
+  const { bucket } = getR2Env();
+  const result = await getClient().send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+  if (!result.Body) throw new Error("El objeto privado no tiene contenido.");
+  return new Uint8Array(await result.Body.transformToByteArray());
+}
+
 export async function deletePrivateObject(key: string) {
   const { bucket } = getR2Env();
   await getClient().send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));

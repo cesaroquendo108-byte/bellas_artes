@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
-import { providerUnavailable } from "@/lib/audio/http";
-import { getAudioProvider } from "@/lib/audio/provider";
 import { ttsRequestSchema } from "@/lib/audio/validation";
-import { createClient } from "@/utils/supabase/server";
+import { resolveAudioRoute } from "@/lib/generation/registry";
+import { enqueueGeneration, generationErrorResponse, requireGenerationUser } from "@/lib/generation/service";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 });
+  let user;
+  try {
+    user = await requireGenerationUser();
+  } catch (error) {
+    const result = generationErrorResponse(error);
+    return NextResponse.json(result.body, { status: result.status });
+  }
 
   let body: unknown;
   try {
@@ -21,9 +24,18 @@ export async function POST(request: Request) {
   const parsed = ttsRequestSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ errorCode: "INVALID_TTS_REQUEST", message: "Revisa el guion y los controles.", fieldErrors: parsed.error.flatten().fieldErrors }, { status: 422 });
 
-  const provider = getAudioProvider();
-  if (provider.state !== "configured") return providerUnavailable("tts");
-  // No adapter is registered yet. This guard prevents a partial environment
-  // configuration from creating jobs or touching the credit ledger.
-  return providerUnavailable("tts");
+  try {
+    const result = await enqueueGeneration({
+      userId: user.id,
+      kind: "audio",
+      queueKind: "audio",
+      route: resolveAudioRoute("tts", "f5-tts"),
+      request: { kind: "tts", ...parsed.data },
+      idempotencyKey: parsed.data.idempotencyKey,
+    });
+    return NextResponse.json({ ...result, kind: "tts", errorCode: result.errorCode ?? (result.status === "not_configured" ? "AUDIO_PROVIDER_NOT_CONFIGURED" : undefined) }, { status: result.status === "not_configured" ? 503 : 202 });
+  } catch (error) {
+    const result = generationErrorResponse(error);
+    return NextResponse.json({ ...result.body, kind: "tts", creditsReserved: 0 }, { status: result.status });
+  }
 }

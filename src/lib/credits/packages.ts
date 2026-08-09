@@ -7,19 +7,19 @@ export const CREDIT_PACKAGES = {
     id: "curioso",
     name: "Curioso",
     priceUsd: 2,
-    credits: 400,
+    credits: 600,
   },
   creador: {
     id: "creador",
     name: "Creador",
     priceUsd: 5,
-    credits: 1_200,
+    credits: 1_600,
   },
   estudio: {
     id: "estudio",
     name: "Estudio",
     priceUsd: 10,
-    credits: 3_000,
+    credits: 3_500,
   },
 } as const satisfies Record<CreditPackageId, {
   id: CreditPackageId;
