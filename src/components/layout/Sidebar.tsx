@@ -1,15 +1,14 @@
 'use client';
-import { useState } from 'react';
 import { 
   Home, Clapperboard, Video, Globe, Music, Image as ImageIcon,
   User, FolderOpen, Palette, Film, Layout, Wrench,
   BookOpen, GraduationCap, FileText, ChevronRight, ChevronLeft,
-  Sparkles, Layers
+  Sparkles, Layers, type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 type SidebarItem = {
-  icon: any;
+  icon: LucideIcon;
   label: string;
   href: string;
   active?: boolean;

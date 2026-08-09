@@ -1,6 +1,5 @@
 export async function getBcvRate(): Promise<number> {
   try {
-    // Try Finve API first
     const finveUrl = process.env.FINVE_MCP_API_URL;
     const finveKey = process.env.FINVE_MCP_API_KEY;
 
@@ -19,20 +18,22 @@ export async function getBcvRate(): Promise<number> {
       }
     }
 
-    // Fallback: Use dolarapi.com (free, public, reliable)
     const response = await fetch('https://ve.dolarapi.com/v1/dolares/oficial', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }
     });
 
     if (response.ok) {
       const data = await response.json();
-      // dolarapi returns { promedio: 752.0943 } for the official BCV rate
       if (data?.promedio) return data.promedio;
     }
-
-    return 752.09; // Hardcoded fallback based on latest known rate
   } catch (error) {
     console.error("Error fetching BCV rate:", error);
-    return 752.09;
   }
+
+  throw new Error("No fue posible obtener una tasa BCV verificable.");
+}
+
+export async function getPaymentRate(): Promise<number> {
+  const bcvRate = await getBcvRate();
+  return Number((bcvRate * 1.2).toFixed(2));
 }

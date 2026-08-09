@@ -26,12 +26,10 @@ export function Hero() {
     setResultUrl(null);
 
     try {
-      const userId = "00000000-0000-0000-0000-000000000000";
-      
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, type: activeTab, userId })
+        body: JSON.stringify({ prompt, type: activeTab })
       });
       
       const data = await res.json();
@@ -41,7 +39,7 @@ export function Hero() {
       } else {
         setErrorMsg(data.error || 'Error generando contenido');
       }
-    } catch (err) {
+    } catch {
       setErrorMsg('Error de conexión');
     } finally {
       setGenerating(false);
@@ -56,12 +54,7 @@ export function Hero() {
           ¿Qué te gustaría crear hoy?
         </h1>
         
-        {/* Pointer decoration mimicking the OpenArt reference */}
-        <img 
-          src="https://cdn.openart.ai/assets/internal/uploads/image_e_z9EOOn_159x159_1770284290206.webp" 
-          alt="Hero Pointer" 
-          className="absolute -top-12 -right-8 w-24 h-24 hidden md:block opacity-80"
-        />
+        <Sparkles className="absolute -top-8 -right-7 hidden h-12 w-12 text-primary/60 md:block" />
       </div>
       
       <div className="flex flex-wrap items-center justify-center gap-3 mb-10 w-full max-w-4xl">
@@ -111,11 +104,7 @@ export function Hero() {
         <p className="text-error-text mt-4 text-[13px]">{errorMsg}</p>
       )}
 
-      {resultUrl && (
-        <div className="mt-8 p-2 bg-background-neutral-soft border border-normal-border rounded-[20px] max-w-xl animate-in fade-in zoom-in duration-500 shadow-oa">
-          <img src={resultUrl} alt="Generated output" className="rounded-[16px] w-full h-auto" />
-        </div>
-      )}
+      {resultUrl && <p className="mt-6 text-sm text-muted-foreground">Resultado preparado.</p>}
     </div>
   );
 }
