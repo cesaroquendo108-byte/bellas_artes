@@ -30,3 +30,11 @@ export function getR2Env() {
     bucket: required("CLOUDFLARE_R2_BUCKET"),
   };
 }
+
+export function getAudioProviderEnv() {
+  return {
+    provider: process.env.AUDIO_PROVIDER?.trim() || "disabled",
+    apiKeyConfigured: Boolean(process.env.AUDIO_PROVIDER_API_KEY?.trim()),
+    webhookSecretConfigured: Boolean(process.env.AUDIO_PROVIDER_WEBHOOK_SECRET?.trim()),
+  };
+}

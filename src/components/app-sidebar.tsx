@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  AudioLines,
   CreditCard,
   FolderOpen,
   Gauge,
@@ -10,6 +11,7 @@ import {
   ReceiptText,
   Settings,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
@@ -34,6 +36,8 @@ type AppSidebarProps = {
 const primaryItems = [
   { title: "Centro de mando", href: "/dashboard", icon: Gauge },
   { title: "Biblioteca", href: "/assets", icon: FolderOpen },
+  { title: "Texto a voz", href: "/audio/tts", icon: AudioLines },
+  { title: "Suite de audio", href: "/audio/my", icon: SlidersHorizontal },
   { title: "Créditos", href: "/credits", icon: ReceiptText },
   { title: "Planes y créditos", href: "/billing", icon: CreditCard },
   { title: "Ajustes", href: "/settings", icon: Settings },
