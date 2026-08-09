@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Check, Download, Pause, Play, Search, Volume2, X } from "lucide-react";
+import { Check, Download, MoreHorizontal, Pause, Pencil, Play, Search, Trash2, Volume2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,15 +33,20 @@ export function AudioLibrary({
   const [query, setQuery] = useState("");
   const [active, setActive] = useState<AudioLibraryItem | null>(null);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [storedAssets, setStoredAssets] = useState(assets);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
 
   const items = useMemo(
     () =>
-      [...assets, ...jobs].filter(
+      [...storedAssets, ...jobs].filter(
         (item) =>
           (tab === "all" || item.kind === tab) &&
           item.name.toLowerCase().includes(query.toLowerCase()),
       ),
-    [assets, jobs, query, tab],
+    [storedAssets, jobs, query, tab],
   );
 
   const selectedItems = useMemo(
@@ -68,6 +74,54 @@ export function AudioLibrary({
     });
   }
 
+  async function renameAsset(item: AudioLibraryItem) {
+    const name = editingName.trim();
+    if (!name || item.kind !== "audio") return;
+    setBusyId(item.id);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/audio/assets/${item.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const result = (await response.json().catch(() => ({}))) as { message?: string };
+      if (!response.ok) throw new Error(result.message ?? "No se pudo renombrar el audio.");
+      setStoredAssets((current) => current.map((asset) => asset.id === item.id ? { ...asset, name } : asset));
+      setActive((current) => current?.id === item.id ? { ...current, name } : current);
+      setEditingId(null);
+      setMessage("Nombre actualizado.");
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : "No se pudo renombrar el audio.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function deleteAsset(item: AudioLibraryItem) {
+    if (item.kind !== "audio" || !window.confirm(`¿Eliminar “${item.name}” de tu biblioteca?`)) return;
+    setBusyId(item.id);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/audio/assets/${item.id}`, { method: "DELETE" });
+      const result = (await response.json().catch(() => ({}))) as { message?: string };
+      if (!response.ok) throw new Error(result.message ?? "No se pudo eliminar el audio.");
+      setStoredAssets((current) => current.filter((asset) => asset.id !== item.id));
+      setSelected((current) => {
+        const next = new Set(current);
+        next.delete(item.id);
+        return next;
+      });
+      if (active?.id === item.id) setActive(null);
+      if (editingId === item.id) setEditingId(null);
+      setMessage("Audio eliminado de la biblioteca privada.");
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : "No se pudo eliminar el audio.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div className="space-y-6 pb-28">
       <AudioNav current="/audio/my" />
@@ -81,6 +135,11 @@ export function AudioLibrary({
         </p>
       </header>
       <ProviderNotice setupPending={setupPending} message={providerMessage} />
+      {message && (
+        <p role="status" className="border-l-2 border-violet-400 px-3 text-xs leading-5 text-slate-300">
+          {message}
+        </p>
+      )}
 
       <div className="flex flex-col gap-3 border-b border-white/[0.07] pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex max-w-full gap-1 overflow-x-auto">
@@ -157,7 +216,59 @@ export function AudioLibrary({
                   ) : (
                     <Download className="size-4 opacity-30" aria-hidden />
                   )}
+                  {item.kind === "audio" && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {
+                        setEditingId(editingId === item.id ? null : item.id);
+                        setEditingName(item.name);
+                      }}
+                      aria-label={`Administrar ${item.name}`}
+                    >
+                      <MoreHorizontal />
+                    </Button>
+                  )}
                 </div>
+                {editingId === item.id && item.kind === "audio" && (
+                  <div className="col-span-full grid gap-3 border-t border-white/[0.06] pt-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                    <label className="relative block">
+                      <Pencil className="absolute top-2.5 left-3 size-4 text-slate-600" />
+                      <Input
+                        value={editingName}
+                        onChange={(event) => setEditingName(event.target.value)}
+                        maxLength={160}
+                        className="pl-9"
+                        aria-label="Nuevo nombre del audio"
+                      />
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" onClick={() => renameAsset(item)} disabled={busyId === item.id || !editingName.trim()}>
+                        Guardar nombre
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        render={<Link href={`/audio/voice-changer?asset=${item.id}`} />}
+                        nativeButton={false}
+                      >
+                        Reutilizar voz
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        render={<Link href={`/video/audio?asset=${item.id}`} />}
+                        nativeButton={false}
+                      >
+                        Llevar al video
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteAsset(item)} disabled={busyId === item.id}>
+                        <Trash2 /> Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
