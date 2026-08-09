@@ -49,7 +49,7 @@ const studioItems = [
   { title: "Centro de mando", href: "/dashboard", icon: Gauge },
   { title: "Image Studio", href: "/image", icon: ImageIcon },
   { title: "Video Suite", href: "/video", icon: Video },
-  { title: "Audio Suite", icon: Volume2, disabled: true },
+  { title: "Audio Suite", href: "/audio/my", icon: Volume2 },
   { title: "Director", href: "/director", icon: Clapperboard },
   { title: "Story", href: "/story", icon: BookOpen },
   { title: "Personajes", href: "/characters", icon: UsersRound },
