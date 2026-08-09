@@ -9,9 +9,21 @@ export const generationStatuses = [
 export type GenerationStatus = (typeof generationStatuses)[number]
 export type GenerationKind = "image" | "video"
 
+export type VideoOperation =
+  | "t2v"
+  | "i2v"
+  | "v2v"
+  | "action-sync"
+  | "effects"
+  | "upscale"
+  | "lip-sync"
+  | "replace-character"
+  | "extend"
+
 export interface GenerationJobResponse {
   jobId: string | null
   kind: GenerationKind
+  operation?: VideoOperation
   status: GenerationStatus
   creditsReserved: number
   assetId?: string
@@ -35,4 +47,18 @@ export interface ImageGenerationRequest {
   steps: number
   cfgScale: number
   referenceAssetIds?: string[]
+}
+
+export type VideoAspectRatio = "16:9" | "9:16" | "1:1" | "4:3"
+export type VideoParameterValue = string | number | boolean | string[]
+
+export interface VideoGenerationRequest {
+  operation: VideoOperation
+  model: string
+  prompt?: string
+  negativePrompt?: string
+  aspectRatio?: VideoAspectRatio
+  sourceAssetIds?: string[]
+  referenceAssetIds?: string[]
+  parameters: Record<string, VideoParameterValue>
 }
