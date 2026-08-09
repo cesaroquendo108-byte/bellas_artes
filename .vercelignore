@@ -3,6 +3,11 @@
 # the Next.js/Vercel build context.
 scripts/e2e-preview-tests.ts
 scripts/verify-preview.ts
+scripts/e2e-cron-tests.ts
+scripts/e2e-r2-tests.ts
+scripts/list_buckets.ts
+scripts/manage_bucket.ts
+scratch.ts
 migration_0006_only.sql
 preview_setup.sql
 
