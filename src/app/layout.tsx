@@ -6,8 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://bellasartes-xi.vercel.app"),
   title: "Bellas Artes | AI Creator Suite",
   description: "Plataforma de generación de arte con IA para Venezuela",
+  openGraph: {
+    title: "Bellas Artes | AI Creator Suite",
+    description: "Imagen, video, personajes, narrativa y recursos de marca en un solo estudio creativo.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

@@ -12,6 +12,18 @@ export interface ImageGalleryAsset {
   createdAt: string
 }
 
+export interface ImageStudioBrandKit {
+  id: string
+  name: string
+  guidelines: string
+  negativePrompt: string
+  assets: Array<{
+    assetId: string
+    name: string
+    signedUrl: string | null
+  }>
+}
+
 export interface ImageStudioSettings {
   prompt: string
   model: "gpt-image-2"

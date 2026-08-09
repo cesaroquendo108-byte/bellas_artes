@@ -10,12 +10,17 @@ const features = [
 export default function HomePage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#0a0a0a] text-white">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 sm:px-8">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary"><Sparkles className="size-4" /></span>
           Bellas Artes
         </Link>
-        <Link href="/login" className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/[0.06]">
+        <div className="hidden items-center gap-1 md:flex">
+          {[{ href: "/inspire", label: "Inspire" }, { href: "/blog", label: "Blog" }, { href: "/tutorials", label: "Tutorials" }, { href: "/mcp", label: "MCP" }].map((item) => (
+            <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 text-sm text-slate-500 transition hover:bg-white/[0.05] hover:text-white">{item.label}</Link>
+          ))}
+        </div>
+        <Link href="/login" className="ml-auto rounded-md border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/[0.06]">
           Entrar
         </Link>
       </nav>
@@ -36,6 +41,9 @@ export default function HomePage() {
             <a href="#como-funciona" className="rounded-md border border-white/10 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.06]">
               Conocer la plataforma
             </a>
+            <Link href="/inspire" className="rounded-md border border-violet-400/20 px-5 py-3 text-sm font-semibold text-violet-200 transition hover:bg-violet-500/10">
+              Explorar Inspire
+            </Link>
           </div>
         </div>
 
@@ -55,6 +63,18 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <footer className="border-t border-white/[0.06] px-5 py-8 text-xs text-slate-500 sm:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Bellas Artes. Suite creativa IA.</p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/inspire" className="hover:text-white">Inspire</Link>
+            <Link href="/blog" className="hover:text-white">Blog</Link>
+            <Link href="/tutorials" className="hover:text-white">Tutorials</Link>
+            <Link href="/mcp" className="hover:text-white">MCP</Link>
+          </div>
+        </div>
+      </footer>
 
       <section id="como-funciona" className="border-t border-white/[0.06] bg-[#0d0d0f] px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-7xl">

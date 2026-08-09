@@ -1,4 +1,6 @@
 'use client';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
   Home, Clapperboard, Video, Globe, Music, Image as ImageIcon,
   User, FolderOpen, Palette, Film, Layout, Wrench,
@@ -10,7 +12,7 @@ import { cn } from '@/lib/utils/cn';
 type SidebarItem = {
   icon: LucideIcon;
   label: string;
-  href: string;
+  href?: string;
   active?: boolean;
 };
 
@@ -23,47 +25,48 @@ const sidebarSections: SidebarSection[] = [
   {
     label: null, // No label for Home
     items: [
-      { icon: Home, label: 'Inicio', href: '/', active: true },
+      { icon: Home, label: 'Inicio', href: '/dashboard' },
     ]
   },
   {
     label: 'CREAR',
     items: [
-      { icon: Clapperboard, label: 'Director', href: '#' },
-      { icon: Video, label: 'Video', href: '#' },
-      { icon: Globe, label: 'Mundo', href: '#' },
-      { icon: Music, label: 'Audio', href: '#' },
-      { icon: ImageIcon, label: 'Imagen', href: '#' },
-      { icon: User, label: 'Personaje', href: '#' },
-      { icon: Layers, label: 'MCP', href: '#' },
+      { icon: Clapperboard, label: 'Director', href: '/director' },
+      { icon: Video, label: 'Video', href: '/video' },
+      { icon: Globe, label: 'Mundo', href: '/world' },
+      { icon: Music, label: 'Audio' },
+      { icon: ImageIcon, label: 'Imagen', href: '/image' },
+      { icon: User, label: 'Personaje', href: '/characters' },
+      { icon: Layers, label: 'MCP', href: '/mcp' },
     ]
   },
   {
     label: 'ACTIVOS',
     items: [
-      { icon: FolderOpen, label: 'Proyectos Director', href: '#' },
-      { icon: Film, label: 'Personajes y Mundos', href: '#' },
-      { icon: Palette, label: 'Kit de Marca', href: '#' },
-      { icon: Layout, label: 'Media', href: '#' },
+      { icon: FolderOpen, label: 'Proyectos Director', href: '/director/projects' },
+      { icon: Film, label: 'Personajes y Mundos', href: '/characters-and-worlds' },
+      { icon: Palette, label: 'Kit de Marca', href: '/brand-kits' },
+      { icon: Layout, label: 'Media', href: '/media' },
     ]
   },
   {
     label: 'INSPIRACIÓN',
     items: [
-      { icon: BookOpen, label: 'Plantillas', href: '#' },
-      { icon: GraduationCap, label: 'Tutoriales', href: '#' },
-      { icon: FileText, label: 'Blog', href: '#' },
+      { icon: BookOpen, label: 'Inspire', href: '/inspire' },
+      { icon: GraduationCap, label: 'Tutoriales', href: '/tutorials' },
+      { icon: FileText, label: 'Blog', href: '/blog' },
     ]
   },
   {
     label: 'HERRAMIENTAS',
     items: [
-      { icon: Wrench, label: 'Todas las herramientas', href: '#' },
+      { icon: Wrench, label: 'Todas las herramientas' },
     ]
   },
 ];
 
 export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean, setCollapsed: (c: boolean) => void }) {
+  const pathname = usePathname();
   return (
     <>
       {/* Desktop Sidebar */}
@@ -91,26 +94,33 @@ export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean, setCo
               {section.label && collapsed && (
                 <div className="border-t border-normal-border mx-2 mb-2" />
               )}
-              {section.items.map((item, ii) => (
-                <a
+              {section.items.map((item, ii) => {
+                const active = Boolean(item.href && (pathname === item.href || pathname.startsWith(`${item.href}/`)));
+                const className = cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-[14px] font-medium transition-colors group",
+                  active
+                    ? "bg-primary/15 text-white"
+                    : "text-text-icon-neutral-secondary hover:text-white hover:bg-white/5",
+                  !item.href && "cursor-not-allowed opacity-45",
+                  collapsed && "justify-center px-0"
+                );
+                const content = <><item.icon className={cn("w-[18px] h-[18px] flex-shrink-0", active && "text-primary")} />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                  {!collapsed && !item.href && <span className="ml-auto text-[9px]">Próximamente</span>}
+                  {!collapsed && active && (
+                    <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
+                  )}</>;
+                return item.href ? <Link
                   key={ii}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-[14px] font-medium transition-colors group",
-                    item.active 
-                      ? "bg-primary/15 text-white" 
-                      : "text-text-icon-neutral-secondary hover:text-white hover:bg-white/5",
-                    collapsed && "justify-center px-0"
+                    className
                   )}
                   title={collapsed ? item.label : undefined}
                 >
-                  <item.icon className={cn("w-[18px] h-[18px] flex-shrink-0", item.active && "text-primary")} />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                  {!collapsed && item.active && (
-                    <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
-                  )}
-                </a>
-              ))}
+                  {content}
+                </Link> : <span key={ii} className={className} aria-disabled="true" title={`${item.label} · Próximamente`}>{content}</span>;
+              })}
             </div>
           ))}
         </nav>

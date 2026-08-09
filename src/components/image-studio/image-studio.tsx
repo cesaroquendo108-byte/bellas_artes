@@ -13,6 +13,7 @@ import { ImageStudioResizeHandle } from "./image-studio-resize-handle"
 import type {
   ImageGalleryAsset,
   ImageGenerationMode,
+  ImageStudioBrandKit,
   ImageStudioSettings,
   LocalReferences,
   ReferenceCategory,
@@ -39,9 +40,10 @@ const emptyReferences: LocalReferences = {
 interface ImageStudioProps {
   initialAssets: ImageGalleryAsset[]
   galleryError: string | null
+  brandKits: ImageStudioBrandKit[]
 }
 
-export function ImageStudio({ initialAssets, galleryError }: ImageStudioProps) {
+export function ImageStudio({ initialAssets, galleryError, brandKits }: ImageStudioProps) {
   const [panelWidth, setPanelWidth] = useState(400)
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false)
   const [mode, setMode] = useState<ImageGenerationMode>("create")
@@ -49,6 +51,7 @@ export function ImageStudio({ initialAssets, galleryError }: ImageStudioProps) {
   const [references, setReferences] = useState<LocalReferences>(emptyReferences)
   const referencesRef = useRef(references)
   const [selectedAsset, setSelectedAsset] = useState<SelectedReferenceAsset | null>(null)
+  const [selectedBrandKitId, setSelectedBrandKitId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<{ tone: "error" | "info"; message: string } | null>(null)
 
@@ -58,6 +61,32 @@ export function ImageStudio({ initialAssets, galleryError }: ImageStudioProps) {
 
   useEffect(() => () => {
     Object.values(referencesRef.current).flat().forEach((reference) => URL.revokeObjectURL(reference.previewUrl))
+  }, [])
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("bellas-artes-remix")
+    if (!stored) return
+
+    let active = true
+
+    try {
+      const remix = JSON.parse(stored) as { prompt?: unknown; sourcePostId?: unknown }
+      if (typeof remix.prompt === "string" && remix.prompt.trim()) {
+        queueMicrotask(() => {
+          if (!active) return
+          setSettings((current) => ({ ...current, prompt: remix.prompt as string }))
+          setFeedback({
+            tone: "info",
+            message: "El contexto público se cargó como punto de partida. Revísalo antes de generar.",
+          })
+        })
+      }
+    } catch {
+      // Ignore malformed browser-only handoff data.
+    } finally {
+      sessionStorage.removeItem("bellas-artes-remix")
+    }
+    return () => { active = false }
   }, [])
 
   function addFiles(category: ReferenceCategory, files: File[]) {
@@ -87,7 +116,13 @@ export function ImageStudio({ initialAssets, galleryError }: ImageStudioProps) {
 
   async function submitGeneration() {
     if (!settings.prompt.trim()) return
-    if (mode === "variation" && !selectedAsset) {
+    const selectedBrandKit = brandKits.find((kit) => kit.id === selectedBrandKitId)
+    const referenceAssetIds = [
+      ...(selectedAsset ? [selectedAsset.id] : []),
+      ...(selectedBrandKit?.assets.map((asset) => asset.assetId) ?? []),
+    ]
+
+    if (mode === "variation" && !referenceAssetIds.length) {
       setFeedback({
         tone: "error",
         message: "Para crear una variación selecciona Recreate en una imagen guardada. Las cargas locales permanecen como previsualizaciones hasta habilitar la subida de referencias.",
@@ -99,7 +134,9 @@ export function ImageStudio({ initialAssets, galleryError }: ImageStudioProps) {
       mode,
       ...settings,
       prompt: settings.prompt.trim(),
-      referenceAssetIds: selectedAsset ? [selectedAsset.id] : undefined,
+      referenceAssetIds: referenceAssetIds.length
+        ? [...new Set(referenceAssetIds)]
+        : undefined,
     }
 
     setIsSubmitting(true)
@@ -131,11 +168,14 @@ export function ImageStudio({ initialAssets, galleryError }: ImageStudioProps) {
       selectedAsset={selectedAsset}
       isSubmitting={isSubmitting}
       feedback={feedback}
+      brandKits={brandKits}
+      selectedBrandKitId={selectedBrandKitId}
       onModeChange={setMode}
       onSettingsChange={setSettings}
       onAddFiles={addFiles}
       onRemoveFile={removeFile}
       onRemoveSelectedAsset={() => setSelectedAsset(null)}
+      onBrandKitChange={setSelectedBrandKitId}
       onSubmit={submitGeneration}
     />
   )

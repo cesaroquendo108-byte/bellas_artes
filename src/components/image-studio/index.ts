@@ -1,2 +1,2 @@
 export { ImageStudio } from "./image-studio"
-export type { ImageGalleryAsset } from "./types"
+export type { ImageGalleryAsset, ImageStudioBrandKit } from "./types"

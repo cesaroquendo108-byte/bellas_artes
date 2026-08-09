@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { requireUser } from "@/lib/auth";
 import { getWalletSummary } from "@/lib/credits/queries";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function PrivateLayout({ children }: { children: React.ReactNode }) {
   const [{ profile }, wallet] = await Promise.all([requireUser(), getWalletSummary()]);

@@ -3,14 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BookOpen,
+  Boxes,
+  Clapperboard,
+  Compass,
   CreditCard,
   FolderOpen,
   Gauge,
+  Globe2,
+  GraduationCap,
+  Image as ImageIcon,
   LogOut,
+  Newspaper,
+  Palette,
+  PlugZap,
   ReceiptText,
+  Send,
   Settings,
   ShieldCheck,
   Sparkles,
+  UsersRound,
+  Video,
+  Volume2,
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 import {
@@ -31,9 +45,30 @@ type AppSidebarProps = {
   role: "user" | "admin";
 };
 
-const primaryItems = [
+const studioItems = [
   { title: "Centro de mando", href: "/dashboard", icon: Gauge },
+  { title: "Image Studio", href: "/image", icon: ImageIcon },
+  { title: "Video Suite", href: "/video", icon: Video },
+  { title: "Audio Suite", icon: Volume2, disabled: true },
+  { title: "Director", href: "/director", icon: Clapperboard },
+  { title: "Story", href: "/story", icon: BookOpen },
+  { title: "Personajes", href: "/characters", icon: UsersRound },
+  { title: "Mundos", href: "/world", icon: Globe2 },
+  { title: "Characters & Worlds", href: "/characters-and-worlds", icon: Boxes },
+  { title: "Brand Kits", href: "/brand-kits", icon: Palette },
+  { title: "Media", href: "/media", icon: FolderOpen },
   { title: "Biblioteca", href: "/assets", icon: FolderOpen },
+];
+
+const discoverItems = [
+  { title: "Inspire", href: "/inspire", icon: Compass },
+  { title: "Tutorials", href: "/tutorials", icon: GraduationCap },
+  { title: "Blog", href: "/blog", icon: Newspaper },
+  { title: "MCP", href: "/mcp", icon: PlugZap },
+  { title: "Publicar en Inspire", href: "/community/publish", icon: Send },
+];
+
+const accountItems = [
   { title: "Créditos", href: "/credits", icon: ReceiptText },
   { title: "Planes y créditos", href: "/billing", icon: CreditCard },
   { title: "Ajustes", href: "/settings", icon: Settings },
@@ -41,9 +76,12 @@ const primaryItems = [
 
 export function AppSidebar({ email, displayName, role }: AppSidebarProps) {
   const pathname = usePathname();
-  const items = role === "admin"
-    ? [...primaryItems, { title: "Revisar pagos", href: "/admin/payments", icon: ShieldCheck }]
-    : primaryItems;
+  const adminItems = role === "admin"
+    ? [
+        { title: "Revisar pagos", href: "/admin/payments", icon: ShieldCheck },
+        { title: "Moderar comunidad", href: "/admin/community", icon: ShieldCheck },
+      ]
+    : [];
   const initials = (displayName || email || "BA")
     .split(/[\s@._-]+/)
     .filter(Boolean)
@@ -65,25 +103,17 @@ export function AppSidebar({ email, displayName, role }: AppSidebarProps) {
         </Link>
       </SidebarHeader>
       <SidebarContent className="px-2 py-3">
-        <SidebarMenu>
-          {items.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  render={<Link href={item.href} />}
-                  isActive={active}
-                  tooltip={item.title}
-                  className="h-10 text-slate-400 hover:bg-white/[0.06] hover:text-white data-[active=true]:bg-primary/15 data-[active=true]:text-violet-300"
-                >
-                  <item.icon className="size-4" />
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
-        <SidebarSeparator className="my-4 bg-white/[0.06]" />
+        <SidebarSection label="Studio" items={studioItems} pathname={pathname} />
+        <SidebarSeparator className="my-3 bg-white/[0.06]" />
+        <SidebarSection label="Discover" items={discoverItems} pathname={pathname} />
+        <SidebarSeparator className="my-3 bg-white/[0.06]" />
+        <SidebarSection label="Cuenta" items={accountItems} pathname={pathname} />
+        {adminItems.length > 0 && (
+          <>
+            <SidebarSeparator className="my-3 bg-white/[0.06]" />
+            <SidebarSection label="Admin" items={adminItems} pathname={pathname} />
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter className="p-3">
         <div className="rounded-lg border border-white/[0.08] bg-white/[0.035] p-2">
@@ -111,5 +141,53 @@ export function AppSidebar({ email, displayName, role }: AppSidebarProps) {
         </div>
       </SidebarFooter>
     </Sidebar>
+  );
+}
+
+type SidebarItem = {
+  title: string;
+  href?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  disabled?: boolean;
+};
+
+function SidebarSection({
+  label,
+  items,
+  pathname,
+}: {
+  label: string;
+  items: SidebarItem[];
+  pathname: string;
+}) {
+  return (
+    <div>
+      <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-[.16em] text-slate-600">
+        {label}
+      </p>
+      <SidebarMenu>
+        {items.map((item) => {
+          const active = Boolean(
+            item.href &&
+              (pathname === item.href || pathname.startsWith(`${item.href}/`)),
+          );
+          return (
+            <SidebarMenuItem key={item.href ?? item.title}>
+              <SidebarMenuButton
+                render={item.href ? <Link href={item.href} /> : undefined}
+                isActive={active}
+                tooltip={item.disabled ? `${item.title} · Próximamente` : item.title}
+                disabled={item.disabled}
+                className="h-9 text-slate-400 hover:bg-white/[0.06] hover:text-white data-[active=true]:bg-primary/15 data-[active=true]:text-violet-300 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                <item.icon className="size-4" />
+                <span>{item.title}</span>
+                {item.disabled && <span className="ml-auto text-[9px]">Próximamente</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        })}
+      </SidebarMenu>
+    </div>
   );
 }

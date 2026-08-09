@@ -94,6 +94,35 @@ export function VideoStudioProvider({ operation, children }: { operation: VideoO
     })
   }, [])
 
+  useEffect(() => {
+    const stored = sessionStorage.getItem("bellas-artes-remix")
+    if (!stored) return
+    let active = true
+
+    try {
+      const remix = JSON.parse(stored) as { prompt?: unknown }
+      if (typeof remix.prompt === "string" && remix.prompt.trim()) {
+        queueMicrotask(() => {
+          if (!active) return
+          dispatch({ type: "field", key: "prompt", value: remix.prompt as string })
+          dispatch({
+            type: "feedback",
+            value: {
+              tone: "info",
+              message: "Se cargó el contexto público. El asset del autor no se copió ni se expuso; selecciona uno propio si esta herramienta lo requiere.",
+            },
+          })
+        })
+      }
+    } catch {
+      // Ignore malformed browser-only handoff data.
+    } finally {
+      sessionStorage.removeItem("bellas-artes-remix")
+    }
+
+    return () => { active = false }
+  }, [])
+
   const setField = useCallback(<K extends keyof VideoStudioFields>(key: K, value: VideoStudioFields[K]) => {
     dispatch({ type: "field", key, value })
   }, [])

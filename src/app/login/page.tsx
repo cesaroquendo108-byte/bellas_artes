@@ -1,11 +1,16 @@
 import { login, signup } from "./actions";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sparkles, Mail, Lock } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message: string }>;
+  searchParams: Promise<{ message?: string; next?: string }>;
 }) {
   const params = await searchParams;
   
@@ -32,6 +37,7 @@ export default async function LoginPage({
             </p>
 
             <form className="flex flex-col gap-4">
+              <input type="hidden" name="next" value={params.next ?? ""} />
               <div>
                 <label className="text-sm font-medium text-text-icon-neutral-secondary mb-1 block" htmlFor="email">
                   Correo Electrónico

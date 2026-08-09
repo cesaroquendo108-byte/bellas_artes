@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ImageReferenceDropzones } from "./image-reference-dropzones"
 import type {
   ImageGenerationMode,
+  ImageStudioBrandKit,
   ImageStudioSettings,
   LocalReferences,
   ReferenceCategory,
@@ -30,11 +31,14 @@ interface ImageControlsProps {
   selectedAsset: SelectedReferenceAsset | null
   isSubmitting: boolean
   feedback: { tone: "error" | "info"; message: string } | null
+  brandKits: ImageStudioBrandKit[]
+  selectedBrandKitId: string | null
   onModeChange: (mode: ImageGenerationMode) => void
   onSettingsChange: (settings: ImageStudioSettings) => void
   onAddFiles: (category: ReferenceCategory, files: File[]) => void
   onRemoveFile: (category: ReferenceCategory, id: string) => void
   onRemoveSelectedAsset: () => void
+  onBrandKitChange: (id: string | null) => void
   onSubmit: () => void
 }
 
@@ -45,11 +49,14 @@ export function ImageControls({
   selectedAsset,
   isSubmitting,
   feedback,
+  brandKits,
+  selectedBrandKitId,
   onModeChange,
   onSettingsChange,
   onAddFiles,
   onRemoveFile,
   onRemoveSelectedAsset,
+  onBrandKitChange,
   onSubmit,
 }: ImageControlsProps) {
   function update<K extends keyof ImageStudioSettings>(key: K, value: ImageStudioSettings[K]) {
@@ -125,6 +132,34 @@ export function ImageControls({
           onRemoveFile={onRemoveFile}
           onRemoveSelectedAsset={onRemoveSelectedAsset}
         />
+
+        <div className="space-y-2">
+          <Label>Saved Brand Kit</Label>
+          <Select
+            value={selectedBrandKitId ?? "none"}
+            onValueChange={(value) =>
+              onBrandKitChange(value && value !== "none" ? value : null)
+            }
+          >
+            <SelectTrigger className="w-full border-white/10 bg-white/[0.035]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start">
+              <SelectItem value="none">Sin Brand Kit</SelectItem>
+              {brandKits.map((kit) => (
+                <SelectItem key={kit.id} value={kit.id}>
+                  {kit.name} · {kit.assets.length} referencias
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {selectedBrandKitId && (
+            <p className="text-[10px] leading-4 text-violet-200/70">
+              Sus logos y referencias guardadas se incluirán sin cambiar el
+              contrato de generación.
+            </p>
+          )}
+        </div>
 
         <div className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
           <div>
