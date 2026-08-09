@@ -1,7 +1,8 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Copy, Film, Music2, Plus, Save, Scissors, Trash2, Upload } from "lucide-react";
+import { Copy, Film, Music2, Plus, Save, Trash2, Upload, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -17,8 +18,10 @@ type Track = {
   name: string;
   start: number;
   width: number;
+  trimStart: number;
   volume: number;
   speed: number;
+  muted: boolean;
 };
 
 const colors = {
@@ -34,6 +37,21 @@ const kindLabels: Record<Track["kind"], string> = {
   effect: "Efecto",
   ambience: "Ambiente",
 };
+
+function createTrack(kind: Track["kind"], asset?: AudioLibraryItem): Track {
+  return {
+    id: crypto.randomUUID(),
+    assetId: asset?.id ?? null,
+    kind,
+    name: asset?.name ?? `${kindLabels[kind]} sin asset`,
+    start: 0,
+    width: 36,
+    trimStart: 0,
+    volume: kind === "music" ? 0.35 : 1,
+    speed: 1,
+    muted: false,
+  };
+}
 
 export function VideoAudioStudio({
   assets,
@@ -52,14 +70,23 @@ export function VideoAudioStudio({
   setupPending: boolean;
   providerMessage: string;
 }) {
+  const searchParams = useSearchParams();
   const videoRef = useRef<HTMLInputElement>(null);
+  const [initialTrack] = useState<Track | null>(() => {
+    const requestedAssetId = searchParams.get("asset");
+    const asset = assets.find((item) => item.id === requestedAssetId);
+    return asset ? createTrack("voice", asset) : null;
+  });
   const [video, setVideo] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [sourceVideoAssetId, setSourceVideoAssetId] = useState<string | null>(null);
   const [durationSeconds, setDurationSeconds] = useState(30);
-  const [tracks, setTracks] = useState<Track[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [tracks, setTracks] = useState<Track[]>(() => initialTrack ? [initialTrack] : []);
+  const [selectedId, setSelectedId] = useState<string | null>(initialTrack?.id ?? null);
   const [projectId, setProjectId] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    initialTrack ? `“${initialTrack.name}” se añadió como pista de voz.` : "",
+  );
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -84,6 +111,7 @@ export function VideoAudioStudio({
     if (videoUrl) URL.revokeObjectURL(videoUrl);
     setVideo(nextFile);
     setVideoUrl(URL.createObjectURL(nextFile));
+    setSourceVideoAssetId(null);
     setMessage(
       "Este video es una previsualización local. Guárdalo en la biblioteca antes de usarlo en un render real.",
     );
@@ -93,25 +121,14 @@ export function VideoAudioStudio({
     if (videoUrl) URL.revokeObjectURL(videoUrl);
     setVideoUrl(null);
     setVideo(null);
+    setSourceVideoAssetId(null);
     if (videoRef.current) videoRef.current.value = "";
   }
 
   function addTrack(kind: Track["kind"], asset?: AudioLibraryItem) {
-    const id = crypto.randomUUID();
-    setTracks((current) => [
-      ...current,
-      {
-        id,
-        assetId: asset?.id ?? null,
-        kind,
-        name: asset?.name ?? `${kindLabels[kind]} sin asset`,
-        start: 0,
-        width: 36,
-        volume: kind === "music" ? 0.35 : 1,
-        speed: 1,
-      },
-    ]);
-    setSelectedId(id);
+    const track = createTrack(kind, asset);
+    setTracks((current) => [...current, track]);
+    setSelectedId(track.id);
   }
 
   function updateSelected(change: Partial<Track>) {
@@ -120,10 +137,29 @@ export function VideoAudioStudio({
     );
   }
 
+  async function uploadSourceVideo() {
+    if (!video) return sourceVideoAssetId;
+    if (sourceVideoAssetId) return sourceVideoAssetId;
+    const form = new FormData();
+    form.set("file", video);
+    form.set("kind", "video");
+    const response = await fetch("/api/audio/uploads", { method: "POST", body: form });
+    const result = (await response.json().catch(() => ({}))) as {
+      asset?: { id?: string };
+      message?: string;
+    };
+    if (!response.ok || !result.asset?.id) {
+      throw new Error(result.message ?? "No se pudo guardar el video en el almacenamiento privado.");
+    }
+    setSourceVideoAssetId(result.asset.id);
+    return result.asset.id;
+  }
+
   async function saveProject() {
     setBusy(true);
     setMessage("");
     try {
+      const storedVideoId = await uploadSourceVideo();
       const durationMs = Math.max(0, Math.round(durationSeconds * 1000));
       const response = await fetch("/api/audio/projects", {
         method: "POST",
@@ -131,20 +167,20 @@ export function VideoAudioStudio({
         body: JSON.stringify({
           id: projectId ?? undefined,
           name: video?.name ? `Audio · ${video.name}` : "Proyecto de audio para video",
-          sourceVideoAssetId: null,
+          sourceVideoAssetId: storedVideoId,
           durationMs,
-          preset: { localVideoName: video?.name ?? null },
+          preset: { sourceVideoName: video?.name ?? null },
           tracks: tracks.map((track) => ({
             id: track.id,
             assetId: track.assetId,
             kind: track.kind,
             name: track.name,
             startMs: Math.round((track.start / 100) * durationMs),
-            trimStartMs: 0,
+            trimStartMs: Math.max(0, Math.round((track.trimStart / 100) * durationMs)),
             durationMs: Math.max(0, Math.round((track.width / 100) * durationMs)),
             volume: track.volume,
             speed: track.speed,
-            muted: false,
+            muted: track.muted,
           })),
         }),
       });
@@ -157,7 +193,7 @@ export function VideoAudioStudio({
         throw new Error(result.message ?? "No se pudo guardar el proyecto.");
       }
       setProjectId(result.projectId);
-      setMessage("Proyecto guardado. El video local todavía debe subirse como asset para renderizar.");
+      setMessage(storedVideoId ? "Proyecto y video guardados en tu espacio privado." : "Proyecto guardado.");
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "No se pudo guardar el proyecto.");
     } finally {
@@ -166,19 +202,21 @@ export function VideoAudioStudio({
   }
 
   async function exportMix() {
-    if (!projectId) {
-      setMessage("Guarda el proyecto antes de preparar la exportación.");
-      return;
-    }
     setBusy(true);
     setMessage("");
     try {
+      const exportProjectId = projectId;
+      if (!exportProjectId) {
+        await saveProject();
+        setMessage("El proyecto quedó guardado. Pulsa exportar de nuevo para preparar la mezcla.");
+        return;
+      }
       const response = await fetch("/api/audio/mix", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           idempotencyKey: crypto.randomUUID(),
-          projectId,
+          projectId: exportProjectId,
           format: "mp4",
         }),
       });
@@ -234,7 +272,7 @@ export function VideoAudioStudio({
                 </Button>
               </div>
             )}
-            {video && (
+          {video && (
               <Button
                 type="button"
                 variant="destructive"
@@ -312,6 +350,57 @@ export function VideoAudioStudio({
               </div>
               <label className="block">
                 <span className="flex justify-between text-xs text-slate-400">
+                  <span>Entrada</span>
+                  <span>{selected.start.toFixed(0)}%</span>
+                </span>
+                <Slider
+                  className="mt-3"
+                  min={0}
+                  max={Math.max(0, 100 - selected.width)}
+                  step={1}
+                  value={[selected.start]}
+                  onValueChange={(nextValue) => {
+                    const value = typeof nextValue === "number" ? nextValue : nextValue[0];
+                    if (value !== undefined) updateSelected({ start: value });
+                  }}
+                />
+              </label>
+              <label className="block">
+                <span className="flex justify-between text-xs text-slate-400">
+                  <span>Duración</span>
+                  <span>{selected.width.toFixed(0)}%</span>
+                </span>
+                <Slider
+                  className="mt-3"
+                  min={1}
+                  max={Math.max(1, 100 - selected.start)}
+                  step={1}
+                  value={[selected.width]}
+                  onValueChange={(nextValue) => {
+                    const value = typeof nextValue === "number" ? nextValue : nextValue[0];
+                    if (value !== undefined) updateSelected({ width: value });
+                  }}
+                />
+              </label>
+              <label className="block">
+                <span className="flex justify-between text-xs text-slate-400">
+                  <span>Recorte inicial</span>
+                  <span>{selected.trimStart.toFixed(0)}%</span>
+                </span>
+                <Slider
+                  className="mt-3"
+                  min={0}
+                  max={99}
+                  step={1}
+                  value={[selected.trimStart]}
+                  onValueChange={(nextValue) => {
+                    const value = typeof nextValue === "number" ? nextValue : nextValue[0];
+                    if (value !== undefined) updateSelected({ trimStart: value });
+                  }}
+                />
+              </label>
+              <label className="block">
+                <span className="flex justify-between text-xs text-slate-400">
                   <span>Volumen</span>
                   <span>{Math.round(selected.volume * 100)}%</span>
                 </span>
@@ -345,8 +434,13 @@ export function VideoAudioStudio({
                 />
               </label>
               <div className="grid grid-cols-3 gap-2">
-                <Button variant="outline" size="icon" title="Recortar" disabled>
-                  <Scissors />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  title={selected.muted ? "Activar pista" : "Silenciar pista"}
+                  onClick={() => updateSelected({ muted: !selected.muted })}
+                >
+                  {selected.muted ? <VolumeX /> : <Volume2 />}
                 </Button>
                 <Button
                   variant="outline"
@@ -405,7 +499,7 @@ export function VideoAudioStudio({
           <Button
             className="w-full bg-violet-600 text-white hover:bg-violet-500"
             onClick={exportMix}
-            disabled={busy || !projectId}
+            disabled={busy || !video || tracks.some((track) => !track.assetId)}
           >
             <Music2 /> Preparar exportación
           </Button>

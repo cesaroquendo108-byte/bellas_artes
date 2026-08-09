@@ -28,6 +28,9 @@ export function VoiceChangerStudio({
   providerMessage: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const mediaChunksRef = useRef<Blob[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [voiceId, setVoiceId] = useState(voices[0]?.id ?? "");
@@ -40,12 +43,77 @@ export function VoiceChangerStudio({
   });
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [recording, setRecording] = useState(false);
 
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
+      mediaRecorderRef.current?.stop();
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
   }, [previewUrl]);
+
+  async function toggleRecording() {
+    if (recording) {
+      mediaRecorderRef.current?.stop();
+      return;
+    }
+
+    if (setupPending) {
+      setMessage(
+        "La grabación está preparada, pero el micrófono seguirá deshabilitado hasta conectar un proveedor aprobado.",
+      );
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setMessage("Este navegador no permite grabar audio desde el micrófono.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const preferredTypes = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"];
+      const mimeType = preferredTypes.find((type) => MediaRecorder.isTypeSupported(type));
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+
+      mediaStreamRef.current = stream;
+      mediaRecorderRef.current = recorder;
+      mediaChunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) mediaChunksRef.current.push(event.data);
+      };
+      recorder.onerror = () => {
+        setMessage("La grabación se interrumpió. Revisa el permiso del micrófono.");
+      };
+      recorder.onstop = () => {
+        const type = recorder.mimeType || mimeType || "audio/webm";
+        const blob = new Blob(mediaChunksRef.current, { type });
+        mediaChunksRef.current = [];
+        stream.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+        mediaRecorderRef.current = null;
+        setRecording(false);
+
+        if (!blob.size) {
+          setMessage("No se capturó audio. Inténtalo de nuevo y habla cerca del micrófono.");
+          return;
+        }
+
+        const extension = type.includes("ogg") ? "ogg" : "webm";
+        selectFile(new File([blob], `grabacion-${Date.now()}.${extension}`, { type }));
+        setMessage("Grabación lista. Escúchala antes de transformar la voz.");
+      };
+      recorder.start(250);
+      setRecording(true);
+      setMessage("Grabando… pulsa Detener cuando termines.");
+    } catch {
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+      setRecording(false);
+      setMessage("No pude acceder al micrófono. Revisa el permiso del navegador.");
+    }
+  }
 
   function selectFile(nextFile?: File) {
     if (!nextFile) return;
@@ -138,13 +206,10 @@ export function VoiceChangerStudio({
               </Button>
               <Button
                 variant="outline"
-                onClick={() =>
-                  setMessage(
-                    "La grabación está preparada, pero el micrófono seguirá deshabilitado hasta conectar un proveedor aprobado.",
-                  )
-                }
+                onClick={toggleRecording}
+                className={recording ? "border-red-400/40 text-red-200" : undefined}
               >
-                <Mic /> Grabar
+                <Mic /> {recording ? "Detener" : "Grabar"}
               </Button>
               {file && (
                 <Button variant="destructive" onClick={removeFile}>

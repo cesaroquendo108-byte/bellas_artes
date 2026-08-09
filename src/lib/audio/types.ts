@@ -33,4 +33,5 @@ export interface AudioLibraryItem {
   createdAt: string;
   durationSeconds: number | null;
   signedUrl: string | null;
+  mimeType?: string | null;
 }
