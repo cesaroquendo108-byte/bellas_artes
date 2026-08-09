@@ -4,7 +4,7 @@ import { PublishCommunityForm, type PublishableAsset } from "@/components/social
 import { getAssets } from "@/lib/assets/queries"
 
 export const metadata: Metadata = {
-  title: "Publicar en Inspire · Bellas Artes",
+  title: "Publicar en Inspiración · Bellas Artes",
   robots: { index: false, follow: false },
 }
 
@@ -29,7 +29,7 @@ export default async function PublishCommunityPage() {
   return (
     <div className="min-h-screen text-white">
       <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-300">Inspire community</p>
+        <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-300">Comunidad de inspiración</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Comparte una creación</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Selecciona un asset propio. Toda publicación entra en revisión y nunca consume créditos.</p>
       </header>

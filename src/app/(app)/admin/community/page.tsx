@@ -24,7 +24,7 @@ export default async function CommunityAdminPage() {
     <div className="min-h-screen text-white">
       <header className="mb-8">
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-300">Administration</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Community moderation</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Moderación de la comunidad</h1>
         <p className="mt-3 text-sm text-slate-500">Aprueba, rechaza u oculta publicaciones. El feed público sólo consulta contenido aprobado.</p>
       </header>
       {error ? <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 p-4 text-xs text-amber-200">{error}</p> : <CommunityModeration posts={posts} />}

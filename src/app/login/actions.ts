@@ -4,17 +4,23 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
-function safeNextPath(value: FormDataEntryValue | null) {
+export async function safeNextPath(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return "/dashboard";
   const path = value.trim();
-  if (!path.startsWith("/") || path.startsWith("//") || path.length > 500) {
+  if (
+    !path.startsWith("/") ||
+    path.startsWith("//") ||
+    path.startsWith("/\\") ||
+    path.includes("\\") ||
+    path.length > 500
+  ) {
     return "/dashboard";
   }
   return path;
 }
 
 export async function login(formData: FormData) {
-  const nextPath = safeNextPath(formData.get("next"));
+  const nextPath = await safeNextPath(formData.get("next"));
   let supabase;
 
   try {
@@ -41,7 +47,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const nextPath = safeNextPath(formData.get("next"));
+  const nextPath = await safeNextPath(formData.get("next"));
   let supabase;
 
   try {

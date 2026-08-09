@@ -98,7 +98,12 @@ export async function updateSession(request: NextRequest) {
   if (user && request.nextUrl.pathname.startsWith("/login")) {
     const url = request.nextUrl.clone();
     const destination = request.nextUrl.searchParams.get("next");
-    if (destination?.startsWith("/") && !destination.startsWith("//")) {
+    if (
+      destination?.startsWith("/") &&
+      !destination.startsWith("//") &&
+      !destination.startsWith("/\\") &&
+      !destination.includes("\\")
+    ) {
       const target = new URL(destination, request.url);
       url.pathname = target.pathname;
       url.search = target.search;

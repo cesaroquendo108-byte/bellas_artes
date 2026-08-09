@@ -7,10 +7,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://bellasartes-xi.vercel.app"),
-  title: "Bellas Artes | AI Creator Suite",
+  title: "Bellas Artes | Suite creativa con IA",
   description: "Plataforma de generación de arte con IA para Venezuela",
   openGraph: {
-    title: "Bellas Artes | AI Creator Suite",
+    title: "Bellas Artes | Suite creativa con IA",
     description: "Imagen, video, personajes, narrativa y recursos de marca en un solo estudio creativo.",
     type: "website",
   },

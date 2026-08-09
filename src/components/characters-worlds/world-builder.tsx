@@ -1,37 +1,306 @@
-"use client"
+"use client";
 
-import { Coins, FolderOpen, ImagePlus, LoaderCircle, Sparkles, Trash2 } from "lucide-react"
-import { useEffect, useId, useState } from "react"
+import {
+  Coins,
+  FolderOpen,
+  ImagePlus,
+  LoaderCircle,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useId, useState } from "react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
-import type { CharacterWorldJobResponse, WorldGenerationRequest } from "@/lib/generation/character-world"
-import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import type {
+  CharacterWorldJobResponse,
+  WorldGenerationRequest,
+} from "@/lib/generation/character-world";
+import { cn } from "@/lib/utils";
 
-import type { CharacterWorldAsset } from "./types"
+import type { CharacterWorldAsset } from "./types";
 
 export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
-  const inputId = useId()
-  const [prompt, setPrompt] = useState("")
-  const [model, setModel] = useState<WorldGenerationRequest["model"]>("flux-1-dev")
-  const [aspectRatio, setAspectRatio] = useState<WorldGenerationRequest["aspectRatio"]>("16:9")
-  const [cfgScale, setCfgScale] = useState(7)
-  const [seed, setSeed] = useState(0)
-  const [randomSeed, setRandomSeed] = useState(true)
-  const [localReference, setLocalReference] = useState<{ file: File; url: string } | null>(null)
-  const [savedReference, setSavedReference] = useState<CharacterWorldAsset | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [feedback, setFeedback] = useState<{ tone: "error" | "info"; message: string } | null>(null)
-  const imageAssets = assets.filter((asset) => asset.type === "image")
-  useEffect(() => () => { if (localReference) URL.revokeObjectURL(localReference.url) }, [localReference])
-  function choose(file?: File) { if (!file || !file.type.startsWith("image/") || file.size > 30 * 1024 * 1024) { setFeedback({ tone: "error", message: "Usa una imagen de hasta 30 MB." }); return } if (localReference) URL.revokeObjectURL(localReference.url); setSavedReference(null); setLocalReference({ file, url: URL.createObjectURL(file) }); setFeedback(null) }
-  async function submit() { setSubmitting(true); setFeedback(null); const payload: WorldGenerationRequest = { prompt, model, aspectRatio, cfgScale, seed, randomSeed, referenceAssetIds: savedReference ? [savedReference.id] : undefined }; try { const response = await fetch("/api/generate/world", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); const body = await response.json() as CharacterWorldJobResponse | { message?: string }; setFeedback({ tone: response.status === 503 ? "info" : "error", message: body.message ?? "No se pudo validar la solicitud." }) } catch { setFeedback({ tone: "error", message: "No fue posible contactar el endpoint de mundos." }) } finally { setSubmitting(false) } }
-  const preview = localReference?.url ?? savedReference?.signedUrl
-  return <div className="grid min-h-0 gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_300px]"><div className="flex min-h-80 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-black">{preview ? <div className="aspect-video w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url(${preview})` }} /> : <div className="px-8 text-center"><div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600"><Sparkles className="size-7" /></div><h3 className="mt-5 text-lg font-semibold">World Canvas</h3><p className="mt-2 max-w-sm text-xs leading-5 text-slate-500">Describe atmósfera, arquitectura, clima y cámara. No se mostrará ningún mundo ficticio como resultado.</p></div>}</div><div className="space-y-4"><div className="space-y-2"><Label className="text-xs text-slate-400">Prompt del mundo</Label><Textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Una ciudad flotante entre tepuyes al amanecer…" className="min-h-28" /></div><div className="space-y-2"><Label className="text-xs text-slate-400">Modelo</Label><Select value={model} onValueChange={(value) => value && setModel(value as WorldGenerationRequest["model"])}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="flux-1-dev">Flux.1 Dev</SelectItem><SelectItem value="kling-3-omni">Kling 3.0 Omni</SelectItem></SelectContent></Select></div><div className="space-y-2"><Label className="text-xs text-slate-400">Aspect ratio</Label><div className="grid grid-cols-4 gap-1">{(["1:1", "9:16", "16:9", "4:5"] as const).map((ratio) => <button key={ratio} type="button" onClick={() => setAspectRatio(ratio)} className={cn("rounded-lg border py-2 text-[9px]", aspectRatio === ratio ? "border-violet-400 bg-violet-500/15 text-violet-200" : "border-white/10 text-slate-500")}>{ratio}</button>)}</div></div><div className="space-y-2"><div className="flex justify-between text-[10px]"><Label>CFG Scale</Label><span className="text-violet-300">{cfgScale}</span></div><Slider value={[cfgScale]} min={1} max={20} step={.5} onValueChange={(value) => setCfgScale(Array.isArray(value) ? value[0] : value)} /></div><div className="space-y-2"><div className="flex justify-between"><Label className="text-[10px]">Seed</Label><Switch checked={randomSeed} onCheckedChange={setRandomSeed} /></div><Input type="number" value={seed} disabled={randomSeed} onChange={(event) => setSeed(Number(event.target.value))} /></div>{preview ? <div className="overflow-hidden rounded-xl border border-violet-400/20"><div className="flex items-center gap-2 p-2"><Badge className="text-[9px]">{localReference ? "Preview local" : "Asset guardado"}</Badge><span className="min-w-0 flex-1 truncate text-[9px] text-slate-500">{localReference?.file.name ?? savedReference?.name}</span><Button type="button" variant="ghost" size="icon-xs" onClick={() => { if (localReference) { URL.revokeObjectURL(localReference.url); setLocalReference(null) } else setSavedReference(null) }}><Trash2 /></Button></div></div> : <><input id={inputId} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => { choose(event.target.files?.[0]); event.target.value = "" }} /><label htmlFor={inputId} className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 p-3 text-[10px] text-slate-500"><ImagePlus className="size-4" /> Referencia opcional</label>{imageAssets.length > 0 && <Select value={null} onValueChange={(id) => { const asset = imageAssets.find((item) => item.id === id); if (asset) { setSavedReference(asset); setLocalReference(null) } }}><SelectTrigger className="w-full"><FolderOpen className="size-3.5" /><SelectValue placeholder="Elegir asset guardado" /></SelectTrigger><SelectContent>{imageAssets.map((asset) => <SelectItem key={asset.id} value={asset.id}>{asset.name}</SelectItem>)}</SelectContent></Select>}</>}<Button type="button" size="lg" onClick={submit} disabled={submitting} className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white">{submitting ? <LoaderCircle className="animate-spin" /> : <Sparkles />} Generate World</Button><p className="text-center text-[9px] text-slate-600"><Coins className="mr-1 inline size-3" />0 créditos</p>{feedback && <div role="status" className={feedback.tone === "error" ? "rounded-xl border border-rose-400/20 bg-rose-500/10 p-3 text-xs text-rose-200" : "rounded-xl border border-violet-400/20 bg-violet-500/10 p-3 text-xs text-violet-200"}>{feedback.message}</div>}</div></div>
+  const inputId = useId();
+  const [prompt, setPrompt] = useState("");
+  const [model, setModel] =
+    useState<WorldGenerationRequest["model"]>("flux-1-dev");
+  const [aspectRatio, setAspectRatio] =
+    useState<WorldGenerationRequest["aspectRatio"]>("16:9");
+  const [cfgScale, setCfgScale] = useState(7);
+  const [seed, setSeed] = useState(0);
+  const [randomSeed, setRandomSeed] = useState(true);
+  const [localReference, setLocalReference] = useState<{
+    file: File;
+    url: string;
+  } | null>(null);
+  const [savedReference, setSavedReference] =
+    useState<CharacterWorldAsset | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    tone: "error" | "info";
+    message: string;
+  } | null>(null);
+  const imageAssets = assets.filter((asset) => asset.type === "image");
+  useEffect(
+    () => () => {
+      if (localReference) URL.revokeObjectURL(localReference.url);
+    },
+    [localReference],
+  );
+  function choose(file?: File) {
+    if (
+      !file ||
+      !file.type.startsWith("image/") ||
+      file.size > 30 * 1024 * 1024
+    ) {
+      setFeedback({ tone: "error", message: "Usa una imagen de hasta 30 MB." });
+      return;
+    }
+    if (localReference) URL.revokeObjectURL(localReference.url);
+    setSavedReference(null);
+    setLocalReference({ file, url: URL.createObjectURL(file) });
+    setFeedback(null);
+  }
+  async function submit() {
+    setSubmitting(true);
+    setFeedback(null);
+    const payload: WorldGenerationRequest = {
+      prompt,
+      model,
+      aspectRatio,
+      cfgScale,
+      seed,
+      randomSeed,
+      referenceAssetIds: savedReference ? [savedReference.id] : undefined,
+    };
+    try {
+      const response = await fetch("/api/generate/world", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const body = (await response.json()) as
+        CharacterWorldJobResponse | { message?: string };
+      setFeedback({
+        tone: response.status === 503 ? "info" : "error",
+        message: body.message ?? "No se pudo validar la solicitud.",
+      });
+    } catch {
+      setFeedback({
+        tone: "error",
+        message: "No fue posible contactar el endpoint de mundos.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+  const preview = localReference?.url ?? savedReference?.signedUrl;
+  return (
+    <div className="grid min-h-0 gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="flex min-h-80 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-black">
+        {preview ? (
+          <div
+            className="aspect-video w-full bg-contain bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${preview})` }}
+          />
+        ) : (
+          <div className="px-8 text-center">
+            <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600">
+              <Sparkles className="size-7" />
+            </div>
+            <h3 className="mt-5 text-lg font-semibold">Lienzo del mundo</h3>
+            <p className="mt-2 max-w-sm text-xs leading-5 text-slate-500">
+              Describe atmósfera, arquitectura, clima y cámara. No se mostrará
+              ningún mundo ficticio como resultado.
+            </p>
+          </div>
+        )}
+      </div>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label className="text-xs text-slate-400">Prompt del mundo</Label>
+          <Textarea
+            value={prompt}
+            onChange={(event) => setPrompt(event.target.value)}
+            placeholder="Una ciudad flotante entre tepuyes al amanecer…"
+            className="min-h-28"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs text-slate-400">Modelo</Label>
+          <Select
+            value={model}
+            onValueChange={(value) =>
+              value && setModel(value as WorldGenerationRequest["model"])
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="flux-1-dev">Flux.1 Dev</SelectItem>
+              <SelectItem value="kling-3-omni">Kling 3.0 Omni</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs text-slate-400">Relación de aspecto</Label>
+          <div className="grid grid-cols-4 gap-1">
+            {(["1:1", "9:16", "16:9", "4:5"] as const).map((ratio) => (
+              <button
+                key={ratio}
+                type="button"
+                onClick={() => setAspectRatio(ratio)}
+                className={cn(
+                  "rounded-lg border py-2 text-[9px]",
+                  aspectRatio === ratio
+                    ? "border-violet-400 bg-violet-500/15 text-violet-200"
+                    : "border-white/10 text-slate-500",
+                )}
+              >
+                {ratio}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between text-[10px]">
+            <Label>CFG Scale</Label>
+            <span className="text-violet-300">{cfgScale}</span>
+          </div>
+          <Slider
+            value={[cfgScale]}
+            min={1}
+            max={20}
+            step={0.5}
+            onValueChange={(value) =>
+              setCfgScale(Array.isArray(value) ? value[0] : value)
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label className="text-[10px]">Seed</Label>
+            <Switch checked={randomSeed} onCheckedChange={setRandomSeed} />
+          </div>
+          <Input
+            type="number"
+            value={seed}
+            disabled={randomSeed}
+            onChange={(event) => setSeed(Number(event.target.value))}
+          />
+        </div>
+        {preview ? (
+          <div className="overflow-hidden rounded-xl border border-violet-400/20">
+            <div className="flex items-center gap-2 p-2">
+              <Badge className="text-[9px]">
+                {localReference ? "Vista previa local" : "Asset guardado"}
+              </Badge>
+              <span className="min-w-0 flex-1 truncate text-[9px] text-slate-500">
+                {localReference?.file.name ?? savedReference?.name}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => {
+                  if (localReference) {
+                    URL.revokeObjectURL(localReference.url);
+                    setLocalReference(null);
+                  } else setSavedReference(null);
+                }}
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <input
+              id={inputId}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={(event) => {
+                choose(event.target.files?.[0]);
+                event.target.value = "";
+              }}
+            />
+            <label
+              htmlFor={inputId}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 p-3 text-[10px] text-slate-500"
+            >
+              <ImagePlus className="size-4" /> Referencia opcional
+            </label>
+            {imageAssets.length > 0 && (
+              <Select
+                value={null}
+                onValueChange={(id) => {
+                  const asset = imageAssets.find((item) => item.id === id);
+                  if (asset) {
+                    setSavedReference(asset);
+                    setLocalReference(null);
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <FolderOpen className="size-3.5" />
+                  <SelectValue placeholder="Elegir asset guardado" />
+                </SelectTrigger>
+                <SelectContent>
+                  {imageAssets.map((asset) => (
+                    <SelectItem key={asset.id} value={asset.id}>
+                      {asset.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </>
+        )}
+        <Button
+          type="button"
+          size="lg"
+          onClick={submit}
+          disabled={submitting}
+          className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"
+        >
+          {submitting ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <Sparkles />
+          )}{" "}
+          Generar mundo
+        </Button>
+        <p className="text-center text-[9px] text-slate-600">
+          <Coins className="mr-1 inline size-3" />0 créditos
+        </p>
+        {feedback && (
+          <div
+            role="status"
+            className={
+              feedback.tone === "error"
+                ? "rounded-xl border border-rose-400/20 bg-rose-500/10 p-3 text-xs text-rose-200"
+                : "rounded-xl border border-violet-400/20 bg-violet-500/10 p-3 text-xs text-violet-200"
+            }
+          >
+            {feedback.message}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

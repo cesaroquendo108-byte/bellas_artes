@@ -16,7 +16,7 @@ export default function HomePage() {
           Bellas Artes
         </Link>
         <div className="hidden items-center gap-1 md:flex">
-          {[{ href: "/inspire", label: "Inspire" }, { href: "/blog", label: "Blog" }, { href: "/tutorials", label: "Tutorials" }, { href: "/mcp", label: "MCP" }].map((item) => (
+          {[{ href: "/inspire", label: "Inspiración" }, { href: "/blog", label: "Blog" }, { href: "/tutorials", label: "Tutoriales" }, { href: "/mcp", label: "MCP" }].map((item) => (
             <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 text-sm text-slate-500 transition hover:bg-white/[0.05] hover:text-white">{item.label}</Link>
           ))}
         </div>
@@ -42,7 +42,7 @@ export default function HomePage() {
               Conocer la plataforma
             </a>
             <Link href="/inspire" className="rounded-md border border-violet-400/20 px-5 py-3 text-sm font-semibold text-violet-200 transition hover:bg-violet-500/10">
-              Explorar Inspire
+              Explorar inspiración
             </Link>
           </div>
         </div>
@@ -68,9 +68,9 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Bellas Artes. Suite creativa IA.</p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/inspire" className="hover:text-white">Inspire</Link>
+            <Link href="/inspire" className="hover:text-white">Inspiración</Link>
             <Link href="/blog" className="hover:text-white">Blog</Link>
-            <Link href="/tutorials" className="hover:text-white">Tutorials</Link>
+            <Link href="/tutorials" className="hover:text-white">Tutoriales</Link>
             <Link href="/mcp" className="hover:text-white">MCP</Link>
           </div>
         </div>

@@ -11,6 +11,10 @@ import { getR2Env } from "@/lib/env";
 
 let client: S3Client | null = null;
 
+export function _resetR2ClientForTesting() {
+  client = null;
+}
+
 function getClient() {
   if (client) return client;
   const env = getR2Env();

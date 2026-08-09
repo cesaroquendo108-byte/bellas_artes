@@ -1,55 +1,63 @@
-"use client"
+"use client";
 
-import { Plus, SearchX, Sparkles } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import type { BrandKit } from "@/lib/brand-kits/contracts"
-import { BrandKitCard } from "./brand-kit-card"
+import { Plus, SearchX, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import type { BrandKit } from "@/lib/brand-kits/contracts";
+import { BrandKitCard } from "./brand-kit-card";
 
 export function BrandKitsDashboard({
   kits,
   error,
 }: {
-  kits: BrandKit[]
-  error?: string | null
+  kits: BrandKit[];
+  error?: string | null;
 }) {
-  const router = useRouter()
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState("")
-  const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   async function create() {
-    setBusy(true)
-    setMessage(null)
+    setBusy(true);
+    setMessage(null);
 
     try {
       const response = await fetch("/api/brand-kits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
-      })
+      });
       const body = (await response.json()) as {
-        kit?: BrandKit
-        message?: string
-      }
+        kit?: BrandKit;
+        message?: string;
+      };
 
       if (!response.ok || !body.kit) {
-        throw new Error(body.message ?? "No se pudo crear el kit.")
+        throw new Error(body.message ?? "No se pudo crear el kit.");
       }
 
-      setOpen(false)
-      router.push(`/brand-kits/${body.kit.id}`)
-      router.refresh()
+      setOpen(false);
+      router.push(`/brand-kits/${body.kit.id}`);
+      router.refresh();
     } catch (reason) {
       setMessage(
         reason instanceof Error ? reason.message : "No se pudo crear el kit.",
-      )
+      );
     } finally {
-      setBusy(false)
+      setBusy(false);
     }
   }
 
@@ -144,5 +152,5 @@ export function BrandKitsDashboard({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 const links = [
-  { href: "/inspire", label: "Inspire" },
+  { href: "/inspire", label: "Inspiración" },
   { href: "/blog", label: "Blog" },
-  { href: "/tutorials", label: "Tutorials" },
+  { href: "/tutorials", label: "Tutoriales" },
   { href: "/mcp", label: "MCP" },
 ]
 

@@ -47,25 +47,25 @@ type AppSidebarProps = {
 
 const studioItems = [
   { title: "Centro de mando", href: "/dashboard", icon: Gauge },
-  { title: "Image Studio", href: "/image", icon: ImageIcon },
-  { title: "Video Suite", href: "/video", icon: Video },
-  { title: "Audio Suite", href: "/audio/my", icon: Volume2 },
+  { title: "Estudio de imágenes", href: "/image", icon: ImageIcon },
+  { title: "Suite de video", href: "/video", icon: Video },
+  { title: "Suite de audio", href: "/audio/my", icon: Volume2 },
   { title: "Director", href: "/director", icon: Clapperboard },
-  { title: "Story", href: "/story", icon: BookOpen },
+  { title: "Historias", href: "/story", icon: BookOpen },
   { title: "Personajes", href: "/characters", icon: UsersRound },
   { title: "Mundos", href: "/world", icon: Globe2 },
-  { title: "Characters & Worlds", href: "/characters-and-worlds", icon: Boxes },
-  { title: "Brand Kits", href: "/brand-kits", icon: Palette },
-  { title: "Media", href: "/media", icon: FolderOpen },
+  { title: "Personajes y mundos", href: "/characters-and-worlds", icon: Boxes },
+  { title: "Kits de marca", href: "/brand-kits", icon: Palette },
+  { title: "Medios", href: "/media", icon: FolderOpen },
   { title: "Biblioteca", href: "/assets", icon: FolderOpen },
 ];
 
 const discoverItems = [
-  { title: "Inspire", href: "/inspire", icon: Compass },
-  { title: "Tutorials", href: "/tutorials", icon: GraduationCap },
+  { title: "Inspiración", href: "/inspire", icon: Compass },
+  { title: "Tutoriales", href: "/tutorials", icon: GraduationCap },
   { title: "Blog", href: "/blog", icon: Newspaper },
   { title: "MCP", href: "/mcp", icon: PlugZap },
-  { title: "Publicar en Inspire", href: "/community/publish", icon: Send },
+  { title: "Publicar en Inspiración", href: "/community/publish", icon: Send },
 ];
 
 const accountItems = [
@@ -103,15 +103,15 @@ export function AppSidebar({ email, displayName, role }: AppSidebarProps) {
         </Link>
       </SidebarHeader>
       <SidebarContent className="px-2 py-3">
-        <SidebarSection label="Studio" items={studioItems} pathname={pathname} />
+        <SidebarSection label="Estudio" items={studioItems} pathname={pathname} />
         <SidebarSeparator className="my-3 bg-white/[0.06]" />
-        <SidebarSection label="Discover" items={discoverItems} pathname={pathname} />
+        <SidebarSection label="Descubrir" items={discoverItems} pathname={pathname} />
         <SidebarSeparator className="my-3 bg-white/[0.06]" />
         <SidebarSection label="Cuenta" items={accountItems} pathname={pathname} />
         {adminItems.length > 0 && (
           <>
             <SidebarSeparator className="my-3 bg-white/[0.06]" />
-            <SidebarSection label="Admin" items={adminItems} pathname={pathname} />
+            <SidebarSection label="Administración" items={adminItems} pathname={pathname} />
           </>
         )}
       </SidebarContent>

@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { Cpu } from "lucide-react"
+import { Cpu } from "lucide-react";
 
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-import { useVideoStudio } from "./video-studio-context"
+import { useVideoStudio } from "./video-studio-context";
 
 const models = [
   { value: "openart-video-v2", label: "OpenArt Video V2" },
@@ -22,21 +28,29 @@ const models = [
   { value: "kling-2.1", label: "Kling 2.1" },
   { value: "wan-2.2", label: "Wan 2.2" },
   { value: "topaz-video", label: "Topaz Video" },
-]
+];
 
 export function VideoModelSelector() {
-  const { state, setField } = useVideoStudio()
+  const { state, setField } = useVideoStudio();
   return (
     <div className="space-y-2">
       <Label className="text-[11px] text-slate-400">Modelo</Label>
-      <Select value={state.fields.model} onValueChange={(value) => value && setField("model", value)}>
+      <Select
+        value={state.fields.model}
+        onValueChange={(value) => value && setField("model", value)}
+      >
         <SelectTrigger className="w-full border-white/10 bg-white/[0.03] text-xs">
-          <Cpu className="size-3.5 text-violet-300" /><SelectValue />
+          <Cpu className="size-3.5 text-violet-300" />
+          <SelectValue />
         </SelectTrigger>
         <SelectContent align="start">
-          {models.map((model) => <SelectItem key={model.value} value={model.value}>{model.label}</SelectItem>)}
+          {models.map((model) => (
+            <SelectItem key={model.value} value={model.value}>
+              {model.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
-  )
+  );
 }

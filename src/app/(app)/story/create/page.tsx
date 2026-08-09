@@ -5,7 +5,7 @@ import { getStoryAssets } from "@/lib/story/assets"
 import { creativeProjectKinds, storyTemplates, type CreativeProjectKind, type StoryTemplate } from "@/lib/story/contracts"
 import { getProjectForPage } from "@/lib/story/projects"
 
-export const metadata: Metadata = { title: "Storyboard Editor · Bellas Artes" }
+export const metadata: Metadata = { title: "Editor de storyboard · Bellas Artes" }
 
 export default async function StoryCreatePage({ searchParams }: { searchParams: Promise<{ project?: string; template?: string; kind?: string; view?: string }> }) {
   const params = await searchParams

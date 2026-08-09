@@ -1,20 +1,178 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Archive, Copy, MoreVertical, Pencil, Play, Trash2 } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import Link from "next/link";
+import {
+  Archive,
+  Copy,
+  MoreVertical,
+  Pencil,
+  Play,
+  Trash2,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import type { CreativeProject } from "@/lib/story/contracts"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { CreativeProject } from "@/lib/story/contracts";
 
 export function DirectorProjectCard({ project }: { project: CreativeProject }) {
-  const router = useRouter(); const [confirmOpen, setConfirmOpen] = useState(false); const [busy, setBusy] = useState(false)
-  async function duplicate() { setBusy(true); try { await fetch("/api/story/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: project.kind, title: `${project.title} — copia`, description: project.description, storyType: project.storyType, coverAssetId: project.coverAssetId, document: project.document, metadata: project.metadata }) }); router.refresh() } finally { setBusy(false) } }
-  async function archive() { setBusy(true); try { await fetch(`/api/story/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "archived" }) }); router.refresh() } finally { setBusy(false) } }
-  async function remove() { setBusy(true); try { await fetch(`/api/story/projects/${project.id}`, { method: "DELETE" }); setConfirmOpen(false); router.refresh() } finally { setBusy(false) } }
-  return <><article className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#121214] transition hover:border-violet-400/40"><div className="relative aspect-video overflow-hidden bg-gradient-to-br from-violet-950 via-[#191923] to-black"><div className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105" style={project.coverUrl ? { backgroundImage: `url(${project.coverUrl})` } : undefined} /><div className="absolute inset-0 bg-black/10 group-hover:bg-black/50" /><Badge className="absolute top-3 left-3 bg-black/70 text-[9px] capitalize text-white">{project.status}</Badge><Link href={`/story/create?project=${project.id}`} className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-violet-600 text-white opacity-0 shadow-lg shadow-violet-500/30 transition group-hover:opacity-100"><Play className="ml-0.5 fill-current" /><span className="sr-only">Abrir {project.title}</span></Link></div><div className="flex items-start gap-3 p-4"><div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-white">{project.title}</h3><p className="mt-1 text-[10px] text-slate-600">Actualizado {new Date(project.updatedAt).toLocaleDateString("es-VE")}</p></div><DropdownMenu><DropdownMenuTrigger render={<Button type="button" variant="ghost" size="icon-sm" disabled={busy} />}><MoreVertical /><span className="sr-only">Acciones</span></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem render={<Link href={`/story/create?project=${project.id}`} />}><Pencil /> Editar</DropdownMenuItem><DropdownMenuItem onClick={duplicate}><Copy /> Duplicar</DropdownMenuItem><DropdownMenuItem onClick={archive}><Archive /> Archivar</DropdownMenuItem><DropdownMenuItem onClick={() => setConfirmOpen(true)} variant="destructive"><Trash2 /> Eliminar</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div></article><Dialog open={confirmOpen} onOpenChange={setConfirmOpen}><DialogContent><DialogHeader><DialogTitle>Eliminar “{project.title}”</DialogTitle><DialogDescription>Se eliminará el proyecto narrativo. Los assets vinculados permanecerán en tu biblioteca.</DialogDescription></DialogHeader><DialogFooter><DialogClose render={<Button variant="outline" />}>Cancelar</DialogClose><Button type="button" variant="destructive" onClick={remove} disabled={busy}>{busy ? "Eliminando…" : "Eliminar proyecto"}</Button></DialogFooter></DialogContent></Dialog></>
+  const router = useRouter();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  async function duplicate() {
+    setBusy(true);
+    try {
+      await fetch("/api/story/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: project.kind,
+          title: `${project.title} — copia`,
+          description: project.description,
+          storyType: project.storyType,
+          coverAssetId: project.coverAssetId,
+          document: project.document,
+          metadata: project.metadata,
+        }),
+      });
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function archive() {
+    setBusy(true);
+    try {
+      await fetch(`/api/story/projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "archived" }),
+      });
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function remove() {
+    setBusy(true);
+    try {
+      await fetch(`/api/story/projects/${project.id}`, { method: "DELETE" });
+      setConfirmOpen(false);
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <article className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#121214] transition hover:border-violet-400/40">
+        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-violet-950 via-[#191923] to-black">
+          <div
+            className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
+            style={
+              project.coverUrl
+                ? { backgroundImage: `url(${project.coverUrl})` }
+                : undefined
+            }
+          />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/50" />
+          <Badge className="absolute top-3 left-3 bg-black/70 text-[9px] capitalize text-white">
+            {project.status}
+          </Badge>
+          <Link
+            href={`/story/create?project=${project.id}`}
+            className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-violet-600 text-white opacity-0 shadow-lg shadow-violet-500/30 transition group-hover:opacity-100"
+          >
+            <Play className="ml-0.5 fill-current" />
+            <span className="sr-only">Abrir {project.title}</span>
+          </Link>
+        </div>
+        <div className="flex items-start gap-3 p-4">
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-sm font-semibold text-white">
+              {project.title}
+            </h3>
+            <p className="mt-1 text-[10px] text-slate-600">
+              Actualizado{" "}
+              {new Date(project.updatedAt).toLocaleDateString("es-VE")}
+            </p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={busy}
+                />
+              }
+            >
+              <MoreVertical />
+              <span className="sr-only">Acciones</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                render={<Link href={`/story/create?project=${project.id}`} />}
+              >
+                <Pencil /> Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={duplicate}>
+                <Copy /> Duplicar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={archive}>
+                <Archive /> Archivar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setConfirmOpen(true)}
+                variant="destructive"
+              >
+                <Trash2 /> Eliminar
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </article>
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar “{project.title}”</DialogTitle>
+            <DialogDescription>
+              Se eliminará el proyecto narrativo. Los assets vinculados
+              permanecerán en tu biblioteca.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" />}>
+              Cancelar
+            </DialogClose>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={remove}
+              disabled={busy}
+            >
+              {busy ? "Eliminando…" : "Eliminar proyecto"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }

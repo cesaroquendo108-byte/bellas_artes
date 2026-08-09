@@ -5,7 +5,7 @@ import { getAssets } from "@/lib/assets/queries"
 import { getBrandKitsForPage } from "@/lib/brand-kits/queries"
 
 export const metadata: Metadata = {
-  title: "Image Studio · Bellas Artes",
+  title: "Estudio de imágenes · Bellas Artes",
   description: "Estudio privado para crear y reinventar imágenes con IA.",
 }
 

@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { CharactersAndWorldsHub, type UnifiedCategory } from "@/components/characters-worlds"
 import { getCharacterWorldLibrary } from "@/lib/assets/character-worlds"
 
-export const metadata: Metadata = { title: "Characters & Worlds · Bellas Artes", description: "Repositorio unificado de recursos visuales." }
+export const metadata: Metadata = { title: "Personajes y mundos · Bellas Artes", description: "Repositorio unificado de recursos visuales." }
 const categories = new Set<UnifiedCategory>(["all", "characters", "worlds", "objects", "backgrounds", "styles"])
 
 export default async function CharactersWorldsPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {

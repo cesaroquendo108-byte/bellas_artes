@@ -4,7 +4,7 @@ import { MediaHub, type MediaHubAsset } from "@/components/media-hub"
 import { getAssets } from "@/lib/assets/queries"
 
 export const metadata: Metadata = {
-  title: "Media Hub · Bellas Artes",
+  title: "Centro de medios · Bellas Artes",
   description: "Herramientas de video y biblioteca privada de medios.",
 }
 

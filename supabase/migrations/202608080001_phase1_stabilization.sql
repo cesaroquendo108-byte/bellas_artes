@@ -368,15 +368,19 @@ begin
   where id = p_payment_id;
 
   insert into public.transactions (
-    user_id, type, package_name, amount_bs, reference_number,
-    proof_image_url, credits_granted, credit_delta, balance_after,
-    description, metadata, status, payment_id, actor_id
+    user_id, type, package_name, amount, credits_granted, credit_delta,
+    balance_after, description, metadata, status, payment_id, actor_id
   ) values (
     v_payment.user_id, 'purchase', v_payment.package_id,
-    v_payment.extracted_amount_bs, v_payment.extracted_reference,
-    v_payment.receipt_key, v_payment.credits::integer,
+    v_payment.price_usd, v_payment.credits::integer,
     v_payment.credits, v_balance, 'Compra de créditos',
-    jsonb_build_object('price_usd', v_payment.price_usd, 'payment_rate', v_payment.payment_rate),
+    jsonb_build_object(
+      'amount_bs', v_payment.extracted_amount_bs,
+      'reference_number', v_payment.extracted_reference,
+      'proof_image_url', v_payment.receipt_key,
+      'price_usd', v_payment.price_usd,
+      'payment_rate', v_payment.payment_rate
+    ),
     'approved', v_payment.id, p_reviewer
   ) returning id into v_transaction_id;
 
