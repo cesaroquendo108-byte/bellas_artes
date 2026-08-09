@@ -155,44 +155,48 @@ export function VideoAudioStudio({
     return result.asset.id;
   }
 
+  async function persistProject() {
+    const storedVideoId = await uploadSourceVideo();
+    const durationMs = Math.max(0, Math.round(durationSeconds * 1000));
+    const response = await fetch("/api/audio/projects", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        id: projectId ?? undefined,
+        name: video?.name ? `Audio · ${video.name}` : "Proyecto de audio para video",
+        sourceVideoAssetId: storedVideoId,
+        durationMs,
+        preset: { sourceVideoName: video?.name ?? null },
+        tracks: tracks.map((track) => ({
+          id: track.id,
+          assetId: track.assetId,
+          kind: track.kind,
+          name: track.name,
+          startMs: Math.round((track.start / 100) * durationMs),
+          trimStartMs: Math.max(0, Math.round((track.trimStart / 100) * durationMs)),
+          durationMs: Math.max(0, Math.round((track.width / 100) * durationMs)),
+          volume: track.volume,
+          speed: track.speed,
+          muted: track.muted,
+        })),
+      }),
+    });
+    const result = (await response.json().catch(() => ({}))) as {
+      projectId?: string;
+      message?: string;
+    };
+    if (!response.ok || !result.projectId) {
+      throw new Error(result.message ?? "No se pudo guardar el proyecto.");
+    }
+    setProjectId(result.projectId);
+    return { projectId: result.projectId, storedVideoId };
+  }
+
   async function saveProject() {
     setBusy(true);
     setMessage("");
     try {
-      const storedVideoId = await uploadSourceVideo();
-      const durationMs = Math.max(0, Math.round(durationSeconds * 1000));
-      const response = await fetch("/api/audio/projects", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          id: projectId ?? undefined,
-          name: video?.name ? `Audio · ${video.name}` : "Proyecto de audio para video",
-          sourceVideoAssetId: storedVideoId,
-          durationMs,
-          preset: { sourceVideoName: video?.name ?? null },
-          tracks: tracks.map((track) => ({
-            id: track.id,
-            assetId: track.assetId,
-            kind: track.kind,
-            name: track.name,
-            startMs: Math.round((track.start / 100) * durationMs),
-            trimStartMs: Math.max(0, Math.round((track.trimStart / 100) * durationMs)),
-            durationMs: Math.max(0, Math.round((track.width / 100) * durationMs)),
-            volume: track.volume,
-            speed: track.speed,
-            muted: track.muted,
-          })),
-        }),
-      });
-      const result = (await response.json().catch(() => ({}))) as {
-        projectId?: string;
-        message?: string;
-        errorCode?: string;
-      };
-      if (!response.ok || !result.projectId) {
-        throw new Error(result.message ?? "No se pudo guardar el proyecto.");
-      }
-      setProjectId(result.projectId);
+      const { storedVideoId } = await persistProject();
       setMessage(storedVideoId ? "Proyecto y video guardados en tu espacio privado." : "Proyecto guardado.");
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "No se pudo guardar el proyecto.");
@@ -205,12 +209,9 @@ export function VideoAudioStudio({
     setBusy(true);
     setMessage("");
     try {
-      const exportProjectId = projectId;
-      if (!exportProjectId) {
-        await saveProject();
-        setMessage("El proyecto quedó guardado. Pulsa exportar de nuevo para preparar la mezcla.");
-        return;
-      }
+      const { projectId: exportProjectId } = projectId
+        ? { projectId }
+        : await persistProject();
       const response = await fetch("/api/audio/mix", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -499,7 +500,7 @@ export function VideoAudioStudio({
           <Button
             className="w-full bg-violet-600 text-white hover:bg-violet-500"
             onClick={exportMix}
-            disabled={busy || !video || tracks.some((track) => !track.assetId)}
+            disabled={busy || (!video && !sourceVideoAssetId) || tracks.some((track) => !track.assetId)}
           >
             <Music2 /> Preparar exportación
           </Button>

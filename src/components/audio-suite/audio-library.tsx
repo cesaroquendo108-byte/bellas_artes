@@ -31,6 +31,7 @@ export function AudioLibrary({
 }) {
   const [tab, setTab] = useState<(typeof tabs)[number][0]>("all");
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
   const [active, setActive] = useState<AudioLibraryItem | null>(null);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [storedAssets, setStoredAssets] = useState(assets);
@@ -39,15 +40,17 @@ export function AudioLibrary({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
-  const items = useMemo(
-    () =>
-      [...storedAssets, ...jobs].filter(
-        (item) =>
-          (tab === "all" || item.kind === tab) &&
-          item.name.toLowerCase().includes(query.toLowerCase()),
-      ),
-    [storedAssets, jobs, query, tab],
-  );
+  const items = useMemo(() => {
+    const filtered = [...storedAssets, ...jobs].filter(
+      (item) =>
+        (tab === "all" || item.kind === tab) &&
+        item.name.toLowerCase().includes(query.toLowerCase()),
+    );
+    return filtered.sort((left, right) => {
+      const difference = new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+      return sort === "newest" ? -difference : difference;
+    });
+  }, [storedAssets, jobs, query, sort, tab]);
 
   const selectedItems = useMemo(
     () => items.filter((item) => selected.has(item.id)),
@@ -159,15 +162,26 @@ export function AudioLibrary({
             </button>
           ))}
         </div>
-        <label className="relative block lg:w-72">
-          <Search className="absolute top-2.5 left-3 size-4 text-slate-600" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar audio"
-            className="pl-9"
-          />
-        </label>
+        <div className="flex flex-col gap-2 sm:flex-row lg:w-[430px]">
+          <label className="relative block min-w-0 flex-1">
+            <Search className="absolute top-2.5 left-3 size-4 text-slate-600" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar audio"
+              className="pl-9"
+            />
+          </label>
+          <select
+            aria-label="Ordenar biblioteca"
+            value={sort}
+            onChange={(event) => setSort(event.target.value as "newest" | "oldest")}
+            className="h-9 border border-white/10 bg-white/[0.03] px-3 text-xs text-slate-300 outline-none focus:border-violet-400"
+          >
+            <option value="newest">Más recientes</option>
+            <option value="oldest">Más antiguos</option>
+          </select>
+        </div>
       </div>
 
       {items.length ? (

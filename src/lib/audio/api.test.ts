@@ -9,10 +9,12 @@ const mocks = vi.hoisted(() => ({
     credentialsPresent: false,
     message: "La generación de audio está deshabilitada.",
   })),
+  from: vi.fn(),
+  getProject: vi.fn(),
 }));
 
 vi.mock("@/utils/supabase/server", () => ({
-  createClient: vi.fn(async () => ({ auth: { getUser: mocks.getUser } })),
+  createClient: vi.fn(async () => ({ auth: { getUser: mocks.getUser }, from: mocks.from })),
 }));
 
 vi.mock("@/lib/audio/provider", () => ({
@@ -49,6 +51,14 @@ describe("Audio API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    mocks.getProject.mockResolvedValue({ data: { id: "project-1" }, error: null });
+    mocks.from.mockImplementation(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          eq: vi.fn(() => ({ maybeSingle: mocks.getProject })),
+        })),
+      })),
+    }));
   });
 
   it("rechaza usuarios no autenticados", async () => {
@@ -171,5 +181,17 @@ describe("Audio API", () => {
       status: "not_configured",
       creditsReserved: 0,
     });
+  });
+
+  it("rechaza mezclar un proyecto que no pertenece al usuario", async () => {
+    mocks.getProject.mockResolvedValue({ data: null, error: null });
+    const response = await mixAudio(
+      new Request("http://localhost/api/audio/mix", {
+        method: "POST",
+        body: JSON.stringify({ idempotencyKey: "request-1234", projectId: crypto.randomUUID(), format: "mp4" }),
+      }),
+    );
+    expect(response.status).toBe(404);
+    expect(mocks.getAudioProvider).not.toHaveBeenCalled();
   });
 });

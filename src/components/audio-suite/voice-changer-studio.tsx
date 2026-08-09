@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeftRight, Mic, Play, Trash2, Upload, WandSparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import type { AudioVoice } from "@/lib/audio/types";
+import type { AudioLibraryItem, AudioVoice } from "@/lib/audio/types";
 import { validateAudioFile } from "@/lib/audio/validation";
 
 import { AudioNav, ProviderNotice } from "./audio-nav";
@@ -20,17 +21,21 @@ type VoiceChangerValues = {
 
 export function VoiceChangerStudio({
   voices,
+  assets,
   setupPending,
   providerMessage,
 }: {
   voices: AudioVoice[];
+  assets: AudioLibraryItem[];
   setupPending: boolean;
   providerMessage: string;
 }) {
+  const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaChunksRef = useRef<Blob[]>([]);
+  const loadedAssetRef = useRef<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [voiceId, setVoiceId] = useState(voices[0]?.id ?? "");
@@ -56,13 +61,6 @@ export function VoiceChangerStudio({
   async function toggleRecording() {
     if (recording) {
       mediaRecorderRef.current?.stop();
-      return;
-    }
-
-    if (setupPending) {
-      setMessage(
-        "La grabación está preparada, pero el micrófono seguirá deshabilitado hasta conectar un proveedor aprobado.",
-      );
       return;
     }
 
@@ -128,6 +126,36 @@ export function VoiceChangerStudio({
     setPreviewUrl(URL.createObjectURL(nextFile));
     setMessage("");
   }
+
+  useEffect(() => {
+    const requestedAssetId = searchParams.get("asset");
+    if (!requestedAssetId || loadedAssetRef.current === requestedAssetId) return;
+    const asset = assets.find((item) => item.id === requestedAssetId && item.signedUrl);
+    if (!asset?.signedUrl) return;
+
+    loadedAssetRef.current = requestedAssetId;
+    let canceled = false;
+    void fetch(asset.signedUrl)
+      .then((response) => {
+        if (!response.ok) throw new Error("No se pudo descargar el audio privado.");
+        return response.blob();
+      })
+      .then((blob) => {
+        if (canceled) return;
+        const type = asset.mimeType ?? blob.type ?? "audio/mpeg";
+        selectFile(new File([blob], asset.name, { type }));
+        setMessage("Audio cargado desde tu biblioteca privada.");
+      })
+      .catch(() => {
+        if (!canceled) setMessage("No pude cargar el audio privado desde tu biblioteca.");
+      });
+
+    return () => {
+      canceled = true;
+    };
+    // selectFile is stable for this component and the asset query is intentionally one-shot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assets, searchParams]);
 
   function removeFile() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
