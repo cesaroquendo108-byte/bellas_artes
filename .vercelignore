@@ -1,0 +1,10 @@
+# Local audit artifacts from Supabase Preview validation.
+# Keep these files available for local verification, but never send them to
+# the Next.js/Vercel build context.
+scripts/e2e-preview-tests.ts
+scripts/verify-preview.ts
+migration_0006_only.sql
+preview_setup.sql
+
+# Multi-agent handoff metadata is not application source.
+.agents

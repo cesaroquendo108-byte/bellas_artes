@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.vercel
+.agents
+.env*
+!.env.example
+coverage
+out
+scripts/e2e-preview-tests.ts
+scripts/verify-preview.ts
+migration_0006_only.sql
+preview_setup.sql

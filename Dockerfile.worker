@@ -1,0 +1,15 @@
+FROM node:24-bookworm-slim
+
+WORKDIR /app
+
+# The worker runs TypeScript through the repository's tsx entrypoint. Keep
+# devDependencies in this image because tsx is a runtime dependency here.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+ENV NODE_ENV=production
+ENV RUN_GENERATION_WORKER=true
+
+CMD ["npm", "run", "worker"]
