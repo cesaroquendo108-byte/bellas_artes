@@ -8,16 +8,37 @@ function required(name: string): string {
   return value;
 }
 
+function validUrl(name: string): string {
+  const value = required(name);
+
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:") throw new Error("invalid protocol");
+  } catch {
+    throw new Error(`${name} debe ser una URL HTTPS válida.`);
+  }
+
+  return value;
+}
+
+function validSupabasePublicKey(): string {
+  const value = required("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  if (value.trim().length < 40) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY no parece una clave pública válida.");
+  }
+  return value;
+}
+
 export function getSupabasePublicEnv() {
   return {
-    url: required("NEXT_PUBLIC_SUPABASE_URL"),
-    anonKey: required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    url: validUrl("NEXT_PUBLIC_SUPABASE_URL"),
+    anonKey: validSupabasePublicKey(),
   };
 }
 
 export function getSupabaseAdminEnv() {
   return {
-    url: required("NEXT_PUBLIC_SUPABASE_URL"),
+    url: validUrl("NEXT_PUBLIC_SUPABASE_URL"),
     serviceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
   };
 }

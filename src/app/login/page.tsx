@@ -10,9 +10,15 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; next?: string }>;
+  searchParams: Promise<{
+    message?: string;
+    notice?: string;
+    config?: string;
+    next?: string;
+  }>;
 }) {
   const params = await searchParams;
+  const configMissing = params.config === "missing";
   
   return (
     <main className="min-h-screen bg-black flex flex-col">
@@ -82,16 +88,30 @@ export default async function LoginPage({
                 </div>
               )}
 
+              {params.notice && (
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-center text-sm text-emerald-300">
+                  {params.notice}
+                </div>
+              )}
+
+              {configMissing && (
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-center text-sm text-amber-200">
+                  La autenticación todavía no está configurada en este entorno. Comprueba las variables de Supabase.
+                </div>
+              )}
+
               <div className="flex flex-col gap-2 mt-4">
                 <button
                   formAction={login}
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-primary/20"
+                  disabled={configMissing}
+                  className="w-full bg-primary hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-primary/20"
                 >
                   Iniciar Sesión
                 </button>
                 <button
                   formAction={signup}
-                  className="w-full bg-transparent border border-normal-border hover:bg-white/5 text-white font-bold py-3 px-4 rounded-xl transition"
+                  disabled={configMissing}
+                  className="w-full bg-transparent border border-normal-border hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition"
                 >
                   Registrarme
                 </button>

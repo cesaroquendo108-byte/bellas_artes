@@ -34,7 +34,7 @@ const sidebarSections: SidebarSection[] = [
       { icon: Clapperboard, label: 'Director', href: '/director' },
       { icon: Video, label: 'Video', href: '/video' },
       { icon: Globe, label: 'Mundo', href: '/world' },
-      { icon: Music, label: 'Audio' },
+      { icon: Music, label: 'Audio', href: '/audio/my' },
       { icon: ImageIcon, label: 'Imagen', href: '/image' },
       { icon: User, label: 'Personaje', href: '/characters' },
       { icon: Layers, label: 'MCP', href: '/mcp' },

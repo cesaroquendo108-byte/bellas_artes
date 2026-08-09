@@ -14,8 +14,15 @@ function safeNextPath(value: FormDataEntryValue | null) {
 }
 
 export async function login(formData: FormData) {
-  const supabase = await createClient();
   const nextPath = safeNextPath(formData.get("next"));
+  let supabase;
+
+  try {
+    supabase = await createClient();
+  } catch {
+    const query = new URLSearchParams({ config: "missing", next: nextPath });
+    redirect(`/login?${query}`);
+  }
 
   const data = {
     email: formData.get("email") as string,
@@ -34,18 +41,33 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient();
   const nextPath = safeNextPath(formData.get("next"));
+  let supabase;
+
+  try {
+    supabase = await createClient();
+  } catch {
+    const query = new URLSearchParams({ config: "missing", next: nextPath });
+    redirect(`/login?${query}`);
+  }
 
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signUp(data);
+  const { data: authData, error } = await supabase.auth.signUp(data);
 
   if (error) {
     const query = new URLSearchParams({ message: "No se pudo registrar el usuario", next: nextPath });
+    redirect(`/login?${query}`);
+  }
+
+  if (!authData.session) {
+    const query = new URLSearchParams({
+      notice: "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
+      next: nextPath,
+    });
     redirect(`/login?${query}`);
   }
 
@@ -54,7 +76,11 @@ export async function signup(formData: FormData) {
 }
 
 export async function logout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  try {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+  } catch {
+    // Permite cerrar la sesión local aunque falte la configuración del backend.
+  }
   redirect("/login");
 }
