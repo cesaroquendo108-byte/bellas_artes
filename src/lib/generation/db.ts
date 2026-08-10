@@ -137,6 +137,26 @@ export async function recordGenerationFailure(input: { jobId: string; code: stri
   return data;
 }
 
+export async function recordGenerationMetrics(input: {
+  jobId: string;
+  attempt: number;
+  startupMs: number;
+  inferenceMs: number;
+  totalMs: number;
+  estimatedCostUsd: number;
+}) {
+  const { data, error } = await createAdminClient().rpc("record_generation_metrics", {
+    p_job_id: input.jobId,
+    p_attempt: input.attempt,
+    p_startup_ms: Math.max(Math.round(input.startupMs), 0),
+    p_inference_ms: Math.max(Math.round(input.inferenceMs), 0),
+    p_total_ms: Math.max(Math.round(input.totalMs), 0),
+    p_estimated_cost_usd: Math.max(input.estimatedCostUsd, 0),
+  });
+  if (error) throw rpcError(error);
+  return data;
+}
+
 export async function requestGenerationCancellation(jobId: string) {
   const { data, error } = await createAdminClient().rpc("request_generation_cancellation", { p_job_id: jobId });
   if (error) throw rpcError(error);

@@ -2,19 +2,28 @@
 
 La generación se ejecuta fuera de Vercel. Next.js sólo autentica, valida,
 reserva créditos y encola jobs. El worker consume Redis y utiliza ComfyUI en
-Vast.ai o un endpoint Serverless de RunPod como rebose.
+Vast.ai Serverless como único proveedor GPU.
 
 ## Activación segura
 
 1. Crear Supabase Preview y aplicar las migraciones en orden numérico.
 2. Crear Redis administrado y configurar `REDIS_URL` únicamente en el servidor
    y el worker.
-3. Desplegar ComfyUI en Vast.ai con los pesos open source aprobados.
-4. Exportar cada workflow de ComfyUI en formato API y cargarlo en las variables
-   `WORKFLOW_*`. Los pesos no se guardan en Git.
-5. Configurar los endpoints de RunPod por modalidad y límites de gasto.
+3. Desplegar ComfyUI en Vast.ai Serverless con `min_load=0`,
+   `cold_workers=0` y `max_workers=1`.
+4. Exportar cada workflow de ComfyUI en formato API, guardarlo en `workflows/`
+   y registrarlo en `src/lib/generation/workflows.ts`. `WORKFLOW_*` queda como
+   override opcional. Los pesos no se guardan en Git.
+5. Configurar `VAST_API_KEY` y los nombres `VAST_*_SERVERLESS_ENDPOINT`. El
+   worker usa el router oficial y `/generate/sync`; las variables
+   `VAST_*_COMFY_BASE_URL` sólo sirven para compatibilidad directa.
 6. Ejecutar el worker con `RUN_GENERATION_WORKER=true`.
 7. Mantener `GENERATION_ENABLED=false` hasta probar un job completo en staging.
+
+Las instancias GPU temporales usadas para depurar workflows deben apagarse tras
+10 minutos de inactividad. Durante implementación se permiten como máximo dos
+jobs smoke y tres de aceptación por workflow; el canary de 20 queda reservado
+para el lanzamiento con presupuesto aprobado.
 
 ## Rutas y modelos
 
@@ -37,6 +46,10 @@ política comercial.
 - `QUEUE_UNAVAILABLE`: la reserva se devuelve automáticamente.
 - `WORKFLOW_NOT_CONFIGURED`: el worker devuelve la reserva; no crea asset.
 - `PROVIDER_TIMEOUT`: se reintenta hasta tres veces y después se reembolsa.
+- `VAST_UNAVAILABLE`: el control plane o el endpoint no están listos; no se
+  solicita una segunda GPU ni otro proveedor.
+- `VAST_OUTPUT_URL_REJECTED`: la salida no usa HTTPS o no pertenece a un host
+  R2 permitido.
 - `completed`: sólo significa que existe un asset real en R2 vinculado al job.
 
 No se deben crear imágenes, audios o videos simulados para resolver un error

@@ -18,7 +18,7 @@ function getConnection() {
 export function getGenerationQueue(kind: GenerationQueueKind) {
   const existing = queues.get(kind);
   if (existing) return existing;
-  const queue = new Queue(`generation:${kind}`, {
+  const queue = new Queue(`generation-${kind}`, {
     connection: getConnection(),
     prefix: process.env.BULLMQ_PREFIX ?? "bellas-artes",
     defaultJobOptions: {
@@ -30,6 +30,33 @@ export function getGenerationQueue(kind: GenerationQueueKind) {
   });
   queues.set(kind, queue);
   return queue;
+}
+
+export function getDeadLetterQueue(kind: GenerationQueueKind) {
+  const dlqName = `dlq:${kind}`;
+  const existing = queues.get(dlqName);
+  if (existing) return existing;
+  const queue = new Queue(`generation-${kind}-dlq`, {
+    connection: getConnection(),
+    prefix: process.env.BULLMQ_PREFIX ?? "bellas-artes",
+  });
+  queues.set(dlqName, queue);
+  return queue;
+}
+
+export async function moveToDLQ(input: {
+  kind: GenerationQueueKind;
+  jobId: string;
+  error: string;
+  attempts: number;
+}) {
+  const dlq = getDeadLetterQueue(input.kind);
+  await dlq.add("dead-letter", {
+    jobId: input.jobId,
+    error: input.error,
+    attempts: input.attempts,
+    failedAt: new Date().toISOString(),
+  }, { jobId: input.jobId });
 }
 
 export async function enqueueGenerationJob(input: {

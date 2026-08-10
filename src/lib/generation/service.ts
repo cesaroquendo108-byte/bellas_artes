@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { enqueueGenerationJob, type GenerationQueueKind } from "./queue";
 import { getGenerationConfig, isGenerationRouteConfigured } from "./config";
 import { moderateGenerationInput } from "./moderation";
+import { recordModerationEvent } from "./audit";
+import { consumeGenerationRateLimit, GenerationRateLimitError } from "./rate-limit";
 import { linkGenerationAssets, reserveGenerationJob, refundGenerationJob, verifyOwnedAssets } from "./db";
 import type { GenerationKind, GenerationJobResponse } from "./contracts";
 import type { GenerationRouteSpec } from "./registry";
@@ -20,6 +23,17 @@ export async function requireGenerationUser() {
   return user;
 }
 
+async function assertGenerationAccess(userId: string) {
+  if (!getGenerationConfig().adminOnly) return;
+  const { data, error } = await createAdminClient()
+    .from("users")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error) throw new GenerationServiceError("GENERATION_ACCESS_UNAVAILABLE", "No se pudo comprobar el acceso de generación.", 503);
+  if (data?.role !== "admin") throw new GenerationServiceError("GENERATION_ADMIN_ONLY", "La generación está limitada temporalmente a administradores.", 403);
+}
+
 export async function enqueueGeneration(input: {
   userId: string;
   kind: GenerationKind;
@@ -29,11 +43,21 @@ export async function enqueueGeneration(input: {
   assetIds?: string[];
   idempotencyKey?: string;
   priority?: number;
+  auditContext?: { ipAddress?: string; userAgent?: string };
 }): Promise<GenerationJobResponse> {
   const moderation = moderateGenerationInput({ prompt: String(input.request.prompt ?? ""), negativePrompt: String(input.request.negativePrompt ?? "") });
+  await recordModerationEvent({
+    userId: input.userId,
+    prompt: String(input.request.prompt ?? ""),
+    decision: moderation.allowed ? "allowed" : "blocked",
+    reason: moderation.reason,
+    ...input.auditContext,
+  });
   if (!moderation.allowed) throw new GenerationServiceError(moderation.code ?? "PROMPT_BLOCKED", moderation.reason ?? "Solicitud bloqueada.", 422);
 
   try {
+    await assertGenerationAccess(input.userId);
+    await consumeGenerationRateLimit({ userId: input.userId, kind: input.kind });
     await verifyOwnedAssets(input.userId, input.assetIds ?? []);
     if (!isGenerationRouteConfigured(input.route)) {
       return {
@@ -77,6 +101,7 @@ export async function enqueueGeneration(input: {
     };
   } catch (error) {
     if (error instanceof GenerationServiceError) throw error;
+    if (error instanceof GenerationRateLimitError) throw new GenerationServiceError(error.code, error.message, error.status);
     if (error && typeof error === "object" && "code" in error && error.code === "ASSET_NOT_OWNED") {
       throw new GenerationServiceError("ASSET_NOT_OWNED", "Uno de los assets no pertenece al usuario.", 403);
     }

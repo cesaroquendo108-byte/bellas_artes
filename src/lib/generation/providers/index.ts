@@ -1,25 +1,21 @@
-import { getGenerationConfig } from "../config";
+import { getGenerationConfig, type GenerationProviderKind } from "../config";
 import { ComfyUIProvider } from "./comfyui";
-import { RunPodProvider } from "./runpod";
-import type { GenerationProvider } from "./types";
+import { ProviderError, type GenerationProvider } from "./types";
 
-export function getProvider(route = getGenerationConfig().route): GenerationProvider {
-  if (route === "runpod") return new RunPodProvider();
-  if (route === "vast") return new ComfyUIProvider();
+export function getProvider(route = getGenerationConfig().route, kind?: GenerationProviderKind): GenerationProvider {
+  if (route === "vast") return new ComfyUIProvider(kind);
   throw new Error("No hay un proveedor de generación configurado.");
 }
 
-export async function selectProvider(input: { preferred: "vast" | "runpod"; kind: "image" | "video" | "audio" | "character" | "world" }) {
+export async function selectProvider(input: { kind: GenerationProviderKind }) {
   const config = getGenerationConfig();
-  const vast = new ComfyUIProvider();
-  const runpod = new RunPodProvider();
-  const runpodConfigured = Boolean(process.env.RUNPOD_API_KEY?.trim() && (process.env.RUNPOD_ENDPOINT_ID?.trim() || process.env[`RUNPOD_${input.kind.toUpperCase()}_ENDPOINT_ID`]?.trim()));
+  const vast = new ComfyUIProvider(input.kind);
 
-  if (input.preferred === "vast" && config.hasVast && await vast.health() && await vast.queueDepth() <= config.vastQueueThreshold) return vast;
-  if (runpodConfigured && await runpod.health()) return runpod;
-  if (config.hasVast && await vast.health()) return vast;
-  throw new Error("Ningún proveedor de generación está saludable.");
+  if (!config.vastServerless.safe) throw new ProviderError("VAST_SERVERLESS_COST_GUARD", "VAST_SERVERLESS_COST_GUARD", false);
+  if (!config.hasVast || !await vast.health()) throw new ProviderError("VAST_UNAVAILABLE", "VAST_UNAVAILABLE", true);
+  if (await vast.queueDepth() > config.vastQueueThreshold) throw new ProviderError("VAST_QUEUE_BUSY", "VAST_QUEUE_BUSY", true);
+  return vast;
 }
 
-export { ComfyUIProvider, RunPodProvider };
+export { ComfyUIProvider };
 export * from "./types";

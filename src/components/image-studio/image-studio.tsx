@@ -15,6 +15,7 @@ import type {
   GenerationJobResponse,
   ImageGenerationRequest,
 } from "@/lib/generation/contracts";
+import { useGenerationJob } from "@/lib/generation/use-generation-job";
 
 import { ImageControls } from "./image-controls";
 import { ImageGallery } from "./image-gallery";
@@ -71,10 +72,12 @@ export function ImageStudio({
     null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{
     tone: "error" | "info";
     message: string;
   } | null>(null);
+  const { job: activeJob, error: pollingError } = useGenerationJob(activeJobId);
 
   useEffect(() => {
     referencesRef.current = references;
@@ -123,6 +126,27 @@ export function ImageStudio({
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (pollingError) {
+      const timer = window.setTimeout(() => setFeedback({ tone: "error", message: pollingError }), 0);
+      return () => window.clearTimeout(timer);
+    }
+    if (!activeJob) return;
+    let message: string | null = null;
+    let tone: "error" | "info" = "info";
+    if (activeJob.status === "processing") {
+      message = "La generación está procesándose en la GPU.";
+    } else if (activeJob.status === "completed") {
+      message = "Generación completada. La galería se actualizará al recargar.";
+    } else if (activeJob.status === "failed" || activeJob.status === "canceled") {
+      tone = "error";
+      message = activeJob.message ?? "La generación terminó sin resultado.";
+    }
+    if (!message) return;
+    const timer = window.setTimeout(() => setFeedback({ tone, message: message as string }), 0);
+    return () => window.clearTimeout(timer);
+  }, [activeJob, pollingError]);
 
   function addFiles(category: ReferenceCategory, files: File[]) {
     const created = files.map((file) => ({
@@ -217,6 +241,7 @@ export function ImageStudio({
         tone: "info",
         message: payload?.message ?? "La generación entró en cola.",
       });
+      setActiveJobId(payload?.jobId ?? null);
     } catch {
       setFeedback({
         tone: "error",

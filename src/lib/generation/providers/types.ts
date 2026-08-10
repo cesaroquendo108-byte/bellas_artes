@@ -11,7 +11,7 @@ export interface ProviderSubmitInput {
 
 export interface ProviderJob {
   providerJobId: string;
-  provider: "vast" | "runpod" | "fake";
+  provider: "vast" | "fake";
   kind: ProviderSubmitInput["kind"];
 }
 
@@ -22,6 +22,12 @@ export interface ProviderResult {
   metadata?: Record<string, string>;
 }
 
+export interface ProviderExecution {
+  job: ProviderJob;
+  result: ProviderResult;
+  timings?: Record<string, number>;
+}
+
 export interface GenerationProvider {
   readonly name: ProviderJob["provider"];
   health(): Promise<boolean>;
@@ -29,6 +35,10 @@ export interface GenerationProvider {
   getStatus(job: ProviderJob): Promise<ProviderStatus>;
   getResult(job: ProviderJob): Promise<ProviderResult>;
   cancel(job: ProviderJob): Promise<void>;
+  execute?(input: ProviderSubmitInput, options?: {
+    signal?: AbortSignal;
+    onAssigned?: (job: ProviderJob) => Promise<void>;
+  }): Promise<ProviderExecution>;
 }
 
 export class ProviderError extends Error {

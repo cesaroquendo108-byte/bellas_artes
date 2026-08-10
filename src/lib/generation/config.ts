@@ -1,4 +1,23 @@
-export type ProviderRoute = "vast" | "runpod" | "fake";
+import { isWorkflowConfigured } from "./workflows";
+
+export type ProviderRoute = "vast" | "fake";
+export type GenerationProviderKind = "image" | "video" | "audio" | "character" | "world";
+
+const vastEndpointVariables: Record<GenerationProviderKind, string> = {
+  image: "VAST_IMAGE_COMFY_BASE_URL",
+  video: "VAST_VIDEO_COMFY_BASE_URL",
+  audio: "VAST_AUDIO_COMFY_BASE_URL",
+  character: "VAST_CHARACTER_COMFY_BASE_URL",
+  world: "VAST_WORLD_COMFY_BASE_URL",
+};
+
+const vastServerlessEndpointVariables: Record<GenerationProviderKind, string> = {
+  image: "VAST_IMAGE_SERVERLESS_ENDPOINT",
+  video: "VAST_VIDEO_SERVERLESS_ENDPOINT",
+  audio: "VAST_AUDIO_SERVERLESS_ENDPOINT",
+  character: "VAST_CHARACTER_SERVERLESS_ENDPOINT",
+  world: "VAST_WORLD_SERVERLESS_ENDPOINT",
+};
 
 function truthy(value: string | undefined) {
   return value === "1" || value?.toLowerCase() === "true";
@@ -6,36 +25,93 @@ function truthy(value: string | undefined) {
 
 export function getGenerationConfig() {
   const enabled = truthy(process.env.GENERATION_ENABLED);
+  const adminOnly = process.env.GENERATION_ADMIN_ONLY === undefined
+    ? enabled
+    : truthy(process.env.GENERATION_ADMIN_ONLY);
   const route = process.env.GENERATION_PROVIDER?.trim() as ProviderRoute | undefined;
-  const hasVast = Boolean(process.env.VAST_COMFY_BASE_URL?.trim());
-  const hasRunPod = Boolean(process.env.RUNPOD_API_KEY?.trim() && (process.env.RUNPOD_ENDPOINT_ID?.trim() || process.env.RUNPOD_IMAGE_ENDPOINT_ID?.trim() || process.env.RUNPOD_VIDEO_ENDPOINT_ID?.trim() || process.env.RUNPOD_AUDIO_ENDPOINT_ID?.trim() || process.env.RUNPOD_CHARACTER_ENDPOINT_ID?.trim() || process.env.RUNPOD_WORLD_ENDPOINT_ID?.trim()));
+  const hasVast = Boolean(
+    process.env.VAST_COMFY_BASE_URL?.trim()
+      || Object.values(vastEndpointVariables).some((key) => process.env[key]?.trim())
+      || (process.env.VAST_API_KEY?.trim() && (
+        process.env.VAST_SERVERLESS_ENDPOINT?.trim()
+        || Object.values(vastServerlessEndpointVariables).some((key) => process.env[key]?.trim())
+      )),
+  );
+  const serverlessMinLoad = Number(process.env.VAST_SERVERLESS_MIN_LOAD ?? 0);
+  const serverlessColdWorkers = Number(process.env.VAST_SERVERLESS_COLD_WORKERS ?? 0);
+  const serverlessMaxWorkers = Number(process.env.VAST_SERVERLESS_MAX_WORKERS ?? 1);
+  const serverlessInactivityTimeoutSeconds = Number(process.env.VAST_SERVERLESS_INACTIVITY_TIMEOUT_SECONDS ?? 600);
 
   return {
     enabled,
-    route: route === "vast" || route === "runpod" || route === "fake" ? route : null,
+    adminOnly,
+    route: route === "vast" || route === "fake" ? route : null,
     hasVast,
-    hasRunPod,
     vastQueueThreshold: Number(process.env.VAST_QUEUE_THRESHOLD ?? 50),
+    vastDebugIdleShutdownMinutes: Math.max(Number(process.env.VAST_DEBUG_IDLE_SHUTDOWN_MINUTES ?? 10), 1),
+    vastServerless: {
+      minLoad: serverlessMinLoad,
+      coldWorkers: serverlessColdWorkers,
+      maxWorkers: serverlessMaxWorkers,
+      inactivityTimeoutSeconds: serverlessInactivityTimeoutSeconds,
+      safe: serverlessMinLoad === 0
+        && serverlessColdWorkers === 0
+        && serverlessMaxWorkers === 1
+        && serverlessInactivityTimeoutSeconds === 600,
+    },
     maxAttempts: Math.min(Math.max(Number(process.env.GENERATION_MAX_ATTEMPTS ?? 3), 1), 10),
     workerConcurrency: Math.max(Number(process.env.WORKER_CONCURRENCY ?? 1), 1),
+    requestTimeoutMs: Math.max(Number(process.env.VAST_REQUEST_TIMEOUT_MS ?? 15_000), 1_000),
+    jobTimeoutSeconds: Math.max(Number(process.env.GENERATION_JOB_TIMEOUT_SECONDS ?? 600), 30),
     redisConfigured: Boolean(process.env.REDIS_URL?.trim()),
   };
 }
 
 export function isGenerationConfigured() {
   const config = getGenerationConfig();
-  return config.enabled && (config.route === "fake" || config.hasVast || config.hasRunPod);
+  return config.enabled && (config.route === "fake" || (config.route === "vast" && config.hasVast && config.vastServerless.safe));
 }
 
 export function isGenerationRouteConfigured(input: { providerRoute: ProviderRoute; workflowVersion: string }) {
   const config = getGenerationConfig();
   if (!config.enabled) return false;
   if (input.providerRoute === "fake") return process.env.NODE_ENV === "test";
-  if (input.providerRoute === "runpod") return config.hasRunPod;
-  const workflowKey = `WORKFLOW_${input.workflowVersion.replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
-  return config.hasVast && Boolean(process.env[workflowKey]?.trim());
+  const workflowKind = input.workflowVersion.split("/", 1)[0];
+  const kind = workflowKind === "characters" ? "character" : workflowKind === "worlds" ? "world" : workflowKind;
+  return config.vastServerless.safe
+    && isGenerationProviderKind(kind)
+    && Boolean(getVastComfyBaseUrl(kind) || getVastServerlessEndpointName(kind))
+    && isWorkflowConfigured(input.workflowVersion);
 }
 
 export function isGenerationEnabled() {
   return getGenerationConfig().enabled;
+}
+
+export function getVastComfyBaseUrl(kind?: GenerationProviderKind) {
+  const specific = kind ? process.env[vastEndpointVariables[kind]]?.trim() : undefined;
+  return specific || process.env.VAST_COMFY_BASE_URL?.trim() || null;
+}
+
+export function getVastServerlessEndpointName(kind?: GenerationProviderKind) {
+  const specific = kind ? process.env[vastServerlessEndpointVariables[kind]]?.trim() : undefined;
+  return specific || process.env.VAST_SERVERLESS_ENDPOINT?.trim() || null;
+}
+
+export function assertSafeVastServerlessConfig() {
+  const config = getGenerationConfig();
+  if (!config.vastServerless.safe) {
+    throw new Error("Vast.ai Serverless debe usar min_load=0, cold_workers=0, max_workers=1 e inactivity_timeout=600.");
+  }
+}
+
+export function getEstimatedVastCostRate(kind: GenerationProviderKind) {
+  const specific = process.env[`VAST_${kind.toUpperCase()}_ESTIMATED_USD_PER_GPU_SECOND`]?.trim();
+  const fallback = process.env.VAST_ESTIMATED_USD_PER_GPU_SECOND?.trim();
+  const rate = Number(specific || fallback || 0);
+  return Number.isFinite(rate) && rate >= 0 ? rate : 0;
+}
+
+function isGenerationProviderKind(value: string): value is GenerationProviderKind {
+  return ["image", "video", "audio", "character", "world"].includes(value);
 }

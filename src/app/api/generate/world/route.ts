@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { getGenerationAuditContext } from "@/lib/generation/audit"
 import { worldGenerationRequestSchema } from "@/lib/generation/character-world"
 import { resolveWorldRoute } from "@/lib/generation/registry"
 import { enqueueGeneration, generationErrorResponse, requireGenerationUser } from "@/lib/generation/service"
@@ -30,10 +31,11 @@ export async function POST(request: Request) {
       userId: user.id,
       kind: "world",
       queueKind: "world",
-      route: resolveWorldRoute(parsed.data.model),
+      route: resolveWorldRoute(parsed.data.model, parsed.data),
       request: parsed.data,
       assetIds: parsed.data.referenceAssetIds,
       idempotencyKey: request.headers.get("idempotency-key") ?? undefined,
+      auditContext: getGenerationAuditContext(request),
     })
     return NextResponse.json(response, { status: response.status === "not_configured" ? 503 : 202 })
   } catch (error) {

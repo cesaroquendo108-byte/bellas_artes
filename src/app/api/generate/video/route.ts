@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { getGenerationAuditContext } from "@/lib/generation/audit"
 import type { GenerationJobResponse } from "@/lib/generation/contracts"
 import { videoGenerationRequestSchema } from "@/lib/generation/video"
 import { resolveVideoRoute } from "@/lib/generation/registry"
@@ -39,10 +40,11 @@ export async function POST(request: Request) {
       userId: user.id,
       kind: "video",
       queueKind: "video",
-      route: resolveVideoRoute(parsed.data.operation, parsed.data.model),
+      route: resolveVideoRoute(parsed.data.operation, parsed.data.model, parsed.data),
       request: parsed.data,
       assetIds: [...(parsed.data.sourceAssetIds ?? []), ...(parsed.data.referenceAssetIds ?? [])],
       idempotencyKey: request.headers.get("idempotency-key") ?? undefined,
+      auditContext: getGenerationAuditContext(request),
     })
     return NextResponse.json(response, { status: response.status === "not_configured" ? 503 : 202 })
   } catch (error) {

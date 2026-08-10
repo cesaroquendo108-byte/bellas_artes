@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { getGenerationAuditContext } from "@/lib/generation/audit"
 import type { GenerationJobResponse } from "@/lib/generation/contracts"
 import { imageGenerationRequestSchema } from "@/lib/generation/image"
 import { resolveImageRoute } from "@/lib/generation/registry"
@@ -39,10 +40,11 @@ export async function POST(request: Request) {
       userId: user.id,
       kind: "image",
       queueKind: "image",
-      route: resolveImageRoute(parsed.data.model),
+      route: resolveImageRoute(parsed.data.model, parsed.data),
       request: parsed.data,
       assetIds: parsed.data.referenceAssetIds,
       idempotencyKey: request.headers.get("idempotency-key") ?? undefined,
+      auditContext: getGenerationAuditContext(request),
     })
     return NextResponse.json(response, { status: response.status === "not_configured" ? 503 : 202 })
   } catch (error) {

@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const migration = readFileSync(new URL("../../../supabase/migrations/202608080006_generation_orchestration.sql", import.meta.url), "utf8");
+const vastOnlyMigration = readFileSync(new URL("../../../supabase/migrations/202608080008_vast_only_generation.sql", import.meta.url), "utf8");
+const telemetryMigration = readFileSync(new URL("../../../supabase/migrations/202608080009_generation_telemetry.sql", import.meta.url), "utf8");
 
 describe("generation orchestration migration", () => {
   it("crea jobs, auditoría y relaciones de assets", () => {
@@ -15,5 +17,19 @@ describe("generation orchestration migration", () => {
     expect(migration).toContain("refund_generation_credits");
     expect(migration).toContain("revoke all on function public.reserve_generation_credits");
     expect(migration).toContain("grant execute on function public.reserve_generation_credits");
+  });
+
+  it("bloquea nuevas rutas RunPod sin alterar el historial", () => {
+    expect(vastOnlyMigration).toContain("enforce_vast_only_generation_provider");
+    expect(vastOnlyMigration).toContain("new.provider_route not in ('vast', 'fake')");
+    expect(vastOnlyMigration).not.toContain("delete from public.generation_jobs");
+  });
+
+  it("registra tiempos y coste estimado sin almacenar prompts", () => {
+    expect(telemetryMigration).toContain("record_generation_metrics");
+    expect(telemetryMigration).toContain("startup_ms");
+    expect(telemetryMigration).toContain("inference_ms");
+    expect(telemetryMigration).toContain("estimated_cost_usd");
+    expect(telemetryMigration).not.toContain("prompt_hash");
   });
 });
