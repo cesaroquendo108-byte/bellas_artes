@@ -144,4 +144,32 @@ describe("ComfyUIProvider", () => {
       },
     });
   });
+
+  it("acepta salida base64 y mantiene R2 fuera de la GPU", async () => {
+    vi.stubEnv("VAST_IMAGE_SERVERLESS_ENDPOINT", "ba-image-sandbox");
+    vi.stubEnv("VAST_API_KEY", "test-vast-key");
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(jsonResponse({
+        endpoint: "ba-image-sandbox",
+        url: "https://worker.example.test",
+        cost: 100,
+        reqnum: 7,
+        signature: "signed-route",
+      }))
+      .mockResolvedValueOnce(jsonResponse({
+        status: "completed",
+        output: [{ filename: "result.png", data: `data:image/png;base64,${Buffer.from([1, 2, 3]).toString("base64")}` }],
+      }));
+
+    const execution = await new ComfyUIProvider("image").execute({
+      jobId: "job-base64-1",
+      kind: "image",
+      workflowVersion: "image/flux-schnell-v1",
+      backendModel: "flux-schnell",
+      request: { prompt: "base64" },
+    });
+
+    expect(execution.result).toMatchObject({ contentType: "image/png", bytes: new Uint8Array([1, 2, 3]) });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+  });
 });

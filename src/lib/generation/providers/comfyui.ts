@@ -134,20 +134,19 @@ export class ComfyUIProvider implements GenerationProvider {
     if (payload.status !== "completed") {
       throw new ProviderError(payload.message ?? "Vast no completó el workflow.", "VAST_GENERATION_FAILED", false);
     }
-    const output = payload.output?.find((candidate) => typeof candidate.url === "string" && candidate.url.length > 0);
-    if (!output?.url) throw new ProviderError("Vast no devolvió una URL de salida.", "VAST_OUTPUT_URL_MISSING", true);
-    assertAllowedOutputUrl(output.url);
-    const outputResponse = await fetch(output.url, {
-      signal: combineSignals(options?.signal, AbortSignal.timeout(config.requestTimeoutMs)),
-    });
-    if (!outputResponse.ok) throw new ProviderError("No se pudo descargar la salida de Vast.", "VAST_OUTPUT_DOWNLOAD", true);
-    const contentType = outputResponse.headers.get("content-type") ?? inferContentType(output.filename);
+    const output = payload.output?.find((candidate) =>
+      (typeof candidate.url === "string" && candidate.url.length > 0)
+      || (typeof candidate.data === "string" && candidate.data.length > 0));
+    if (!output) throw new ProviderError("Vast no devolvió una salida descargable.", "VAST_OUTPUT_MISSING", true);
+    const resolved = output.data
+      ? decodeBase64Output(output.data, output.filename)
+      : await downloadOutput(output.url!, output.filename, options?.signal, config.requestTimeoutMs);
 
     return {
       job,
       result: {
-        contentType,
-        bytes: new Uint8Array(await outputResponse.arrayBuffer()),
+        contentType: resolved.contentType,
+        bytes: resolved.bytes,
         filename: output.filename || `${input.kind}-${input.jobId}`,
       },
       timings: numericTimings(payload.timings),
@@ -208,7 +207,7 @@ interface VastComfyResponse {
   id?: string;
   status?: string;
   message?: string;
-  output?: Array<{ filename?: string; url?: string; output_type?: string }>;
+  output?: Array<{ filename?: string; url?: string; data?: string; output_type?: string }>;
   timings?: Record<string, unknown>;
 }
 
@@ -284,6 +283,30 @@ function assertAllowedOutputUrl(value: string) {
   if (!allowed.has(url.hostname.toLowerCase())) {
     throw new ProviderError("El host de salida de Vast no está permitido.", "VAST_OUTPUT_URL_REJECTED", false);
   }
+}
+
+async function downloadOutput(url: string, filename: string | undefined, signal: AbortSignal | undefined, timeoutMs: number) {
+  assertAllowedOutputUrl(url);
+  const response = await fetch(url, { signal: combineSignals(signal, AbortSignal.timeout(timeoutMs)) });
+  if (!response.ok) throw new ProviderError("No se pudo descargar la salida de Vast.", "VAST_OUTPUT_DOWNLOAD", true);
+  return {
+    contentType: response.headers.get("content-type") ?? inferContentType(filename),
+    bytes: new Uint8Array(await response.arrayBuffer()),
+  };
+}
+
+function decodeBase64Output(value: string, filename?: string) {
+  const match = /^data:([^;,]+);base64,([\s\S]+)$/.exec(value);
+  const contentType = match?.[1] || inferContentType(filename);
+  const encoded = match?.[2] ?? value;
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded.replace(/\s/g, ""))) {
+    throw new ProviderError("La salida base64 de Vast no es válida.", "VAST_OUTPUT_BASE64_INVALID", false);
+  }
+  const bytes = new Uint8Array(Buffer.from(encoded, "base64"));
+  if (!bytes.byteLength || bytes.byteLength > 250 * 1024 * 1024) {
+    throw new ProviderError("La salida base64 de Vast excede el límite permitido.", "VAST_OUTPUT_BASE64_INVALID", false);
+  }
+  return { contentType, bytes };
 }
 
 function inferContentType(filename?: string) {
