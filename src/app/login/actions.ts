@@ -90,3 +90,33 @@ export async function logout() {
   }
   redirect("/login");
 }
+
+export async function loginWithGoogle(formData: FormData) {
+  const nextPath = await safeNextPath(formData.get("next"));
+  let supabase;
+
+  try {
+    supabase = await createClient();
+  } catch {
+    const query = new URLSearchParams({ config: "missing", next: nextPath });
+    redirect(`/login?${query}`);
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${baseUrl}/auth/callback?next=${nextPath}`,
+    },
+  });
+
+  if (error) {
+    const query = new URLSearchParams({ message: "No se pudo iniciar sesión con Google", next: nextPath });
+    redirect(`/login?${query}`);
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+}
