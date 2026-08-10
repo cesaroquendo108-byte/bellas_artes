@@ -14,5 +14,7 @@ scripts/e2e-r2-tests.ts
 scripts/list_buckets.ts
 scripts/manage_bucket.ts
 scratch.ts
+scratch/
 migration_0006_only.sql
 preview_setup.sql
+supabase/.temp/
