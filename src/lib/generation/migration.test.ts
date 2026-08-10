@@ -5,6 +5,7 @@ const migration = readFileSync(new URL("../../../supabase/migrations/20260808000
 const vastOnlyMigration = readFileSync(new URL("../../../supabase/migrations/202608080008_vast_only_generation.sql", import.meta.url), "utf8");
 const telemetryMigration = readFileSync(new URL("../../../supabase/migrations/202608080009_generation_telemetry.sql", import.meta.url), "utf8");
 const billingShadowMigration = readFileSync(new URL("../../../supabase/migrations/202608100010_generation_billing_shadow.sql", import.meta.url), "utf8");
+const rolloutAccessMigration = readFileSync(new URL("../../../supabase/migrations/20260810075311_generation_rollout_access.sql", import.meta.url), "utf8");
 
 describe("generation orchestration migration", () => {
   it("crea jobs, auditoría y relaciones de assets", () => {
@@ -40,5 +41,12 @@ describe("generation orchestration migration", () => {
     expect(billingShadowMigration).toContain("record_generation_actual_cost");
     expect(billingShadowMigration).toContain("grant execute on function public.record_generation_actual_cost");
     expect(billingShadowMigration).not.toContain("drop table");
+  });
+
+  it("mantiene allowlist y entitlements fuera del acceso del cliente", () => {
+    expect(rolloutAccessMigration).toContain("generation_access_grants");
+    expect(rolloutAccessMigration).toContain("access_level in ('beta', 'pro', 'b2b', 'service')");
+    expect(rolloutAccessMigration).toContain("revoke all on public.generation_access_grants from anon, authenticated");
+    expect(rolloutAccessMigration).not.toContain("drop table");
   });
 });

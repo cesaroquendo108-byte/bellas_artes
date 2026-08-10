@@ -35,20 +35,23 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
   const requestedAssetIds = [...sourceIds, ...referenceIds];
   const assets = await verifyOwnedAssets(record.user_id, requestedAssetIds);
   const assetsById = new Map(assets.map((asset) => [asset.id, asset]));
-  const orderedAssets = requestedAssetIds.map((id) => assetsById.get(id)).filter((asset): asset is NonNullable<typeof asset> => Boolean(asset));
+  const orderedSourceAssets = sourceIds.map((id) => assetsById.get(id)).filter((asset): asset is NonNullable<typeof asset> => Boolean(asset));
+  const orderedReferenceAssets = referenceIds.map((id) => assetsById.get(id)).filter((asset): asset is NonNullable<typeof asset> => Boolean(asset));
   const workflowManifest = loadWorkflowManifest(record.workflow_version);
   try {
-    validateWorkflowAssets(workflowManifest, orderedAssets);
+    validateWorkflowAssets(workflowManifest, { source: orderedSourceAssets, reference: orderedReferenceAssets });
   } catch (error) {
     throw new ProviderError(error instanceof Error ? error.message : "Los assets no cumplen el contrato del workflow.", "WORKFLOW_ASSET_INVALID", false);
   }
-  const referenceUrls = await Promise.all(orderedAssets.map((asset) => getPrivateObjectUrl(asset.r2_key)));
+  const sourceUrls = await Promise.all(orderedSourceAssets.map((asset) => getPrivateObjectUrl(asset.r2_key)));
+  const referenceUrls = await Promise.all(orderedReferenceAssets.map((asset) => getPrivateObjectUrl(asset.r2_key)));
   const submitInput = {
     jobId: record.id,
     kind: record.kind,
     workflowVersion: record.workflow_version,
     backendModel: record.backend_model,
     request: record.request,
+    sourceUrls,
     referenceUrls,
   };
   const usesServerlessRouter = Boolean(getVastServerlessEndpointName(record.kind, record.workflow_version));

@@ -2,7 +2,7 @@ import type { GenerationProviderKind } from "./config";
 
 export type WorkflowBindingSource =
   | { type: "request"; path: string }
-  | { type: "reference"; index: number }
+  | { type: "asset"; role: "source" | "reference"; index: number }
   | { type: "computed"; value: "image-width" | "image-height" };
 
 export interface WorkflowBinding {
@@ -26,6 +26,13 @@ export interface WorkflowManifest {
     estimatedBudgetUsd?: number;
     minimumVramGb?: number;
   };
+  assetInputs?: Array<{
+    role: "source" | "reference";
+    index: number;
+    required?: boolean;
+    mimeTypes: string[];
+    maxDurationSeconds?: number;
+  }>;
   inputMimeTypes?: string[];
   outputMimeTypes: string[];
 }
@@ -48,9 +55,9 @@ const fluxSchnellManifest: WorkflowManifest = {
 
 const imageReferenceBindings: WorkflowBinding[] = [
   { nodeId: "prompt", input: "text", source: { type: "request", path: "prompt" }, required: true },
-  { nodeId: "reference", input: "url", source: { type: "reference", index: 0 } },
-  { nodeId: "pose", input: "url", source: { type: "reference", index: 1 } },
-  { nodeId: "mask", input: "url", source: { type: "reference", index: 2 } },
+  { nodeId: "reference", input: "url", source: { type: "asset", role: "reference", index: 0 } },
+  { nodeId: "pose", input: "url", source: { type: "asset", role: "reference", index: 1 } },
+  { nodeId: "mask", input: "url", source: { type: "asset", role: "reference", index: 2 } },
   { nodeId: "sampler", input: "seed", source: { type: "request", path: "seed" } },
   { nodeId: "sampler", input: "steps", source: { type: "request", path: "steps" } },
   { nodeId: "sampler", input: "cfg", source: { type: "request", path: "cfgScale" } },
@@ -69,6 +76,7 @@ const manifests: Record<string, WorkflowManifest> = {
     kind: "character",
     bindings: imageReferenceBindings,
     limits: { maxWidth: 2048, maxHeight: 2048, timeoutSeconds: 900, estimatedBudgetUsd: 0.20, minimumVramGb: 24 },
+    assetInputs: [0, 1, 2].map((index) => ({ role: "reference" as const, index, mimeTypes: ["image/png", "image/jpeg", "image/webp"] })),
     inputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
     outputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
   },
@@ -77,6 +85,7 @@ const manifests: Record<string, WorkflowManifest> = {
     kind: "world",
     bindings: imageReferenceBindings.filter((binding) => binding.nodeId !== "face_lock"),
     limits: { maxWidth: 2048, maxHeight: 2048, timeoutSeconds: 900, estimatedBudgetUsd: 0.20, minimumVramGb: 24 },
+    assetInputs: [0, 1, 2].map((index) => ({ role: "reference" as const, index, mimeTypes: ["image/png", "image/jpeg", "image/webp"] })),
     inputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
     outputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
   },
@@ -85,10 +94,14 @@ const manifests: Record<string, WorkflowManifest> = {
     kind: "character",
     operation: "liveportrait",
     bindings: [
-      { nodeId: "portrait", input: "url", source: { type: "reference", index: 0 }, required: true },
-      { nodeId: "driving", input: "url", source: { type: "reference", index: 1 }, required: true },
+      { nodeId: "portrait", input: "url", source: { type: "asset", role: "source", index: 0 }, required: true },
+      { nodeId: "driving", input: "url", source: { type: "asset", role: "source", index: 1 }, required: true },
     ],
     limits: { maxWidth: 1024, maxHeight: 1024, maxDurationSeconds: 15, maxFrames: 450, timeoutSeconds: 900, minimumVramGb: 24 },
+    assetInputs: [
+      { role: "source", index: 0, required: true, mimeTypes: ["image/png", "image/jpeg", "image/webp"] },
+      { role: "source", index: 1, required: true, mimeTypes: ["video/mp4", "video/webm"], maxDurationSeconds: 15 },
+    ],
     inputMimeTypes: ["image/png", "image/jpeg", "video/mp4", "video/webm"],
     outputMimeTypes: ["video/mp4", "video/webm"],
   },
@@ -98,10 +111,11 @@ const manifests: Record<string, WorkflowManifest> = {
     operation: "tts",
     bindings: [
       { nodeId: "text", input: "text", source: { type: "request", path: "text" }, required: true },
-      { nodeId: "reference_audio", input: "url", source: { type: "reference", index: 0 } },
+      { nodeId: "reference_audio", input: "url", source: { type: "asset", role: "reference", index: 0 } },
       { nodeId: "voice", input: "language", source: { type: "request", path: "language" } },
     ],
     limits: { maxDurationSeconds: 120, timeoutSeconds: 600, estimatedBudgetUsd: 0.10, minimumVramGb: 16 },
+    assetInputs: [{ role: "reference", index: 0, mimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"], maxDurationSeconds: 30 }],
     inputMimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"],
     outputMimeTypes: ["audio/wav", "audio/mpeg"],
   },
@@ -110,11 +124,12 @@ const manifests: Record<string, WorkflowManifest> = {
     kind: "audio",
     operation: "voice-changer",
     bindings: [
-      { nodeId: "source_audio", input: "url", source: { type: "reference", index: 0 }, required: true },
+      { nodeId: "source_audio", input: "url", source: { type: "asset", role: "source", index: 0 }, required: true },
       { nodeId: "voice_model", input: "id", source: { type: "request", path: "voiceId" }, required: true },
       { nodeId: "pitch", input: "semitones", source: { type: "request", path: "pitch" } },
     ],
     limits: { maxDurationSeconds: 300, timeoutSeconds: 900, estimatedBudgetUsd: 0.10, minimumVramGb: 16 },
+    assetInputs: [{ role: "source", index: 0, required: true, mimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"], maxDurationSeconds: 300 }],
     inputMimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"],
     outputMimeTypes: ["audio/wav", "audio/mpeg"],
   },
@@ -124,6 +139,13 @@ for (const model of ["hunyuan-8.3b", "hunyuan-13b"] as const) {
   for (const operation of ["t2v", "i2v", "v2v", "action-sync", "effects", "upscale", "lip-sync", "replace-character", "extend"] as const) {
     const version = `video/${model}-${operation}-v1`;
     const premium = model === "hunyuan-13b";
+    const sourceRequired = operation !== "t2v";
+    const sourceMimeTypes = operation === "i2v"
+      ? ["image/png", "image/jpeg", "image/webp"]
+      : operation === "effects" || operation === "action-sync"
+        ? ["image/png", "image/jpeg", "image/webp", "video/mp4", "video/webm"]
+        : ["video/mp4", "video/webm"];
+    const referenceRequired = operation === "action-sync" || operation === "replace-character";
     manifests[version] = {
       version,
       kind: "video",
@@ -131,7 +153,16 @@ for (const model of ["hunyuan-8.3b", "hunyuan-13b"] as const) {
       bindings: [
         { nodeId: "prompt", input: "text", source: { type: "request", path: "prompt" }, ...(operation === "t2v" ? { required: true } : {}) },
         { nodeId: "negative", input: "text", source: { type: "request", path: "negativePrompt" } },
-        ...(operation === "t2v" ? [] : [{ nodeId: "source", input: "url", source: { type: "reference", index: 0 }, required: true } as WorkflowBinding]),
+        ...(sourceRequired ? [{ nodeId: "source", input: "url", source: { type: "asset", role: "source", index: 0 }, required: true } as WorkflowBinding] : []),
+        ...(["action-sync", "replace-character"].includes(operation)
+          ? [{ nodeId: "reference", input: "url", source: { type: "asset", role: "reference", index: 0 }, required: true } as WorkflowBinding]
+          : []),
+        ...(operation === "lip-sync"
+          ? [
+              { nodeId: "audio", input: "url", source: { type: "asset", role: "reference", index: 0 } as const },
+              { nodeId: "tts", input: "text", source: { type: "request", path: "prompt" } as const },
+            ]
+          : []),
         { nodeId: "sampler", input: "seed", source: { type: "request", path: "parameters.seed" } },
         { nodeId: "video", input: "duration", source: { type: "request", path: "parameters.duration" } },
         { nodeId: "video", input: "frames", source: { type: "request", path: "parameters.frames" } },
@@ -145,6 +176,11 @@ for (const model of ["hunyuan-8.3b", "hunyuan-13b"] as const) {
         estimatedBudgetUsd: premium ? 1.5 : 0.75,
         minimumVramGb: premium ? 80 : 48,
       },
+      assetInputs: [
+        ...(sourceRequired ? [{ role: "source" as const, index: 0, required: true, mimeTypes: sourceMimeTypes, maxDurationSeconds: 15 }] : []),
+        ...(referenceRequired ? [{ role: "reference" as const, index: 0, required: true, mimeTypes: ["image/png", "image/jpeg", "image/webp"] }] : []),
+        ...(operation === "lip-sync" ? [{ role: "reference" as const, index: 0, mimeTypes: ["audio/wav", "audio/mpeg", "audio/ogg"], maxDurationSeconds: 15 }] : []),
+      ],
       inputMimeTypes: ["image/png", "image/jpeg", "image/webp", "video/mp4", "video/webm", "audio/wav", "audio/mpeg"],
       outputMimeTypes: ["video/mp4", "video/webm"],
     };
@@ -165,11 +201,12 @@ export function bindWorkflow(input: {
   workflow: Record<string, unknown>;
   manifest: WorkflowManifest;
   request: Record<string, unknown>;
+  sourceUrls?: string[];
   referenceUrls: string[];
 }) {
   const graph = structuredClone(input.workflow);
   for (const binding of input.manifest.bindings) {
-    const value = resolveBindingValue(binding.source, input.request, input.referenceUrls, input.manifest);
+    const value = resolveBindingValue(binding.source, input.request, input.sourceUrls ?? [], input.referenceUrls, input.manifest);
     if (value === undefined || value === null || value === "") {
       if (binding.required) throw new Error(`Falta el binding requerido ${binding.nodeId}.${binding.input}.`);
       continue;
@@ -194,16 +231,27 @@ export function validateWorkflowGraph(workflowVersion: string, workflow: Record<
   return true;
 }
 
-export function validateWorkflowAssets(manifest: WorkflowManifest, assets: Array<{ mime_type?: string | null; metadata?: unknown }>) {
-  const allowedMimeTypes = manifest.inputMimeTypes;
-  for (const asset of assets) {
-    if (allowedMimeTypes?.length && (!asset.mime_type || !allowedMimeTypes.includes(asset.mime_type))) {
-      throw new Error(`MIME no permitido para ${manifest.version}.`);
+export function validateWorkflowAssets(
+  manifest: WorkflowManifest,
+  input: Array<{ mime_type?: string | null; metadata?: unknown }> | {
+    source: Array<{ mime_type?: string | null; metadata?: unknown }>;
+    reference: Array<{ mime_type?: string | null; metadata?: unknown }>;
+  },
+) {
+  const groups = Array.isArray(input) ? { source: [], reference: input } : input;
+  if (manifest.assetInputs?.length) {
+    for (const requirement of manifest.assetInputs) {
+      const asset = groups[requirement.role][requirement.index];
+      if (!asset) {
+        if (requirement.required) throw new Error(`Falta el asset ${requirement.role}[${requirement.index}] para ${manifest.version}.`);
+        continue;
+      }
+      validateAsset(asset, requirement.mimeTypes, requirement.maxDurationSeconds ?? manifest.limits.maxDurationSeconds, manifest.version);
     }
-    const durationSeconds = readDurationSeconds(asset.metadata);
-    if (durationSeconds !== null && manifest.limits.maxDurationSeconds && durationSeconds > manifest.limits.maxDurationSeconds) {
-      throw new Error(`El asset excede la duración máxima de ${manifest.version}.`);
-    }
+    return;
+  }
+  for (const asset of [...groups.source, ...groups.reference]) {
+    validateAsset(asset, manifest.inputMimeTypes, manifest.limits.maxDurationSeconds, manifest.version);
   }
 }
 
@@ -221,11 +269,26 @@ export function validateWorkflowRequest(manifest: WorkflowManifest, request: Rec
   if (frames !== null && manifest.limits.maxFrames && frames > manifest.limits.maxFrames) throw new Error("La cantidad de frames excede el límite del workflow.");
 }
 
-function resolveBindingValue(source: WorkflowBindingSource, request: Record<string, unknown>, referenceUrls: string[], manifest: WorkflowManifest) {
+function resolveBindingValue(source: WorkflowBindingSource, request: Record<string, unknown>, sourceUrls: string[], referenceUrls: string[], manifest: WorkflowManifest) {
   if (source.type === "request") return getPath(request, source.path);
-  if (source.type === "reference") return referenceUrls[source.index];
+  if (source.type === "asset") return source.role === "source" ? sourceUrls[source.index] : referenceUrls[source.index];
   const dimensions = resolveImageDimensions(request, manifest);
   return source.value === "image-width" ? dimensions.width : dimensions.height;
+}
+
+function validateAsset(
+  asset: { mime_type?: string | null; metadata?: unknown },
+  allowedMimeTypes: string[] | undefined,
+  maxDurationSeconds: number | undefined,
+  workflowVersion: string,
+) {
+  if (allowedMimeTypes?.length && (!asset.mime_type || !allowedMimeTypes.includes(asset.mime_type))) {
+    throw new Error(`MIME no permitido para ${workflowVersion}.`);
+  }
+  const durationSeconds = readDurationSeconds(asset.metadata);
+  if (durationSeconds !== null && maxDurationSeconds && durationSeconds > maxDurationSeconds) {
+    throw new Error(`El asset excede la duración máxima de ${workflowVersion}.`);
+  }
 }
 
 function getPath(value: Record<string, unknown>, path: string) {

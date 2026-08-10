@@ -40,6 +40,34 @@ describe("workflow manifests", () => {
     const manifest = loadWorkflowManifest("video/hunyuan-8.3b-i2v-v1");
     expect(() => validateWorkflowRequest(manifest, { parameters: { duration: 11 } })).toThrow(/duración/);
     expect(() => validateWorkflowRequest(manifest, { parameters: { frames: 301 } })).toThrow(/frames/);
-    expect(() => validateWorkflowAssets(manifest, [{ mime_type: "application/pdf" }])).toThrow(/MIME/);
+    expect(() => validateWorkflowAssets(manifest, { source: [{ mime_type: "application/pdf" }], reference: [] })).toThrow(/MIME/);
+  });
+
+  it("conserva el rol y el orden de fuentes y referencias", () => {
+    const manifest = loadWorkflowManifest("video/hunyuan-8.3b-replace-character-v1");
+    const graph = Object.fromEntries(manifest.bindings.map((binding) => [binding.nodeId, { inputs: {} }]));
+    const bound = bindWorkflow({
+      workflow: graph,
+      manifest,
+      request: { prompt: "reemplazo", parameters: {} },
+      sourceUrls: ["https://signed.example/source.mp4"],
+      referenceUrls: ["https://signed.example/character.png"],
+    });
+
+    expect(bound).toHaveProperty("source.inputs.url", "https://signed.example/source.mp4");
+    expect(bound).toHaveProperty("reference.inputs.url", "https://signed.example/character.png");
+    expect(() => validateWorkflowAssets(manifest, {
+      source: [{ mime_type: "video/mp4", metadata: { durationSeconds: 8 } }],
+      reference: [{ mime_type: "image/png" }],
+    })).not.toThrow();
+    expect(() => validateWorkflowAssets(manifest, {
+      source: [{ mime_type: "image/png" }],
+      reference: [{ mime_type: "video/mp4" }],
+    })).toThrow(/MIME/);
+  });
+
+  it("rechaza un asset fuente requerido antes de llamar a la GPU", () => {
+    const manifest = loadWorkflowManifest("audio/rvc-v1");
+    expect(() => validateWorkflowAssets(manifest, { source: [], reference: [] })).toThrow(/Falta el asset source/);
   });
 });

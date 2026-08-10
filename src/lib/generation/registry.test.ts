@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { creditPackages, generationCreditRates } from "./rates";
-import { resolveCharacterRoute, resolveImageRoute, resolveVideoRoute, resolveWorldRoute } from "./registry";
+import { resolveCharacterRoute, resolveImageRoute, resolveLivePortraitRoute, resolveVideoRoute, resolveWorldRoute } from "./registry";
 
 describe("generation registry", () => {
   beforeEach(() => {
@@ -16,6 +16,7 @@ describe("generation registry", () => {
     });
     expect(resolveCharacterRoute("flux-1-dev").backendModel).toBe("flux-dev-reference");
     expect(resolveWorldRoute("flux-1-dev").workflowVersion).toBe("worlds/flux-world-v1");
+    expect(resolveLivePortraitRoute()).toMatchObject({ workflowVersion: "characters/liveportrait-v1", operation: "liveportrait" });
   });
 
   it("resuelve un workflow distinto por operación y entitlement de modelo", () => {

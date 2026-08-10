@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
-import { createAdminClient } from "@/utils/supabase/admin";
 import { enqueueGenerationJob, type GenerationQueueKind } from "./queue";
 import { getGenerationConfig, isGenerationRouteConfigured } from "./config";
 import { moderateGenerationInput } from "./moderation";
@@ -10,6 +9,7 @@ import { linkGenerationAssets, reserveGenerationJob, refundGenerationJob, verify
 import type { GenerationKind, GenerationJobResponse } from "./contracts";
 import type { GenerationRouteSpec } from "./registry";
 import { hasWorkflowManifest, loadWorkflowManifest, validateWorkflowRequest } from "./workflow-manifests";
+import { assertGenerationAccess } from "./access";
 
 export class GenerationServiceError extends Error {
   constructor(readonly code: string, message: string, readonly status = 422) {
@@ -22,17 +22,6 @@ export async function requireGenerationUser() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new GenerationServiceError("UNAUTHORIZED", "No autorizado.", 401);
   return user;
-}
-
-async function assertGenerationAccess(userId: string) {
-  if (!getGenerationConfig().adminOnly) return;
-  const { data, error } = await createAdminClient()
-    .from("users")
-    .select("role")
-    .eq("id", userId)
-    .maybeSingle();
-  if (error) throw new GenerationServiceError("GENERATION_ACCESS_UNAVAILABLE", "No se pudo comprobar el acceso de generación.", 503);
-  if (data?.role !== "admin") throw new GenerationServiceError("GENERATION_ADMIN_ONLY", "La generación está limitada temporalmente a administradores.", 403);
 }
 
 export async function enqueueGeneration(input: {
@@ -57,16 +46,6 @@ export async function enqueueGeneration(input: {
   if (!moderation.allowed) throw new GenerationServiceError(moderation.code ?? "PROMPT_BLOCKED", moderation.reason ?? "Solicitud bloqueada.", 422);
 
   try {
-    await assertGenerationAccess(input.userId);
-    await consumeGenerationRateLimit({ userId: input.userId, kind: input.kind });
-    await verifyOwnedAssets(input.userId, input.assetIds ?? []);
-    if (hasWorkflowManifest(input.route.workflowVersion)) {
-      try {
-        validateWorkflowRequest(loadWorkflowManifest(input.route.workflowVersion), input.request);
-      } catch (error) {
-        throw new GenerationServiceError("WORKFLOW_LIMIT_EXCEEDED", error instanceof Error ? error.message : "La solicitud excede los límites del workflow.", 422);
-      }
-    }
     if (!isGenerationRouteConfigured(input.route)) {
       return {
         jobId: null,
@@ -77,6 +56,17 @@ export async function enqueueGeneration(input: {
         errorCode: `${input.kind.toUpperCase()}_PROVIDER_NOT_CONFIGURED`,
         message: `La generación de ${input.kind} todavía no está conectada.`,
       };
+    }
+    const access = await assertGenerationAccess(input.userId, input.kind, input.route.backendModel);
+    if (!access.allowed) throw new GenerationServiceError(access.code, access.message, access.status);
+    await consumeGenerationRateLimit({ userId: input.userId, kind: input.kind });
+    await verifyOwnedAssets(input.userId, input.assetIds ?? []);
+    if (hasWorkflowManifest(input.route.workflowVersion)) {
+      try {
+        validateWorkflowRequest(loadWorkflowManifest(input.route.workflowVersion), input.request);
+      } catch (error) {
+        throw new GenerationServiceError("WORKFLOW_LIMIT_EXCEEDED", error instanceof Error ? error.message : "La solicitud excede los límites del workflow.", 422);
+      }
     }
     const result = await reserveGenerationJob({
       userId: input.userId,

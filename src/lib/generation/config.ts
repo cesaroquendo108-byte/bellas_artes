@@ -3,6 +3,7 @@ import { isWorkflowConfigured } from "./workflows";
 export type ProviderRoute = "vast" | "fake";
 export type GenerationProviderKind = "image" | "video" | "audio" | "character" | "world";
 export type GenerationBillingMode = "shadow" | "live";
+export type GenerationAccessMode = "admin" | "allowlist" | "public";
 
 const vastEndpointVariables: Record<GenerationProviderKind, string> = {
   image: "VAST_IMAGE_COMFY_BASE_URL",
@@ -29,6 +30,10 @@ export function getGenerationConfig() {
   const adminOnly = process.env.GENERATION_ADMIN_ONLY === undefined
     ? enabled
     : truthy(process.env.GENERATION_ADMIN_ONLY);
+  const requestedAccessMode = process.env.GENERATION_ACCESS_MODE?.trim().toLowerCase();
+  const accessMode: GenerationAccessMode = requestedAccessMode === "admin" || requestedAccessMode === "allowlist" || requestedAccessMode === "public"
+    ? requestedAccessMode
+    : adminOnly ? "admin" : "public";
   const route = process.env.GENERATION_PROVIDER?.trim() as ProviderRoute | undefined;
   const hasVast = Boolean(
     process.env.VAST_COMFY_BASE_URL?.trim()
@@ -51,7 +56,8 @@ export function getGenerationConfig() {
 
   return {
     enabled,
-    adminOnly,
+    adminOnly: accessMode === "admin",
+    accessMode,
     billingMode,
     route: route === "vast" || route === "fake" ? route : null,
     hasVast,

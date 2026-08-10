@@ -63,7 +63,7 @@ export class ComfyUIProvider implements GenerationProvider {
     if (existingProviderJobId) {
       return { providerJobId: existingProviderJobId, provider: "vast", kind: input.kind };
     }
-    const workflow = parseWorkflow(input.workflowVersion, input.request, input.referenceUrls ?? []);
+    const workflow = parseWorkflow(input.workflowVersion, input.request, input.sourceUrls ?? [], input.referenceUrls ?? []);
     const payload = await json<{ prompt_id?: string }>(`${baseUrl(input.kind)}/prompt`, {
       method: "POST",
       body: JSON.stringify({ prompt: workflow, client_id: input.jobId }),
@@ -101,7 +101,7 @@ export class ComfyUIProvider implements GenerationProvider {
   }) {
     const endpointName = getVastServerlessEndpointName(input.kind, input.workflowVersion);
     if (!endpointName) throw new ProviderError("Vast Serverless no está configurado para esta modalidad.", "VAST_ENDPOINT_NOT_CONFIGURED", false);
-    const workflow = parseWorkflow(input.workflowVersion, input.request, input.referenceUrls ?? []);
+    const workflow = parseWorkflow(input.workflowVersion, input.request, input.sourceUrls ?? [], input.referenceUrls ?? []);
     const assignment = await waitForServerlessAssignment(endpointName, input, options?.signal);
     const job: ProviderJob = { providerJobId: input.jobId, provider: "vast", kind: input.kind };
     await options?.onAssigned?.(job);
@@ -338,12 +338,13 @@ function getPromptClientId(prompt: unknown) {
   return typeof clientId === "string" ? clientId : null;
 }
 
-function parseWorkflow(workflowVersion: string, request: Record<string, unknown>, referenceUrls: string[]) {
+function parseWorkflow(workflowVersion: string, request: Record<string, unknown>, sourceUrls: string[], referenceUrls: string[]) {
   try {
     return bindWorkflow({
       workflow: loadWorkflow(workflowVersion),
       manifest: loadWorkflowManifest(workflowVersion),
       request,
+      sourceUrls,
       referenceUrls,
     });
   } catch {

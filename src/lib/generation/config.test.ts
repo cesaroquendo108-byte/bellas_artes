@@ -20,6 +20,15 @@ describe("generation safety defaults", () => {
     expect(getGenerationConfig().adminOnly).toBe(false);
   });
 
+  it("usa un gate explícito para avanzar de admin a beta y público", () => {
+    vi.stubEnv("GENERATION_ENABLED", "true");
+    vi.stubEnv("GENERATION_ADMIN_ONLY", "true");
+    vi.stubEnv("GENERATION_ACCESS_MODE", "allowlist");
+    expect(getGenerationConfig()).toMatchObject({ accessMode: "allowlist", adminOnly: false });
+    vi.stubEnv("GENERATION_ACCESS_MODE", "public");
+    expect(getGenerationConfig()).toMatchObject({ accessMode: "public", adminOnly: false });
+  });
+
   it("acepta únicamente Vast o fake como rutas activas", () => {
     vi.stubEnv("GENERATION_PROVIDER", "runpod");
     expect(getGenerationConfig().route).toBeNull();

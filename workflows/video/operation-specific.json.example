@@ -1,0 +1,5 @@
+{
+  "_purpose": "Exportar un workflow API real por operación y modelo; no reutilizar este archivo como grafo ejecutable",
+  "_operations": ["t2v", "i2v", "v2v", "action-sync", "effects", "upscale", "lip-sync", "replace-character", "extend"],
+  "_models": ["hunyuan-8.3b", "hunyuan-13b"]
+}

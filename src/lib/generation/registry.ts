@@ -65,6 +65,17 @@ export function resolveWorldRoute(model: string, params?: Record<string, unknown
   };
 }
 
+export function resolveLivePortraitRoute(params?: Record<string, unknown>): GenerationRouteSpec {
+  return {
+    publicModel: "liveportrait",
+    backendModel: "liveportrait",
+    workflowVersion: "characters/liveportrait-v1",
+    operation: "liveportrait",
+    providerRoute: configuredRoute(),
+    credits: getGenerationCreditCost("character", params, "liveportrait"),
+  };
+}
+
 export function resolveAudioRoute(kind: string, model = "f5-tts", params?: Record<string, unknown>) {
   const backendModel = kind === "voice_changer" ? "rvc" : kind === "tts" ? "f5-tts-es" : "ffmpeg-mix";
   const workflowVersion = kind === "voice_changer"

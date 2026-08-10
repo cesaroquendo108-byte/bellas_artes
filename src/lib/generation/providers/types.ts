@@ -6,6 +6,7 @@ export interface ProviderSubmitInput {
   workflowVersion: string;
   backendModel: string;
   request: Record<string, unknown>;
+  sourceUrls?: string[];
   referenceUrls?: string[];
 }
 
