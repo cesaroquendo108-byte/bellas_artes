@@ -92,6 +92,9 @@ describe("ComfyUIProvider", () => {
     vi.stubEnv("VAST_IMAGE_SERVERLESS_ENDPOINT", "ba-image-sandbox");
     vi.stubEnv("VAST_API_KEY", "test-vast-key");
     vi.stubEnv("CLOUDFLARE_R2_ACCOUNT_ID", "account-test");
+    vi.stubEnv("CLOUDFLARE_R2_ACCESS_KEY_ID", "test-r2-access");
+    vi.stubEnv("CLOUDFLARE_R2_SECRET_ACCESS_KEY", "test-r2-secret");
+    vi.stubEnv("CLOUDFLARE_R2_SANDBOX_BUCKET", "sandbox-test");
     const onAssigned = vi.fn(async () => undefined);
     const fetchMock = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(jsonResponse({
@@ -140,12 +143,19 @@ describe("ComfyUIProvider", () => {
           workflow_json: {
             "6": { inputs: { text: "nuevo" } },
           },
+          s3: {
+            access_key_id: "test-r2-access",
+            secret_access_key: "test-r2-secret",
+            endpoint_url: "https://account-test.r2.cloudflarestorage.com",
+            bucket_name: "sandbox-test",
+            region: "auto",
+          },
         },
       },
     });
   });
 
-  it("acepta salida base64 y mantiene R2 fuera de la GPU", async () => {
+  it("acepta salida base64 cuando el wrapper no necesita S3", async () => {
     vi.stubEnv("VAST_IMAGE_SERVERLESS_ENDPOINT", "ba-image-sandbox");
     vi.stubEnv("VAST_API_KEY", "test-vast-key");
     vi.spyOn(globalThis, "fetch")

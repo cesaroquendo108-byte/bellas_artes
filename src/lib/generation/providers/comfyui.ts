@@ -107,6 +107,7 @@ export class ComfyUIProvider implements GenerationProvider {
     await options?.onAssigned?.(job);
 
     const config = getGenerationConfig();
+    const s3 = getPerRequestS3Config();
     const response = await fetch(new URL("generate/sync", ensureTrailingSlash(assignment.url)), {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -119,6 +120,7 @@ export class ComfyUIProvider implements GenerationProvider {
           input: {
             request_id: input.jobId,
             workflow_json: workflow,
+            ...(s3 ? { s3 } : {}),
           },
         },
       }),
@@ -192,6 +194,24 @@ export class ComfyUIProvider implements GenerationProvider {
       throw new ProviderError("No se pudo verificar la idempotencia en ComfyUI.", "COMFY_IDEMPOTENCY_CHECK", true);
     }
   }
+}
+
+function getPerRequestS3Config() {
+  const accountId = process.env.CLOUDFLARE_R2_ACCOUNT_ID?.trim();
+  const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID?.trim();
+  const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY?.trim();
+  const bucketName = process.env.CLOUDFLARE_R2_SANDBOX_BUCKET?.trim()
+    || process.env.CLOUDFLARE_R2_BUCKET?.trim();
+  if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) return null;
+  return {
+    access_key_id: accessKeyId,
+    secret_access_key: secretAccessKey,
+    endpoint_url: `https://${accountId}.r2.cloudflarestorage.com`,
+    bucket_name: bucketName,
+    region: "auto",
+    connect_timeout: 60,
+    connect_attempts: 3,
+  };
 }
 
 interface VastRouteAssignment {
