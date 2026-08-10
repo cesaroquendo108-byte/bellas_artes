@@ -4,13 +4,21 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 obsidian_root="${BELLAS_ARTES_OBSIDIAN:-/home/finvecito/Documentos/BellasArtes_Obsidian}"
 
-pattern="(sk-[A-Za-z0-9_-]{20,}|fc-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|eyJhbGciOiJIUzI1NiIs[A-Za-z0-9._-]{20,}|(?:service[_ -]?role|api[_ -]?key|password|contrase(?:n|ñ)a)[[:space:]]*[:=][[:space:]]*[\"']?[A-Za-z0-9_./+=-]{16,})"
+pattern="(sk-[A-Za-z0-9_-]{20,}|fc-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|GOCSPX-[A-Za-z0-9_-]{20,}|eyJhbGciOiJIUzI1NiIs[A-Za-z0-9._-]{20,}|(?:service[_ -]?role|api[_ -]?key|password|contrase(?:n|ñ)a)[[:space:]]*[:=][[:space:]]*[\"']?[A-Za-z0-9_./+=-]{16,})"
 
 mapfile -d '' repo_files < <(
   cd "$repo_root"
-  while IFS= read -r -d '' file; do
-    [[ -f "$file" ]] && printf '%s\0' "$file"
-  done < <(git ls-files -z | grep -zvE '(^|/)\.env($|\.)|package-lock\.json$' || true)
+  rg --files -0 \
+    -g '!node_modules/**' \
+    -g '!.next/**' \
+    -g '!.git/**' \
+    -g '!supabase/.temp/**' \
+    -g '!package-lock.json' \
+    -g '!.env' \
+    -g '!.env.*' \
+    -g '!*.png' -g '!*.jpg' -g '!*.jpeg' -g '!*.webp' \
+    -g '!*.mp3' -g '!*.wav' -g '!*.mp4' -g '!*.webm' \
+    -g '!*.woff' -g '!*.woff2' -g '!*.ttf' -g '!*.ico'
 )
 
 mapfile -d '' doc_files < <(
