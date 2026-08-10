@@ -25,6 +25,27 @@ describe("generation safety defaults", () => {
     expect(getGenerationConfig().route).toBeNull();
   });
 
+  it("usa billing shadow por defecto y exige opt-in para live", () => {
+    expect(getGenerationConfig().billingMode).toBe("shadow");
+    vi.stubEnv("GENERATION_BILLING_MODE", "live");
+    expect(getGenerationConfig().billingMode).toBe("live");
+  });
+
+  it("sólo activa el arnés Vast con presupuesto y máximo de jobs válidos", () => {
+    vi.stubEnv("VAST_TEST_BUDGET_USD", "0.50");
+    vi.stubEnv("VAST_TEST_MAX_JOBS", "5");
+    vi.stubEnv("VAST_TEST_MODALITY", "image");
+    vi.stubEnv("VAST_TEST_RUN_ID", "flux-schnell-acceptance");
+
+    expect(getGenerationConfig().vastTest).toEqual({
+      enabled: true,
+      budgetUsd: 0.5,
+      maxJobs: 5,
+      modality: "image",
+      runId: "flux-schnell-acceptance",
+    });
+  });
+
   it("resuelve endpoints Vast por modalidad con fallback compatible", () => {
     vi.stubEnv("VAST_COMFY_BASE_URL", "https://vast.example/base");
     vi.stubEnv("VAST_AUDIO_COMFY_BASE_URL", "https://vast.example/audio");

@@ -54,6 +54,20 @@ export type CharacterGenerationRequest = z.infer<typeof characterGenerationReque
 export type WorldGenerationRequest = z.infer<typeof worldGenerationRequestSchema>
 export type CharacterWorldKind = "character" | "world"
 
+export function normalizeCharacterGenerationRequest(input: CharacterGenerationRequest) {
+  if (input.prompt) return input
+  if (input.structured) {
+    return {
+      ...input,
+      prompt: Object.entries(input.structured).map(([key, value]) => `${key}: ${value}`).join(", "),
+    }
+  }
+  return {
+    ...input,
+    prompt: "Mantener la identidad facial y visual de las referencias suministradas.",
+  }
+}
+
 export interface CharacterWorldJobResponse {
   jobId: string | null
   kind: CharacterWorldKind

@@ -26,7 +26,12 @@ export async function persistGenerationOutput(input: {
     key,
     body: input.result.bytes,
     contentType: input.result.contentType,
-    metadata: { owner: input.userId, generationJobId: input.jobId, sha256: digest },
+    metadata: {
+      owner: input.userId,
+      generationJobId: input.jobId,
+      sha256: digest,
+      provenance: "bellas-artes-ai-generation",
+    },
   });
   const { data, error } = await createAdminClient().from("assets").insert({
     user_id: input.userId,
@@ -35,7 +40,14 @@ export async function persistGenerationOutput(input: {
     r2_key: key,
     mime_type: input.result.contentType,
     bytes: input.result.bytes.byteLength,
-    metadata: { source: "generation", generationJobId: input.jobId, sha256: digest, backend: input.result.metadata ?? {} },
+    metadata: {
+      source: "generation",
+      provenance: "bellas-artes-ai-generation",
+      watermark: "metadata",
+      generationJobId: input.jobId,
+      sha256: digest,
+      backend: input.result.metadata ?? {},
+    },
   }).select("id").single();
   if (error || !data) throw new Error(error?.message ?? "No se pudo registrar el resultado.");
   return data.id as string;

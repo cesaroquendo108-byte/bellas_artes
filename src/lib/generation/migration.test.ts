@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 const migration = readFileSync(new URL("../../../supabase/migrations/202608080006_generation_orchestration.sql", import.meta.url), "utf8");
 const vastOnlyMigration = readFileSync(new URL("../../../supabase/migrations/202608080008_vast_only_generation.sql", import.meta.url), "utf8");
 const telemetryMigration = readFileSync(new URL("../../../supabase/migrations/202608080009_generation_telemetry.sql", import.meta.url), "utf8");
+const billingShadowMigration = readFileSync(new URL("../../../supabase/migrations/202608100010_generation_billing_shadow.sql", import.meta.url), "utf8");
 
 describe("generation orchestration migration", () => {
   it("crea jobs, auditoría y relaciones de assets", () => {
@@ -31,5 +32,13 @@ describe("generation orchestration migration", () => {
     expect(telemetryMigration).toContain("inference_ms");
     expect(telemetryMigration).toContain("estimated_cost_usd");
     expect(telemetryMigration).not.toContain("prompt_hash");
+  });
+
+  it("añade billing shadow y coste real sin modificar migraciones históricas", () => {
+    expect(billingShadowMigration).toContain("billing_mode");
+    expect(billingShadowMigration).toContain("quoted_credits");
+    expect(billingShadowMigration).toContain("record_generation_actual_cost");
+    expect(billingShadowMigration).toContain("grant execute on function public.record_generation_actual_cost");
+    expect(billingShadowMigration).not.toContain("drop table");
   });
 });

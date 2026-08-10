@@ -9,9 +9,21 @@ describe("generation registry", () => {
 
   it("mapea los aliases públicos a workflows open source", () => {
     expect(resolveImageRoute("gpt-image-2")).toMatchObject({ backendModel: "flux-schnell", workflowVersion: "image/flux-schnell-v1", credits: 1 });
-    expect(resolveVideoRoute("t2v", "openart-video-v2")).toMatchObject({ backendModel: "hunyuan-video-8.3b", credits: 80 });
+    expect(resolveVideoRoute("t2v", "openart-video-v2")).toMatchObject({
+      backendModel: "hunyuan-video-8.3b",
+      workflowVersion: "video/hunyuan-8.3b-t2v-v1",
+      credits: 80,
+    });
     expect(resolveCharacterRoute("flux-1-dev").backendModel).toBe("flux-dev-reference");
     expect(resolveWorldRoute("flux-1-dev").workflowVersion).toBe("worlds/flux-world-v1");
+  });
+
+  it("resuelve un workflow distinto por operación y entitlement de modelo", () => {
+    expect(resolveVideoRoute("i2v", "openart-video-v2").workflowVersion).toBe("video/hunyuan-8.3b-i2v-v1");
+    expect(resolveVideoRoute("lip-sync", "hunyuan-13b-pro")).toMatchObject({
+      backendModel: "hunyuan-video-13b",
+      workflowVersion: "video/hunyuan-13b-lip-sync-v1",
+    });
   });
 
   it("mantiene las tarifas de negocio documentadas", () => {

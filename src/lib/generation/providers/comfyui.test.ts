@@ -39,9 +39,6 @@ describe("ComfyUIProvider", () => {
   });
 
   it("envía un prompt nuevo sólo después de comprobar cola e historial", async () => {
-    vi.stubEnv("WORKFLOW_IMAGE_FLUX_SCHNELL_V1", JSON.stringify({
-      "1": { inputs: { text: "original" }, class_type: "CLIPTextEncode" },
-    }));
     const fetchMock = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(jsonResponse({ queue_running: [], queue_pending: [] }))
       .mockResolvedValueOnce(jsonResponse({}))
@@ -95,9 +92,6 @@ describe("ComfyUIProvider", () => {
     vi.stubEnv("VAST_IMAGE_SERVERLESS_ENDPOINT", "ba-image-sandbox");
     vi.stubEnv("VAST_API_KEY", "test-vast-key");
     vi.stubEnv("CLOUDFLARE_R2_ACCOUNT_ID", "account-test");
-    vi.stubEnv("WORKFLOW_IMAGE_FLUX_SCHNELL_V1", JSON.stringify({
-      "1": { inputs: { text: "original" }, class_type: "CLIPTextEncode" },
-    }));
     const onAssigned = vi.fn(async () => undefined);
     const fetchMock = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(jsonResponse({
@@ -140,7 +134,14 @@ describe("ComfyUIProvider", () => {
     expect(workerInit?.headers).toEqual({ "content-type": "application/json" });
     expect(JSON.parse(String(workerInit?.body))).toMatchObject({
       auth_data: { signature: "signed-route", reqnum: 42 },
-      payload: { input: { request_id: "job-serverless-1" } },
+      payload: {
+        input: {
+          request_id: "job-serverless-1",
+          workflow_json: {
+            "6": { inputs: { text: "nuevo" } },
+          },
+        },
+      },
     });
   });
 });

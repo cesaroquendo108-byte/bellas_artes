@@ -16,6 +16,7 @@
     "db:status": "supabase status",
     "db:new-migration": "supabase migration new",
     "worker": "NODE_OPTIONS=--conditions=react-server tsx workers/generation-worker.ts",
+    "worker:health": "tsx scripts/worker-healthcheck.ts",
     "mcp": "NODE_OPTIONS=--conditions=react-server tsx mcp/server.ts"
   },
   "dependencies": {

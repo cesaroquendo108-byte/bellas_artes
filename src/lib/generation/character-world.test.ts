@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { characterGenerationRequestSchema, worldGenerationRequestSchema } from "./character-world"
+import { characterGenerationRequestSchema, normalizeCharacterGenerationRequest, worldGenerationRequestSchema } from "./character-world"
 
 const assetId = "11111111-1111-4111-8111-111111111111"
 const characterBase = {
@@ -28,6 +28,10 @@ describe("characterGenerationRequestSchema", () => {
     { cfgScale: 21 }, { steps: 2 }, { faceWeight: 2 }, { aspectRatio: "3:2" },
   ])("rechaza parámetros fuera de rango", (override) => expect(characterGenerationRequestSchema.safeParse({ ...characterBase, mode: "prompt", prompt: "x", ...override }).success).toBe(false))
   it("rechaza userId y campos desconocidos", () => expect(characterGenerationRequestSchema.safeParse({ ...characterBase, mode: "prompt", prompt: "x", userId: assetId }).success).toBe(false))
+  it("convierte el constructor estructurado en un prompt reproducible", () => {
+    const parsed = characterGenerationRequestSchema.parse({ ...characterBase, mode: "structured", structured })
+    expect(normalizeCharacterGenerationRequest(parsed).prompt).toContain("aesthetic: cinematic")
+  })
 })
 
 describe("worldGenerationRequestSchema", () => {

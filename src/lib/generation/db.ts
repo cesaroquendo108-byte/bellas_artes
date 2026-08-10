@@ -19,6 +19,8 @@ export interface GenerationJobRecord {
   credits_reserved: number;
   credits_captured: number;
   credits_refunded: number;
+  billing_mode?: "shadow" | "live";
+  quoted_credits?: number;
   output_asset_ids?: string[];
   error_code: string | null;
   error_message: string | null;
@@ -40,8 +42,10 @@ export async function reserveGenerationJob(input: {
   route: GenerationRouteSpec;
   request: Record<string, unknown>;
   maxAttempts: number;
+  billingMode: "shadow" | "live";
 }) {
   const admin = createAdminClient();
+  const chargedCredits = input.billingMode === "shadow" ? 0 : input.route.credits;
   const { data, error } = await admin.rpc("reserve_generation_credits", {
     p_user_id: input.userId,
     p_idempotency_key: input.idempotencyKey,
@@ -51,12 +55,19 @@ export async function reserveGenerationJob(input: {
     p_backend_model: input.route.backendModel,
     p_provider_route: input.route.providerRoute,
     p_workflow_version: input.route.workflowVersion,
-    p_credits: input.route.credits,
+    p_credits: chargedCredits,
     p_request: input.request,
     p_max_attempts: input.maxAttempts,
   });
   if (error) throw rpcError(error);
-  return data as { job_id: string; status: string; reserved_credits: number; idempotent?: boolean };
+  const result = data as { job_id: string; status: string; reserved_credits: number; idempotent?: boolean };
+  const { error: metadataError } = await admin.rpc("set_generation_billing_metadata", {
+    p_job_id: result.job_id,
+    p_billing_mode: input.billingMode,
+    p_quoted_credits: input.route.credits,
+  });
+  if (metadataError) throw rpcError(metadataError);
+  return result;
 }
 
 export async function refundGenerationJob(input: { jobId: string; code: string; message: string; canceled?: boolean }) {
@@ -152,6 +163,24 @@ export async function recordGenerationMetrics(input: {
     p_inference_ms: Math.max(Math.round(input.inferenceMs), 0),
     p_total_ms: Math.max(Math.round(input.totalMs), 0),
     p_estimated_cost_usd: Math.max(input.estimatedCostUsd, 0),
+  });
+  if (error) throw rpcError(error);
+  return data;
+}
+
+export async function recordGenerationActualCost(input: {
+  jobId: string;
+  attempt: number;
+  balanceBeforeUsd: number;
+  balanceAfterUsd: number;
+  actualCostUsd: number;
+}) {
+  const { data, error } = await createAdminClient().rpc("record_generation_actual_cost", {
+    p_job_id: input.jobId,
+    p_attempt: input.attempt,
+    p_balance_before_usd: input.balanceBeforeUsd,
+    p_balance_after_usd: input.balanceAfterUsd,
+    p_actual_cost_usd: input.actualCostUsd,
   });
   if (error) throw rpcError(error);
   return data;

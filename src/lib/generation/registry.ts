@@ -31,10 +31,11 @@ export function resolveImageRoute(model: string, params?: Record<string, unknown
 export function resolveVideoRoute(operation: string, model: string, params?: Record<string, unknown>): GenerationRouteSpec {
   const premium = model.includes("13b") || model.includes("premium") || model.includes("pro");
   const backendModel = premium ? "hunyuan-video-13b" : "hunyuan-video-8.3b";
+  const workflowModel = premium ? "hunyuan-13b" : "hunyuan-8.3b";
   return {
     publicModel: model,
     backendModel,
-    workflowVersion: premium ? "video/hunyuan-13b-v1" : "video/hunyuan-8b-v1",
+    workflowVersion: `video/${workflowModel}-${operation}-v1`,
     operation,
     providerRoute: configuredRoute(),
     credits: getGenerationCreditCost("video", params, backendModel),
@@ -65,12 +66,18 @@ export function resolveWorldRoute(model: string, params?: Record<string, unknown
 }
 
 export function resolveAudioRoute(kind: string, model = "f5-tts", params?: Record<string, unknown>) {
-  const backendModel = kind === "voice_changer" ? "rvc" : "f5-tts-es";
+  const backendModel = kind === "voice_changer" ? "rvc" : kind === "tts" ? "f5-tts-es" : "ffmpeg-mix";
+  const workflowVersion = kind === "voice_changer"
+    ? "audio/rvc-v1"
+    : kind === "tts"
+      ? "audio/f5-tts-es-v1"
+      : "audio/mix-v1";
   return {
     publicModel: model,
     backendModel,
-    workflowVersion: kind === "voice_changer" ? "audio/rvc-v1" : "audio/f5-tts-es-v1",
+    workflowVersion,
+    operation: kind,
     providerRoute: configuredRoute(),
     credits: getGenerationCreditCost("audio", params, backendModel),
-  } satisfies Omit<GenerationRouteSpec, "operation">;
+  } satisfies GenerationRouteSpec;
 }

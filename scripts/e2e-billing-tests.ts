@@ -59,7 +59,8 @@ async function run() {
       kind: "video",
       route: { publicModel: "hunyuan", backendModel: "hunyuan-video-8.3b", providerRoute: "fake", credits: 50, workflowVersion: "test" },
       request: {},
-      maxAttempts: 3
+      maxAttempts: 3,
+      billingMode: "live"
     });
     console.log(`Reserva inicial: Job ${reserve1.job_id}, Reserved: ${reserve1.reserved_credits}`);
 
@@ -70,7 +71,8 @@ async function run() {
       kind: "video",
       route: { publicModel: "hunyuan", backendModel: "hunyuan-video-8.3b", providerRoute: "fake", credits: 50, workflowVersion: "test" },
       request: {},
-      maxAttempts: 3
+      maxAttempts: 3,
+      billingMode: "live"
     });
     console.log(`Reserva idempotente: Mismo Job ID? ${reserve1.job_id === reserve2.job_id}`);
 
@@ -92,7 +94,8 @@ async function run() {
       kind: "image",
       route: { publicModel: "flux", backendModel: "flux-schnell", providerRoute: "fake", credits: 15, workflowVersion: "test" },
       request: {},
-      maxAttempts: 3
+      maxAttempts: 3,
+      billingMode: "live"
     })).job_id;
 
     await completeGenerationJob(captureJobId, []);

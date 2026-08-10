@@ -9,6 +9,7 @@ import { consumeGenerationRateLimit, GenerationRateLimitError } from "./rate-lim
 import { linkGenerationAssets, reserveGenerationJob, refundGenerationJob, verifyOwnedAssets } from "./db";
 import type { GenerationKind, GenerationJobResponse } from "./contracts";
 import type { GenerationRouteSpec } from "./registry";
+import { hasWorkflowManifest, loadWorkflowManifest, validateWorkflowRequest } from "./workflow-manifests";
 
 export class GenerationServiceError extends Error {
   constructor(readonly code: string, message: string, readonly status = 422) {
@@ -59,6 +60,13 @@ export async function enqueueGeneration(input: {
     await assertGenerationAccess(input.userId);
     await consumeGenerationRateLimit({ userId: input.userId, kind: input.kind });
     await verifyOwnedAssets(input.userId, input.assetIds ?? []);
+    if (hasWorkflowManifest(input.route.workflowVersion)) {
+      try {
+        validateWorkflowRequest(loadWorkflowManifest(input.route.workflowVersion), input.request);
+      } catch (error) {
+        throw new GenerationServiceError("WORKFLOW_LIMIT_EXCEEDED", error instanceof Error ? error.message : "La solicitud excede los límites del workflow.", 422);
+      }
+    }
     if (!isGenerationRouteConfigured(input.route)) {
       return {
         jobId: null,
@@ -77,6 +85,7 @@ export async function enqueueGeneration(input: {
       route: input.route,
       request: input.request,
       maxAttempts: getGenerationConfig().maxAttempts,
+      billingMode: getGenerationConfig().billingMode,
     });
     const jobId = String(result.job_id);
     if (!result.idempotent) {

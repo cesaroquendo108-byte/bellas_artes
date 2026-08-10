@@ -1,13 +1,18 @@
 import { UnrecoverableError, Worker, type Job } from "bullmq";
 import Redis from "ioredis";
 import { assertSafeVastServerlessConfig, getEstimatedVastCostRate, getGenerationConfig, getVastServerlessEndpointName } from "@/lib/generation/config";
-import { completeGenerationJob, getGenerationJob, markGenerationProcessing, recordGenerationFailure, recordGenerationMetrics, refundGenerationJob, verifyOwnedAssets } from "@/lib/generation/db";
+import { completeGenerationJob, getGenerationJob, markGenerationProcessing, recordGenerationActualCost, recordGenerationFailure, recordGenerationMetrics, refundGenerationJob, verifyOwnedAssets } from "@/lib/generation/db";
 import { persistGenerationOutput } from "@/lib/generation/output";
 import { getProvider, selectProvider, ProviderError, type ProviderJob, type ProviderResult } from "@/lib/generation/providers";
 import { getPrivateObjectUrl } from "@/lib/storage/r2";
 import { moveToDLQ, type GenerationQueueKind } from "@/lib/generation/queue";
+import { claimVastTestBudget, finalizeVastTestBudget } from "@/lib/generation/vast-test-budget";
+import { loadWorkflowManifest, validateWorkflowAssets } from "@/lib/generation/workflow-manifests";
 
 type WorkerPayload = { jobId: string };
+const activeConnections = new Set<Redis>();
+const activeWorkers = new Set<Worker<WorkerPayload>>();
+let shutdownHandlersInstalled = false;
 
 function log(level: "info" | "warn" | "error", message: string, meta?: Record<string, unknown>) {
   const entry = { ts: new Date().toISOString(), level, message, ...meta };
@@ -27,8 +32,17 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
 
   const sourceIds = Array.isArray(record.request.sourceAssetIds) ? record.request.sourceAssetIds.filter((value): value is string => typeof value === "string") : [];
   const referenceIds = Array.isArray(record.request.referenceAssetIds) ? record.request.referenceAssetIds.filter((value): value is string => typeof value === "string") : [];
-  const assets = await verifyOwnedAssets(record.user_id, [...sourceIds, ...referenceIds]);
-  const referenceUrls = await Promise.all(assets.map((asset) => getPrivateObjectUrl(asset.r2_key)));
+  const requestedAssetIds = [...sourceIds, ...referenceIds];
+  const assets = await verifyOwnedAssets(record.user_id, requestedAssetIds);
+  const assetsById = new Map(assets.map((asset) => [asset.id, asset]));
+  const orderedAssets = requestedAssetIds.map((id) => assetsById.get(id)).filter((asset): asset is NonNullable<typeof asset> => Boolean(asset));
+  const workflowManifest = loadWorkflowManifest(record.workflow_version);
+  try {
+    validateWorkflowAssets(workflowManifest, orderedAssets);
+  } catch (error) {
+    throw new ProviderError(error instanceof Error ? error.message : "Los assets no cumplen el contrato del workflow.", "WORKFLOW_ASSET_INVALID", false);
+  }
+  const referenceUrls = await Promise.all(orderedAssets.map((asset) => getPrivateObjectUrl(asset.r2_key)));
   const submitInput = {
     jobId: record.id,
     kind: record.kind,
@@ -37,7 +51,7 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
     request: record.request,
     referenceUrls,
   };
-  const usesServerlessRouter = Boolean(getVastServerlessEndpointName(record.kind));
+  const usesServerlessRouter = Boolean(getVastServerlessEndpointName(record.kind, record.workflow_version));
   const resumingExistingProviderJob = record.provider_route === "vast" && Boolean(record.provider_job_id);
   const provider = resumingExistingProviderJob && !usesServerlessRouter
     ? getProvider("vast", record.kind)
@@ -120,6 +134,9 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
     totalMs,
     estimatedCostUsd,
   });
+  if (!workflowManifest.outputMimeTypes.includes(result.contentType)) {
+    throw new ProviderError("El MIME de salida no cumple el manifiesto del workflow.", "WORKFLOW_OUTPUT_INVALID", false);
+  }
   const assetId = await persistGenerationOutput({ userId: record.user_id, jobId: record.id, kind: record.kind, result });
   await completeGenerationJob(record.id, [assetId]);
 }
@@ -128,20 +145,28 @@ export function startGenerationWorkers() {
   const redisUrl = process.env.REDIS_URL?.trim();
   if (!redisUrl) throw new Error("REDIS_URL no está configurado.");
   const connection = new Redis(redisUrl, { maxRetriesPerRequest: null });
+  activeConnections.add(connection);
   const config = getGenerationConfig();
   assertSafeVastServerlessConfig();
-  const configuredKinds = (process.env.WORKER_QUEUE_KINDS ?? "image,video,audio,character,world")
-    .split(",")
-    .map((kind) => kind.trim())
-    .filter((kind): kind is GenerationQueueKind => ["image", "video", "audio", "character", "world"].includes(kind));
+  const configuredKinds = getConfiguredQueueKinds();
   if (configuredKinds.length === 0) throw new Error("WORKER_QUEUE_KINDS no contiene una cola válida.");
+
+  installShutdownHandlers();
+  connection.on("error", (error) => log("error", "Error de conexión Redis.", { error: error.message }));
+
+  if (!config.enabled) {
+    log("info", "Worker en modo inactivo; no consumirá jobs.", { kinds: configuredKinds, generationEnabled: false });
+    return [];
+  }
 
   log("info", "Iniciando generation workers.", { concurrency: config.workerConcurrency, maxAttempts: config.maxAttempts, kinds: configuredKinds });
 
   return configuredKinds.map((kind) => {
     const worker = new Worker<WorkerPayload>(`generation-${kind}`, async (job) => {
       log("info", `Procesando job.`, { kind, jobId: job.data.jobId, attempt: job.attemptsMade + 1 });
+      let budgetClaim = null;
       try {
+        budgetClaim = await claimVastTestBudget(job.data.jobId, kind);
         await processGenerationJob(job);
         log("info", `Job completado.`, { kind, jobId: job.data.jobId });
       } catch (error) {
@@ -153,6 +178,27 @@ export function startGenerationWorkers() {
           throw new UnrecoverableError(message);
         }
         throw error;
+      } finally {
+        const budget = await finalizeVastTestBudget(budgetClaim).catch((error) => {
+          log("error", "No se pudo cerrar la medición del presupuesto Vast.", { kind, jobId: job.data.jobId, error: String(error) });
+          return null;
+        });
+        if (budget) {
+          log(budget.overBudget ? "error" : "info", "Presupuesto Vast medido.", {
+            kind,
+            jobId: job.data.jobId,
+            jobCostUsd: budget.jobCostUsd,
+            totalSpentUsd: budget.totalSpentUsd,
+            overBudget: budget.overBudget,
+          });
+          await recordGenerationActualCost({
+            jobId: job.data.jobId,
+            attempt: job.attemptsMade + 1,
+            balanceBeforeUsd: budget.beforeBalanceUsd,
+            balanceAfterUsd: budget.afterBalanceUsd,
+            actualCostUsd: budget.jobCostUsd,
+          }).catch((error) => log("warn", "No se pudo persistir el coste real Vast.", { kind, jobId: job.data.jobId, error: String(error) }));
+        }
       }
     }, { connection, prefix: process.env.BULLMQ_PREFIX ?? "bellas-artes", concurrency: config.workerConcurrency });
 
@@ -180,8 +226,29 @@ export function startGenerationWorkers() {
     });
 
     log("info", `Worker ${kind} iniciado.`, { kind });
+    activeWorkers.add(worker);
     return worker;
   });
+}
+
+export function getConfiguredQueueKinds(value = process.env.WORKER_QUEUE_KINDS ?? "image,video,audio,character,world") {
+  return [...new Set(value
+    .split(",")
+    .map((kind) => kind.trim())
+    .filter((kind): kind is GenerationQueueKind => ["image", "video", "audio", "character", "world"].includes(kind)))];
+}
+
+function installShutdownHandlers() {
+  if (shutdownHandlersInstalled) return;
+  shutdownHandlersInstalled = true;
+  const shutdown = async (signal: string) => {
+    log("info", "Cerrando generation worker.", { signal });
+    await Promise.allSettled([...activeWorkers].map((worker) => worker.close()));
+    await Promise.allSettled([...activeConnections].map((connection) => connection.quit()));
+    process.exit(0);
+  };
+  process.once("SIGTERM", () => void shutdown("SIGTERM"));
+  process.once("SIGINT", () => void shutdown("SIGINT"));
 }
 
 if (process.env.RUN_GENERATION_WORKER === "true") startGenerationWorkers();

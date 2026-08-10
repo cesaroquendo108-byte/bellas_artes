@@ -17,5 +17,6 @@ describe("generation workflows", () => {
     const key = getWorkflowEnvironmentKey("image/test-v1");
     vi.stubEnv(key, JSON.stringify({ node: { class_type: "Test" } }));
     expect(loadWorkflow("image/test-v1")).toEqual({ node: { class_type: "Test" } });
+    expect(isWorkflowConfigured("image/test-v1")).toBe(false);
   });
 });

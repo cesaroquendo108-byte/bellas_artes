@@ -1,6 +1,7 @@
 import { ProviderError, type GenerationProvider, type ProviderJob, type ProviderResult, type ProviderStatus, type ProviderSubmitInput } from "./types";
 import { getGenerationConfig, getVastComfyBaseUrl, getVastServerlessEndpointName, type GenerationProviderKind } from "../config";
 import { loadWorkflow } from "../workflows";
+import { bindWorkflow, loadWorkflowManifest } from "../workflow-manifests";
 
 function baseUrl(kind?: GenerationProviderKind) {
   const value = getVastComfyBaseUrl(kind);
@@ -62,7 +63,7 @@ export class ComfyUIProvider implements GenerationProvider {
     if (existingProviderJobId) {
       return { providerJobId: existingProviderJobId, provider: "vast", kind: input.kind };
     }
-    const workflow = parseWorkflow(input.workflowVersion, input.request);
+    const workflow = parseWorkflow(input.workflowVersion, input.request, input.referenceUrls ?? []);
     const payload = await json<{ prompt_id?: string }>(`${baseUrl(input.kind)}/prompt`, {
       method: "POST",
       body: JSON.stringify({ prompt: workflow, client_id: input.jobId }),
@@ -98,9 +99,9 @@ export class ComfyUIProvider implements GenerationProvider {
     signal?: AbortSignal;
     onAssigned?: (job: ProviderJob) => Promise<void>;
   }) {
-    const endpointName = getVastServerlessEndpointName(input.kind);
+    const endpointName = getVastServerlessEndpointName(input.kind, input.workflowVersion);
     if (!endpointName) throw new ProviderError("Vast Serverless no está configurado para esta modalidad.", "VAST_ENDPOINT_NOT_CONFIGURED", false);
-    const workflow = parseWorkflow(input.workflowVersion, input.request);
+    const workflow = parseWorkflow(input.workflowVersion, input.request, input.referenceUrls ?? []);
     const assignment = await waitForServerlessAssignment(endpointName, input, options?.signal);
     const job: ProviderJob = { providerJobId: input.jobId, provider: "vast", kind: input.kind };
     await options?.onAssigned?.(job);
@@ -313,22 +314,15 @@ function getPromptClientId(prompt: unknown) {
   return typeof clientId === "string" ? clientId : null;
 }
 
-function parseWorkflow(workflowVersion: string, request: Record<string, unknown>) {
+function parseWorkflow(workflowVersion: string, request: Record<string, unknown>, referenceUrls: string[]) {
   try {
-    return injectRequest(loadWorkflow(workflowVersion), request);
+    return bindWorkflow({
+      workflow: loadWorkflow(workflowVersion),
+      manifest: loadWorkflowManifest(workflowVersion),
+      request,
+      referenceUrls,
+    });
   } catch {
     throw new ProviderError(`El workflow ${workflowVersion} no está configurado o no es válido.`, "WORKFLOW_INVALID", false);
   }
-}
-
-function injectRequest(workflow: Record<string, unknown>, request: Record<string, unknown>) {
-  const prompt = typeof request.prompt === "string" ? request.prompt : undefined;
-  if (!prompt) return workflow;
-  const graph = structuredClone(workflow) as Record<string, unknown>;
-  for (const node of Object.values(graph)) {
-    if (!node || typeof node !== "object") continue;
-    const inputs = (node as { inputs?: Record<string, unknown> }).inputs;
-    if (inputs && typeof inputs.text === "string") inputs.text = prompt;
-  }
-  return graph;
 }

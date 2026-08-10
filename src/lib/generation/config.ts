@@ -2,6 +2,7 @@ import { isWorkflowConfigured } from "./workflows";
 
 export type ProviderRoute = "vast" | "fake";
 export type GenerationProviderKind = "image" | "video" | "audio" | "character" | "world";
+export type GenerationBillingMode = "shadow" | "live";
 
 const vastEndpointVariables: Record<GenerationProviderKind, string> = {
   image: "VAST_IMAGE_COMFY_BASE_URL",
@@ -34,6 +35,7 @@ export function getGenerationConfig() {
       || Object.values(vastEndpointVariables).some((key) => process.env[key]?.trim())
       || (process.env.VAST_API_KEY?.trim() && (
         process.env.VAST_SERVERLESS_ENDPOINT?.trim()
+        || process.env.VAST_LIVEPORTRAIT_SERVERLESS_ENDPOINT?.trim()
         || Object.values(vastServerlessEndpointVariables).some((key) => process.env[key]?.trim())
       )),
   );
@@ -41,10 +43,16 @@ export function getGenerationConfig() {
   const serverlessColdWorkers = Number(process.env.VAST_SERVERLESS_COLD_WORKERS ?? 0);
   const serverlessMaxWorkers = Number(process.env.VAST_SERVERLESS_MAX_WORKERS ?? 1);
   const serverlessInactivityTimeoutSeconds = Number(process.env.VAST_SERVERLESS_INACTIVITY_TIMEOUT_SECONDS ?? 600);
+  const requestedBillingMode = process.env.GENERATION_BILLING_MODE?.trim().toLowerCase();
+  const billingMode: GenerationBillingMode = requestedBillingMode === "live" ? "live" : "shadow";
+  const testBudgetUsd = Number(process.env.VAST_TEST_BUDGET_USD ?? 0);
+  const testMaxJobs = Number(process.env.VAST_TEST_MAX_JOBS ?? 0);
+  const testModality = process.env.VAST_TEST_MODALITY?.trim();
 
   return {
     enabled,
     adminOnly,
+    billingMode,
     route: route === "vast" || route === "fake" ? route : null,
     hasVast,
     vastQueueThreshold: Number(process.env.VAST_QUEUE_THRESHOLD ?? 50),
@@ -64,6 +72,13 @@ export function getGenerationConfig() {
     requestTimeoutMs: Math.max(Number(process.env.VAST_REQUEST_TIMEOUT_MS ?? 15_000), 1_000),
     jobTimeoutSeconds: Math.max(Number(process.env.GENERATION_JOB_TIMEOUT_SECONDS ?? 600), 30),
     redisConfigured: Boolean(process.env.REDIS_URL?.trim()),
+    vastTest: {
+      enabled: Number.isFinite(testBudgetUsd) && testBudgetUsd > 0 && Number.isInteger(testMaxJobs) && testMaxJobs > 0,
+      budgetUsd: Number.isFinite(testBudgetUsd) && testBudgetUsd > 0 ? testBudgetUsd : 0,
+      maxJobs: Number.isInteger(testMaxJobs) && testMaxJobs > 0 ? testMaxJobs : 0,
+      modality: isGenerationProviderKind(testModality ?? "") ? testModality as GenerationProviderKind : null,
+      runId: process.env.VAST_TEST_RUN_ID?.trim() || null,
+    },
   };
 }
 
@@ -80,7 +95,7 @@ export function isGenerationRouteConfigured(input: { providerRoute: ProviderRout
   const kind = workflowKind === "characters" ? "character" : workflowKind === "worlds" ? "world" : workflowKind;
   return config.vastServerless.safe
     && isGenerationProviderKind(kind)
-    && Boolean(getVastComfyBaseUrl(kind) || getVastServerlessEndpointName(kind))
+    && Boolean(getVastComfyBaseUrl(kind) || getVastServerlessEndpointName(kind, input.workflowVersion))
     && isWorkflowConfigured(input.workflowVersion);
 }
 
@@ -93,7 +108,13 @@ export function getVastComfyBaseUrl(kind?: GenerationProviderKind) {
   return specific || process.env.VAST_COMFY_BASE_URL?.trim() || null;
 }
 
-export function getVastServerlessEndpointName(kind?: GenerationProviderKind) {
+export function getVastServerlessEndpointName(kind?: GenerationProviderKind, workflowVersion?: string) {
+  if (workflowVersion === "characters/liveportrait-v1") {
+    return process.env.VAST_LIVEPORTRAIT_SERVERLESS_ENDPOINT?.trim()
+      || (kind ? process.env[vastServerlessEndpointVariables[kind]]?.trim() : undefined)
+      || process.env.VAST_SERVERLESS_ENDPOINT?.trim()
+      || null;
+  }
   const specific = kind ? process.env[vastServerlessEndpointVariables[kind]]?.trim() : undefined;
   return specific || process.env.VAST_SERVERLESS_ENDPOINT?.trim() || null;
 }

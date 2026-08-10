@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
 import { getGenerationAuditContext } from "@/lib/generation/audit"
-import { characterGenerationRequestSchema } from "@/lib/generation/character-world"
+import { characterGenerationRequestSchema, normalizeCharacterGenerationRequest } from "@/lib/generation/character-world"
 import { resolveCharacterRoute } from "@/lib/generation/registry"
 import { enqueueGeneration, generationErrorResponse, requireGenerationUser } from "@/lib/generation/service"
 
@@ -27,12 +27,13 @@ export async function POST(request: Request) {
   }
 
   try {
+    const generationRequest = normalizeCharacterGenerationRequest(parsed.data)
     const response = await enqueueGeneration({
       userId: user.id,
       kind: "character",
       queueKind: "character",
-      route: resolveCharacterRoute(parsed.data.model, parsed.data),
-      request: parsed.data,
+      route: resolveCharacterRoute(parsed.data.model, generationRequest),
+      request: generationRequest,
       assetIds: parsed.data.referenceAssetIds,
       idempotencyKey: request.headers.get("idempotency-key") ?? undefined,
       auditContext: getGenerationAuditContext(request),

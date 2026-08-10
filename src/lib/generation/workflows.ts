@@ -1,4 +1,5 @@
 import fluxSchnellV1 from "../../../workflows/image/flux-schnell-v1.json";
+import { hasWorkflowManifest, validateWorkflowGraph } from "./workflow-manifests";
 
 const bundledWorkflows: Record<string, Record<string, unknown>> = {
   "image/flux-schnell-v1": fluxSchnellV1,
@@ -9,8 +10,12 @@ export function getWorkflowEnvironmentKey(workflowVersion: string) {
 }
 
 export function isWorkflowConfigured(workflowVersion: string) {
-  if (process.env[getWorkflowEnvironmentKey(workflowVersion)]?.trim()) return true;
-  return Boolean(bundledWorkflows[workflowVersion]);
+  if (!hasWorkflowManifest(workflowVersion)) return false;
+  try {
+    return validateWorkflowGraph(workflowVersion, loadWorkflow(workflowVersion));
+  } catch {
+    return false;
+  }
 }
 
 export function loadWorkflow(workflowVersion: string) {
