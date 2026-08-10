@@ -5,11 +5,12 @@ async function main() {
   if (!redisUrl) throw new Error("REDIS_URL no está configurado.");
 
   const redis = new Redis(redisUrl, {
-    connectTimeout: 5_000,
-    commandTimeout: 5_000,
+    connectTimeout: 10_000,
+    commandTimeout: 10_000,
     lazyConnect: true,
     maxRetriesPerRequest: 1,
   });
+  redis.on("error", () => undefined);
 
   try {
     await redis.connect();
