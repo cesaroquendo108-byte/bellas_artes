@@ -3,6 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import { getGenerationConfig } from "@/lib/generation/config";
 import { resolveImageRoute } from "@/lib/generation/registry";
 import { enqueueGeneration } from "@/lib/generation/service";
+import { enqueueGenerationJob } from "@/lib/generation/queue";
 import { downloadPrivateObject, getPrivateObjectUrl } from "@/lib/storage/r2";
 
 const TEST_ACCOUNT_PURPOSE = "flux-acceptance-20260810";
@@ -203,6 +204,15 @@ async function main() {
       auditContext: { userAgent: "bellas-artes-vast-acceptance/1.0" },
     });
     if (!queued.jobId || queued.status !== "queued") throw new Error(`No se pudo encolar ${testCase.label}: ${queued.message}`);
+    const admin = createAdminClient();
+    const { data: existing, error: existingError } = await admin.from("generation_jobs").select("status").eq("id", queued.jobId).single();
+    if (existingError) throw existingError;
+    if (existing.status === "failed" || existing.status === "canceled") {
+      const { error: retryError } = await admin.rpc("retry_generation_job", { p_job_id: queued.jobId });
+      if (retryError) throw retryError;
+      await enqueueGenerationJob({ kind: "image", jobId: queued.jobId });
+      emit("job-retried", { label: testCase.label, jobId: queued.jobId, previousStatus: existing.status });
+    }
     emit("job-enqueued", { label: testCase.label, jobId: queued.jobId, creditsReserved: queued.creditsReserved });
     const terminal = await waitForTerminal(queued.jobId);
     if (terminal.status !== "completed") throw new Error(`${testCase.label} terminó ${terminal.status}: ${terminal.error_code ?? terminal.error_message}`);
@@ -236,7 +246,9 @@ async function main() {
   emit("run-complete", { runId: config.vastTest.runId, jobs: evidence.length, balanceBefore, balanceAfter, spentUsd, scaleZero: true });
 }
 
-main().catch((error) => {
-  emit("run-failed", { error: error instanceof Error ? error.message : String(error) });
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    emit("run-failed", { error: error instanceof Error ? error.message : String(error) });
+    process.exit(1);
+  });

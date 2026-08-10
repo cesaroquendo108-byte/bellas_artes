@@ -11,6 +11,7 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV RUN_GENERATION_WORKER=true
+ENV NODE_EXTRA_CA_CERTS=/app/infra/vast/jvastai_root_ca.pem
 
 HEALTHCHECK --interval=30s --timeout=15s --start-period=20s --retries=3 CMD ["npm", "run", "worker:health"]
 USER node
