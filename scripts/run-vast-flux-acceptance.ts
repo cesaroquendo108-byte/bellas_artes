@@ -3,7 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import { getGenerationConfig } from "@/lib/generation/config";
 import { resolveImageRoute } from "@/lib/generation/registry";
 import { enqueueGeneration } from "@/lib/generation/service";
-import { enqueueGenerationJob } from "@/lib/generation/queue";
+import { enqueueGenerationJob, getGenerationQueue } from "@/lib/generation/queue";
 import { downloadPrivateObject, getPrivateObjectUrl } from "@/lib/storage/r2";
 
 const TEST_ACCOUNT_PURPOSE = "flux-acceptance-20260810";
@@ -210,6 +210,12 @@ async function main() {
     if (existing.status === "failed" || existing.status === "canceled") {
       const { error: retryError } = await admin.rpc("retry_generation_job", { p_job_id: queued.jobId });
       if (retryError) throw retryError;
+      const staleQueueJob = await getGenerationQueue("image").getJob(queued.jobId);
+      if (staleQueueJob) {
+        const staleState = await staleQueueJob.getState();
+        if (staleState === "active") throw new Error(`El job ${queued.jobId} todavía está activo en BullMQ.`);
+        await staleQueueJob.remove();
+      }
       await enqueueGenerationJob({ kind: "image", jobId: queued.jobId });
       emit("job-retried", { label: testCase.label, jobId: queued.jobId, previousStatus: existing.status });
     }
