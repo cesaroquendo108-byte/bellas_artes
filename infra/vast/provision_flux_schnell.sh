@@ -12,8 +12,24 @@ readonly partial_path="${model_path}.part"
 readonly checksum_marker="${model_path}.sha256"
 readonly lock_path="${model_path}.lock"
 readonly benchmark_path="${workspace}/flux-schnell-benchmark.json"
+readonly wrapper_dir="/opt/comfyui-api-wrapper"
+readonly wrapper_commit="e1d04af1f3bbd2d44c33e0adf419d6ca57dedd88"
 
 mkdir -p "$checkpoint_dir"
+
+pin_api_wrapper() {
+  [[ -d "${wrapper_dir}/.git" ]] || {
+    echo "No se encontró el repositorio oficial de comfyui-api-wrapper." >&2
+    exit 1
+  }
+  git -C "$wrapper_dir" fetch --quiet --depth=1 origin "$wrapper_commit"
+  git -C "$wrapper_dir" checkout --quiet --detach "$wrapper_commit"
+  [[ "$(git -C "$wrapper_dir" rev-parse HEAD)" == "$wrapper_commit" ]] || {
+    echo "No se pudo fijar la versión de comfyui-api-wrapper." >&2
+    exit 1
+  }
+  echo "comfyui-api-wrapper fijado en ${wrapper_commit}."
+}
 
 write_benchmark() {
   local benchmark_tmp="${benchmark_path}.tmp"
@@ -68,6 +84,7 @@ provision_model() {
 }
 
 write_benchmark
+pin_api_wrapper
 (
   flock -x -w 900 9
   provision_model
