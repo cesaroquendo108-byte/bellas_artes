@@ -4,7 +4,18 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const next = requestUrl.searchParams.get('next') || '/dashboard';
+  const oauthError = requestUrl.searchParams.get('error');
+  const requestedNext = requestUrl.searchParams.get('next') || '/dashboard';
+  const next = requestedNext.startsWith('/')
+    && !requestedNext.startsWith('//')
+    && !requestedNext.startsWith('/\\')
+    && !requestedNext.includes('\\')
+    ? requestedNext
+    : '/dashboard';
+
+  if (oauthError) {
+    return NextResponse.redirect(`${requestUrl.origin}/login?message=No%20se%20pudo%20completar%20la%20autenticaci%C3%B3n%20con%20Google`);
+  }
 
   if (code) {
     const supabase = await createClient();

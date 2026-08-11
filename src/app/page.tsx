@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowRight, Image as ImageIcon, Layers3, ShieldCheck, Sparkles } from "lucide-react";
 
 const features = [
@@ -7,7 +8,26 @@ const features = [
   { icon: ShieldCheck, title: "Pagos verificables", copy: "Compra créditos con pago móvil y conserva un historial auditable de cada movimiento." },
 ];
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const oauthParams = new URLSearchParams();
+
+  for (const key of ["code", "error", "error_description", "error_code", "error_uri", "state"]) {
+    const value = params[key];
+    if (typeof value === "string") oauthParams.set(key, value);
+    else if (Array.isArray(value) && typeof value[0] === "string") oauthParams.set(key, value[0]);
+  }
+
+  // Compatibility for old Supabase/Google redirect settings that returned
+  // the authorization result to the site root instead of /auth/callback.
+  if (oauthParams.has("code") || oauthParams.has("error")) {
+    redirect(`/auth/callback?${oauthParams.toString()}`);
+  }
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#0a0a0a] text-white">
       <nav className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 sm:px-8">
