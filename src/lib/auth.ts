@@ -1,9 +1,10 @@
 import "server-only";
 
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createClient } from "@/utils/supabase/server";
 
-export async function requireUser() {
+export const requireUser = cache(async function requireUser() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,7 +28,7 @@ export async function requireUser() {
       displayName: profile?.display_name ?? null,
     },
   };
-}
+});
 
 export async function requireAdmin() {
   const session = await requireUser();

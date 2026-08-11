@@ -1,7 +1,38 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const oauthCallbackParamNames = [
+  "code",
+  "error",
+  "error_description",
+  "error_code",
+  "error_uri",
+  "state",
+] as const;
+
+function redirectLegacyOAuthCallback(request: NextRequest) {
+  if (request.nextUrl.pathname !== "/") return null;
+
+  const oauthParams = new URLSearchParams();
+  for (const name of oauthCallbackParamNames) {
+    const value = request.nextUrl.searchParams.get(name);
+    if (value) oauthParams.set(name, value);
+  }
+
+  if (!oauthParams.has("code") && !oauthParams.has("error")) return null;
+
+  const url = request.nextUrl.clone();
+  url.pathname = "/auth/callback";
+  url.search = oauthParams.toString();
+  return NextResponse.redirect(url);
+}
+
 export async function updateSession(request: NextRequest) {
+  // Keep the homepage static while preserving compatibility with legacy OAuth
+  // redirect settings that returned the authorization result to "/".
+  const legacyOAuthRedirect = redirectLegacyOAuthCallback(request);
+  if (legacyOAuthRedirect) return legacyOAuthRedirect;
+
   const privatePrefixes = [
     "/admin",
     "/audio",
@@ -54,6 +85,12 @@ export async function updateSession(request: NextRequest) {
     }
     return NextResponse.next({ request });
   }
+
+  // Public pages and API routes authenticate themselves when needed. Avoid a
+  // Supabase round trip on every marketing navigation; protected routes and
+  // /login still refresh the SSR session here.
+  const needsSession = isPrivate || request.nextUrl.pathname.startsWith("/login");
+  if (!needsSession) return NextResponse.next({ request });
 
   let supabaseResponse = NextResponse.next({
     request,

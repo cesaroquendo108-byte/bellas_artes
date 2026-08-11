@@ -18,6 +18,30 @@ describe("Supabase session middleware", () => {
     vi.clearAllMocks()
   })
 
+  it("redirige el callback OAuth heredado de la raíz sin consultar Supabase", async () => {
+    const response = await updateSession(new NextRequest(
+      "https://example.test/?code=oauth-code&state=state-123&ignored=value",
+    ))
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get("location")).toBe(
+      "https://example.test/auth/callback?code=oauth-code&state=state-123",
+    )
+    expect(createServerClient).not.toHaveBeenCalled()
+  })
+
+  it("redirige errores OAuth heredados de la raíz al callback", async () => {
+    const response = await updateSession(new NextRequest(
+      "https://example.test/?error=access_denied&error_description=User%20cancelled",
+    ))
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get("location")).toBe(
+      "https://example.test/auth/callback?error=access_denied&error_description=User+cancelled",
+    )
+    expect(createServerClient).not.toHaveBeenCalled()
+  })
+
   it("mantiene disponibles las páginas públicas sin Supabase configurado", async () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "")
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "")
@@ -60,6 +84,17 @@ describe("Supabase session middleware", () => {
     const response = await updateSession(new NextRequest("https://example.test/login?next=%2Fbrand-kits"))
     expect(response.status).toBe(307)
     expect(response.headers.get("location")).toBe("https://example.test/brand-kits")
+  })
+
+  it("no hace un round trip de sesión en una página pública configurada", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co")
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", validAnonKey)
+
+    const response = await updateSession(new NextRequest("https://example.test/blog"))
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get("x-middleware-next")).toBe("1")
+    expect(createServerClient).not.toHaveBeenCalled()
   })
 
   it("conserva los query params de un destino local", async () => {

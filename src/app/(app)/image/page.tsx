@@ -13,17 +13,19 @@ export default async function ImageStudioPage() {
   let initialAssets: ImageGalleryAsset[] = []
   let galleryError: string | null = null
 
-  const brandKitResult = await getBrandKitsForPage()
+  const [brandKitResult, assetsResult] = await Promise.all([
+    getBrandKitsForPage(),
+    getAssets({ type: "image" }, undefined, 24).catch(() => null),
+  ])
 
-  try {
-    const result = await getAssets({ type: "image" }, undefined, 24)
-    initialAssets = result.assets.map((asset) => ({
+  if (assetsResult) {
+    initialAssets = assetsResult.assets.map((asset) => ({
       id: asset.id,
       name: asset.name,
       signedUrl: asset.signedUrl,
       createdAt: asset.created_at,
     }))
-  } catch {
+  } else {
     galleryError = "Configura el almacenamiento privado para consultar tus imágenes. El estudio puede seguir utilizándose."
   }
 
