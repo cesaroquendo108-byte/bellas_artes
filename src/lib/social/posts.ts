@@ -1,5 +1,6 @@
 import "server-only"
 
+import { unstable_cache } from "next/cache"
 import { buildSeekFilter, decodeSeekCursor, encodeSeekCursor } from "@/lib/pagination/cursor"
 import { PhaseSevenError } from "@/lib/phase7/http"
 import { getPrivateObjectUrl } from "@/lib/storage/r2"
@@ -40,6 +41,19 @@ async function mapRows(rows: PostRow[]): Promise<CommunityPost[]> {
 }
 
 const columns = "id,author_id,asset_id,title,description,category,status,direct_payload,author_name_snapshot,author_avatar_snapshot,metadata,moderation_note,created_at,published_at"
+
+const getCachedPublishedPosts = unstable_cache(
+  async (category: CommunityPost["category"] | null, limit: number, cursor: string | null) => {
+    const admin = createAdminClient()
+    return listPublishedPosts(admin, {
+      category: category ?? undefined,
+      limit,
+      cursor: cursor ?? undefined,
+    })
+  },
+  ["public-inspire-feed"],
+  { revalidate: 60 },
+)
 
 export async function getSocialSession() {
   const supabase = await createClient()
@@ -104,6 +118,12 @@ export async function moderateCommunityPost(postId: string, moderatorId: string,
 }
 
 export async function getPublishedPostsForPage(input: unknown) {
-  try { const client = await createClient(); return { ...(await listPublishedPosts(client, input)), error: null } }
+  try {
+    const parsed = communityListQuerySchema.parse(input)
+    return {
+      ...(await getCachedPublishedPosts(parsed.category ?? null, parsed.limit, parsed.cursor ?? null)),
+      error: null,
+    }
+  }
   catch { return { posts: [], nextCursor: null, error: "La comunidad no está disponible en este entorno." } }
 }
