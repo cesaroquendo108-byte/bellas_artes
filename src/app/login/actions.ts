@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getOAuthRedirectBaseUrl } from "@/lib/auth-redirect";
 import { createClient } from "@/utils/supabase/server";
 
 export async function safeNextPath(value: FormDataEntryValue | null) {
@@ -102,12 +103,13 @@ export async function loginWithGoogle(formData: FormData) {
     redirect(`/login?${query}`);
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+  const redirectUrl = new URL("/auth/callback", getOAuthRedirectBaseUrl());
+  redirectUrl.searchParams.set("next", nextPath);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${baseUrl}/auth/callback?next=${nextPath}`,
+      redirectTo: redirectUrl.toString(),
     },
   });
 
