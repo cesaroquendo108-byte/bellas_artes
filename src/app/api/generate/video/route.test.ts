@@ -10,7 +10,7 @@ import { POST } from "./route"
 
 const validRequest = {
   operation: "t2v",
-  model: "openart-video-v2",
+  model: "hunyuan-video-1.5-8.3b",
   prompt: "Una escena cinematográfica",
   aspectRatio: "16:9",
   parameters: {},

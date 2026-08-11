@@ -33,7 +33,7 @@ import type {
 
 const initialSettings: ImageStudioSettings = {
   prompt: "",
-  model: "gpt-image-2",
+  model: "flux-schnell",
   autoPolish: true,
   aspectRatio: "1:1",
   resolution: "1k",

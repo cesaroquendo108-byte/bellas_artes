@@ -17,6 +17,25 @@ readonly wrapper_commit="e1d04af1f3bbd2d44c33e0adf419d6ca57dedd88"
 
 mkdir -p "$checkpoint_dir"
 
+assert_persistent_cache_mount() {
+  local mount_target
+  local mount_fstype
+  local mount_source
+  mount_target="$(findmnt -T "$checkpoint_dir" -n -o TARGET)"
+  mount_fstype="$(findmnt -T "$checkpoint_dir" -n -o FSTYPE)"
+  mount_source="$(findmnt -T "$checkpoint_dir" -n -o SOURCE)"
+
+  if [[ -z "$mount_target" || "$mount_target" == "/" || "$mount_fstype" == "overlay" || "$mount_fstype" == "overlayfs" || "$mount_source" == "overlay" ]]; then
+    echo "CACHE_VOLUME_NOT_MOUNTED: ${checkpoint_dir} no está sobre un volumen persistente dedicado." >&2
+    exit 1
+  fi
+  if [[ ! -w "$checkpoint_dir" ]]; then
+    echo "CACHE_VOLUME_NOT_WRITABLE: ${checkpoint_dir} no es escribible." >&2
+    exit 1
+  fi
+  echo "Caché persistente confirmada en ${mount_target} (${mount_fstype})."
+}
+
 pin_api_wrapper() {
   [[ -d "${wrapper_dir}/.git" ]] || {
     echo "No se encontró el repositorio oficial de comfyui-api-wrapper." >&2
@@ -85,6 +104,7 @@ provision_model() {
 
 write_benchmark
 pin_api_wrapper
+assert_persistent_cache_mount
 (
   flock -x -w 900 9
   provision_model

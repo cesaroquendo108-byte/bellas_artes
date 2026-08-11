@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 obsidian_root="${BELLAS_ARTES_OBSIDIAN:-/home/finvecito/Documentos/BellasArtes_Obsidian}"
 
-pattern="(sk-[A-Za-z0-9_-]{20,}|fc-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|GOCSPX-[A-Za-z0-9_-]{20,}|eyJhbGciOiJIUzI1NiIs[A-Za-z0-9._-]{20,}|(?:service[_ -]?role|api[_ -]?key|password|contrase(?:n|ñ)a)[[:space:]]*[:=][[:space:]]*[\"']?[A-Za-z0-9_./+=-]{16,})"
+pattern="(sk-[A-Za-z0-9_-]{20,}|fc-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|GOCSPX-[A-Za-z0-9_-]{20,}|eyJhbGciOiJIUzI1NiIs[A-Za-z0-9._-]{20,}|(?:service[_ -]?role|api[_ -]?key|vercel[_ -]?token|client[_ -]?secret|secret[_ -]?access[_ -]?key|password|contrase(?:n|ñ)a)[[:space:]]*[:=][[:space:]]*[\"']?[A-Za-z0-9_./+=-]{16,})"
 
 mapfile -d '' repo_files < <(
   cd "$repo_root"

@@ -6,6 +6,9 @@ export interface VastTestBudgetClaim {
   beforeBalanceUsd: number;
   baselineBalanceUsd: number;
   runId: string;
+  sessionBaselineBalanceUsd?: number;
+  sessionBudgetUsd?: number;
+  reserveUsd?: number;
 }
 
 export async function claimVastTestBudget(jobId: string, kind: GenerationProviderKind): Promise<VastTestBudgetClaim | null> {
@@ -32,6 +35,29 @@ export async function claimVastTestBudget(jobId: string, kind: GenerationProvide
     if (spentBefore >= config.budgetUsd) {
       throw new ProviderError("El presupuesto aprobado de Vast ya fue consumido.", "VAST_TEST_BUDGET_EXHAUSTED", false);
     }
+    if (config.maxEstimatedJobUsd <= 0 || config.maxEstimatedJobUsd > config.budgetUsd - spentBefore) {
+      throw new ProviderError("El coste máximo estimado del próximo job excede el presupuesto restante.", "VAST_TEST_JOB_ESTIMATE_BLOCKED", false);
+    }
+
+    let sessionBaselineBalanceUsd: number | undefined;
+    if (config.session.enabled && config.session.id) {
+      const sessionNamespace = budgetSessionNamespace(config.session.id);
+      const sessionBaselineKey = `${sessionNamespace}:baseline`;
+      await redis.set(sessionBaselineKey, String(beforeBalanceUsd), "NX");
+      sessionBaselineBalanceUsd = Number(await redis.get(sessionBaselineKey));
+      if (!Number.isFinite(sessionBaselineBalanceUsd)) {
+        throw new ProviderError("No se pudo fijar el saldo inicial de la sesión Vast.", "VAST_TEST_SESSION_BASELINE_INVALID", false);
+      }
+      const sessionCeiling = calculateVastBudgetCeiling(sessionBaselineBalanceUsd, config.session.budgetUsd, config.session.reserveUsd);
+      const sessionSpentBefore = Math.max(sessionBaselineBalanceUsd - beforeBalanceUsd, 0);
+      if (sessionCeiling <= 0
+        || sessionSpentBefore >= sessionCeiling
+        || config.maxEstimatedJobUsd > sessionCeiling - sessionSpentBefore
+        || beforeBalanceUsd <= config.session.reserveUsd) {
+        throw new ProviderError("La sesión alcanzó su techo de gasto o la reserva de seguridad.", "VAST_TEST_SESSION_BUDGET_EXHAUSTED", false);
+      }
+      await redis.expire(sessionBaselineKey, 7 * 24 * 60 * 60);
+    }
 
     const jobsKey = `${namespace}:jobs`;
     const added = await redis.sadd(jobsKey, jobId);
@@ -42,7 +68,14 @@ export async function claimVastTestBudget(jobId: string, kind: GenerationProvide
     }
     await redis.expire(jobsKey, 7 * 24 * 60 * 60);
     await redis.expire(baselineKey, 7 * 24 * 60 * 60);
-    return { beforeBalanceUsd, baselineBalanceUsd, runId: config.runId };
+    return {
+      beforeBalanceUsd,
+      baselineBalanceUsd,
+      runId: config.runId,
+      sessionBaselineBalanceUsd,
+      sessionBudgetUsd: config.session.enabled ? config.session.budgetUsd : undefined,
+      reserveUsd: config.session.enabled ? config.session.reserveUsd : undefined,
+    };
   } finally {
     redis.disconnect();
   }
@@ -54,13 +87,27 @@ export async function finalizeVastTestBudget(claim: VastTestBudgetClaim | null) 
   const jobCostUsd = roundUsd(Math.max(claim.beforeBalanceUsd - afterBalanceUsd, 0));
   const totalSpentUsd = roundUsd(Math.max(claim.baselineBalanceUsd - afterBalanceUsd, 0));
   const config = getGenerationConfig().vastTest;
+  const sessionSpentUsd = claim.sessionBaselineBalanceUsd === undefined
+    ? null
+    : roundUsd(Math.max(claim.sessionBaselineBalanceUsd - afterBalanceUsd, 0));
+  const sessionCeilingUsd = claim.sessionBaselineBalanceUsd === undefined || claim.sessionBudgetUsd === undefined
+    ? null
+    : calculateVastBudgetCeiling(claim.sessionBaselineBalanceUsd, claim.sessionBudgetUsd, claim.reserveUsd ?? 0);
   return {
     beforeBalanceUsd: claim.beforeBalanceUsd,
     afterBalanceUsd,
     jobCostUsd,
     totalSpentUsd,
     overBudget: totalSpentUsd > config.budgetUsd,
+    sessionSpentUsd,
+    sessionCeilingUsd,
+    overSessionBudget: sessionSpentUsd !== null && sessionCeilingUsd !== null && sessionSpentUsd > sessionCeilingUsd,
   };
+}
+
+export function calculateVastBudgetCeiling(baselineBalanceUsd: number, configuredBudgetUsd: number, reserveUsd: number) {
+  const spendableBalance = Math.max(baselineBalanceUsd - reserveUsd, 0);
+  return roundUsd(Math.min(Math.max(configuredBudgetUsd, 0), spendableBalance));
 }
 
 async function getVastCreditBalance() {
@@ -90,6 +137,10 @@ function createRedis() {
 
 function budgetNamespace(runId: string) {
   return `${process.env.BULLMQ_PREFIX ?? "bellas-artes"}:vast-test:${runId.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+function budgetSessionNamespace(sessionId: string) {
+  return `${process.env.BULLMQ_PREFIX ?? "bellas-artes"}:vast-test-session:${sessionId.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 }
 
 function roundUsd(value: number) {

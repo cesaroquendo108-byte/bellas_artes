@@ -1,7 +1,7 @@
 import { z } from "zod"
 
-export const characterModels = ["nano-banana-pro", "seedream-4", "kling-3-omni", "flux-1-dev"] as const
-export const worldModels = ["kling-3-omni", "flux-1-dev"] as const
+export const characterModels = ["flux-schnell-reference", "flux-dev-reference"] as const
+export const worldModels = ["flux-schnell-world", "flux-dev-world"] as const
 export const characterWorldAspectRatios = ["1:1", "9:16", "16:9", "4:5"] as const
 
 const assetIdsSchema = z.array(z.string().uuid("Los assets deben usar IDs UUID válidos.")).max(12).optional()

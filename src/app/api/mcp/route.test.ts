@@ -39,4 +39,20 @@ describe("MCP HTTP endpoint", () => {
     const forbidden = await POST(new Request("http://localhost/api/mcp", { method: "POST", headers: { authorization: "Bearer mcp-secret-with-at-least-32-characters", "content-type": "application/json", origin: "https://evil.example" }, body }));
     expect(forbidden.status).toBe(403);
   });
+
+  it("publica sólo tools respaldadas por workflows API reales", async () => {
+    process.env.MCP_API_KEY = "mcp-secret-with-at-least-32-characters";
+    process.env.MCP_USER_ID = userId;
+    process.env.MCP_ALLOWED_ORIGIN = "https://bellasartes-xi.vercel.app";
+    const response = await POST(new Request("http://localhost/api/mcp", {
+      method: "POST",
+      headers: { authorization: "Bearer mcp-secret-with-at-least-32-characters", accept: "application/json, text/event-stream", "content-type": "application/json", origin: "https://bellasartes-xi.vercel.app" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }),
+    }));
+    expect(response.status).toBe(200);
+    const payload = await response.json() as { result?: { tools?: Array<{ name?: string }> } };
+    const names = payload.result?.tools?.map((tool) => tool.name) ?? [];
+    expect(names).toContain("create_image");
+    expect(names).not.toContain("create_video");
+  });
 });

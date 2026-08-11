@@ -26,7 +26,7 @@ export interface ImageStudioBrandKit {
 
 export interface ImageStudioSettings {
   prompt: string
-  model: "gpt-image-2"
+  model: "flux-schnell" | "flux-dev"
   autoPolish: boolean
   aspectRatio: ImageAspectRatio
   resolution: ImageResolution

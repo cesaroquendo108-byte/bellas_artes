@@ -9,6 +9,9 @@ import { downloadPrivateObject, getPrivateObjectUrl } from "@/lib/storage/r2";
 const TEST_ACCOUNT_PURPOSE = "flux-acceptance-20260810";
 const EXPECTED_WORKFLOW = "image/flux-schnell-v1";
 const EXPECTED_ENDPOINT = "ba-image-sandbox";
+const EXPECTED_ENDPOINT_ID = 33225;
+const EXPECTED_WORKERGROUP_ID = 41706;
+const EXPECTED_VOLUME_ID = 47343353;
 const TERMINAL = new Set(["completed", "failed", "canceled"]);
 
 const cases = [
@@ -52,11 +55,74 @@ function requireSafeConfiguration() {
   if (!config.vastServerless.safe || endpoint !== EXPECTED_ENDPOINT) {
     throw new Error("La configuración Vast no coincide con el endpoint seguro 0/0/1/600.");
   }
-  if (!config.vastTest.enabled || config.vastTest.modality !== "image" || config.vastTest.maxJobs !== 5 || config.vastTest.budgetUsd > 0.5) {
+  if (!config.vastTest.enabled
+    || config.vastTest.modality !== "image"
+    || config.vastTest.maxJobs !== 5
+    || config.vastTest.budgetUsd > 0.5
+    || config.vastTest.maxEstimatedJobUsd <= 0
+    || config.vastTest.maxEstimatedJobUsd > 0.2) {
     throw new Error("El arnés debe limitarse a cinco jobs de imagen y US$0.50.");
   }
   if (!config.vastTest.runId) throw new Error("Falta VAST_TEST_RUN_ID.");
+  if (process.env.GENERATION_AUDIT_ENABLED !== "true" || process.env.GENERATION_REQUIRE_AUDIT !== "true" || process.env.GENERATION_RATE_LIMIT_ENABLED !== "true") {
+    throw new Error("La aceptación exige auditoría obligatoria y rate limit activos.");
+  }
+  if (!process.env.MODERATION_AUDIT_SALT?.trim()) throw new Error("Falta MODERATION_AUDIT_SALT para auditar sin guardar prompts en claro.");
+  if (!config.vastTest.session.enabled || !config.vastTest.session.id) {
+    throw new Error("La aceptación exige una sesión global de presupuesto Vast.");
+  }
+  if (config.vastTest.session.budgetUsd > 3.2 || config.vastTest.session.reserveUsd < 0.4) {
+    throw new Error("La sesión Vast debe respetar el techo US$3.20 y la reserva mínima US$0.40.");
+  }
   return config;
+}
+
+async function assertVastControlPlane() {
+  const headers = { authorization: `Bearer ${process.env.VAST_API_KEY}` };
+  const [endpointResponse, workergroupResponse] = await Promise.all([
+    fetch("https://console.vast.ai/api/v0/endptjobs/", { headers, signal: AbortSignal.timeout(15_000) }),
+    fetch("https://console.vast.ai/api/v0/workergroups/", { headers, signal: AbortSignal.timeout(15_000) }),
+  ]);
+  if (!endpointResponse.ok || !workergroupResponse.ok) throw new Error("No se pudo verificar el control plane de Vast.");
+  const endpointPayload = await endpointResponse.json() as { results?: Array<Record<string, unknown>> };
+  const endpoint = endpointPayload.results?.find((item) => Number(item.id) === EXPECTED_ENDPOINT_ID);
+  if (!endpoint
+    || endpoint.endpoint_name !== EXPECTED_ENDPOINT
+    || endpoint.endpoint_state !== "active"
+    || Number(endpoint.min_load) !== 0
+    || Number(endpoint.cold_workers) !== 0
+    || Number(endpoint.max_workers) !== 1
+    || Number(endpoint.inactivity_timeout) !== 600) {
+    throw new Error("El endpoint Vast real no coincide con active/0/0/1/600.");
+  }
+
+  const workergroupPayload = await workergroupResponse.json() as unknown;
+  const workergroup = findObjectById(workergroupPayload, EXPECTED_WORKERGROUP_ID);
+  const launchArgs = typeof workergroup?.launch_args === "string" ? workergroup.launch_args : "";
+  if (!workergroup
+    || Number(workergroup.endpoint_id) !== EXPECTED_ENDPOINT_ID
+    || !launchArgs.includes(`--link-volume ${EXPECTED_VOLUME_ID}`)
+    || !launchArgs.includes("--mount-path /workspace/ComfyUI/models/checkpoints")) {
+    throw new Error("El workergroup no enlaza el volumen persistente en el directorio esperado.");
+  }
+}
+
+function findObjectById(value: unknown, id: number): Record<string, unknown> | null {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const match = findObjectById(item, id);
+      if (match) return match;
+    }
+    return null;
+  }
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  if (Number(record.id) === id) return record;
+  for (const child of Object.values(record)) {
+    const match = findObjectById(child, id);
+    if (match) return match;
+  }
+  return null;
 }
 
 async function findServiceAdminId() {
@@ -174,10 +240,27 @@ async function waitForScaleZero(timeoutMs = 15 * 60_000) {
 
 async function main() {
   const config = requireSafeConfiguration();
+  await assertVastControlPlane();
   const userId = await findServiceAdminId();
   const userHash = createHash("sha256").update(userId).digest("hex").slice(0, 12);
   const balanceBefore = await vastBalance();
-  emit("run-start", { runId: config.vastTest.runId, workflow: EXPECTED_WORKFLOW, userHash, balanceBefore, maxJobs: 5, budgetUsd: config.vastTest.budgetUsd });
+  const sessionCeilingUsd = Math.min(
+    config.vastTest.session.budgetUsd,
+    Math.max(balanceBefore - config.vastTest.session.reserveUsd, 0),
+  );
+  if (sessionCeilingUsd <= 0) throw new Error("El saldo Vast no deja margen sobre la reserva de seguridad.");
+  emit("run-start", {
+    runId: config.vastTest.runId,
+    sessionId: config.vastTest.session.id,
+    workflow: EXPECTED_WORKFLOW,
+    userHash,
+    balanceBefore,
+    maxJobs: 5,
+    budgetUsd: config.vastTest.budgetUsd,
+    maxEstimatedJobUsd: config.vastTest.maxEstimatedJobUsd,
+    sessionCeilingUsd,
+    reserveUsd: config.vastTest.session.reserveUsd,
+  });
 
   const evidence: Array<Record<string, unknown>> = [];
   for (const [index, testCase] of cases.entries()) {

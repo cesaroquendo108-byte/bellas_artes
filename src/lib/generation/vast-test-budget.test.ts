@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { finalizeVastTestBudget } from "./vast-test-budget";
+import { calculateVastBudgetCeiling, finalizeVastTestBudget } from "./vast-test-budget";
 
 describe("Vast test budget", () => {
   afterEach(() => {
@@ -24,5 +24,10 @@ describe("Vast test budget", () => {
       totalSpentUsd: 0.04,
       overBudget: false,
     });
+  });
+
+  it("reduce el techo operativo para conservar la reserva con el saldo real", () => {
+    expect(calculateVastBudgetCeiling(3.279524, 3.20, 0.40)).toBe(2.879524);
+    expect(calculateVastBudgetCeiling(0.35, 3.20, 0.40)).toBe(0);
   });
 });

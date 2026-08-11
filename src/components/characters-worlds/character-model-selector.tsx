@@ -14,10 +14,8 @@ import {
 import { useCharacterBuilder } from "./character-builder-context";
 
 const models = [
-  { value: "nano-banana-pro", label: "Nano Banana Pro" },
-  { value: "seedream-4", label: "Seedream 4.0" },
-  { value: "kling-3-omni", label: "Kling 3.0 Omni" },
-  { value: "flux-1-dev", label: "Flux.1 Dev" },
+  { value: "flux-schnell-reference", label: "Flux Schnell con referencias · En preparación", disabled: false },
+  { value: "flux-dev-reference", label: "Flux Dev con referencias · Pro/B2B", disabled: true },
 ] as const;
 
 export function CharacterModelSelector() {
@@ -35,7 +33,7 @@ export function CharacterModelSelector() {
         </SelectTrigger>
         <SelectContent>
           {models.map((model) => (
-            <SelectItem key={model.value} value={model.value}>
+            <SelectItem key={model.value} value={model.value} disabled={model.disabled}>
               {model.label}
             </SelectItem>
           ))}

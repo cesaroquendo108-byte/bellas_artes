@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { createClient } from "@/utils/supabase/server";
 import { enqueueGenerationJob, type GenerationQueueKind } from "./queue";
 import { getGenerationConfig, isGenerationRouteConfigured } from "./config";
-import { moderateGenerationInput } from "./moderation";
+import { moderateGenerationRequest } from "./moderation";
 import { recordModerationEvent } from "./audit";
 import { consumeGenerationRateLimit, GenerationRateLimitError } from "./rate-limit";
 import { linkGenerationAssets, reserveGenerationJob, refundGenerationJob, verifyOwnedAssets } from "./db";
@@ -35,7 +35,7 @@ export async function enqueueGeneration(input: {
   priority?: number;
   auditContext?: { ipAddress?: string; userAgent?: string };
 }): Promise<GenerationJobResponse> {
-  const moderation = moderateGenerationInput({ prompt: String(input.request.prompt ?? ""), negativePrompt: String(input.request.negativePrompt ?? "") });
+  const moderation = await moderateGenerationRequest({ prompt: String(input.request.prompt ?? ""), negativePrompt: String(input.request.negativePrompt ?? "") });
   await recordModerationEvent({
     userId: input.userId,
     prompt: String(input.request.prompt ?? ""),

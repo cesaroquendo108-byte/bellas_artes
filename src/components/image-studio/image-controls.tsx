@@ -124,10 +124,10 @@ export function ImageControls({
             <Select
               value={settings.model}
               itemToStringLabel={(value) =>
-                value === "gpt-image-2" ? "Flux Schnell" : String(value)
+                value === "flux-schnell" ? "Flux Schnell" : "Flux Dev"
               }
               onValueChange={(value) =>
-                value && update("model", value as "gpt-image-2")
+                value && update("model", value as ImageStudioSettings["model"])
               }
             >
               <SelectTrigger className="w-full border-white/10 bg-white/[0.035]">
@@ -137,7 +137,8 @@ export function ImageControls({
                 </div>
               </SelectTrigger>
               <SelectContent align="start">
-                <SelectItem value="gpt-image-2">Flux Schnell · Admin Preview</SelectItem>
+                <SelectItem value="flux-schnell">Flux Schnell · Admin Preview</SelectItem>
+                <SelectItem value="flux-dev" disabled>Flux Dev · Pro/B2B en preparación</SelectItem>
               </SelectContent>
             </Select>
           </div>

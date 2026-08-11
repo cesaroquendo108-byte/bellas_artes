@@ -52,7 +52,11 @@ export function getGenerationConfig() {
   const billingMode: GenerationBillingMode = requestedBillingMode === "live" ? "live" : "shadow";
   const testBudgetUsd = Number(process.env.VAST_TEST_BUDGET_USD ?? 0);
   const testMaxJobs = Number(process.env.VAST_TEST_MAX_JOBS ?? 0);
+  const testMaxEstimatedJobUsd = Number(process.env.VAST_TEST_MAX_ESTIMATED_JOB_USD ?? 0);
   const testModality = process.env.VAST_TEST_MODALITY?.trim();
+  const testSessionBudgetUsd = Number(process.env.VAST_TEST_SESSION_BUDGET_USD ?? 0);
+  const testReserveUsd = Number(process.env.VAST_TEST_RESERVE_USD ?? 0.40);
+  const testSessionId = process.env.VAST_TEST_SESSION_ID?.trim();
 
   return {
     enabled,
@@ -82,8 +86,15 @@ export function getGenerationConfig() {
       enabled: Number.isFinite(testBudgetUsd) && testBudgetUsd > 0 && Number.isInteger(testMaxJobs) && testMaxJobs > 0,
       budgetUsd: Number.isFinite(testBudgetUsd) && testBudgetUsd > 0 ? testBudgetUsd : 0,
       maxJobs: Number.isInteger(testMaxJobs) && testMaxJobs > 0 ? testMaxJobs : 0,
+      maxEstimatedJobUsd: Number.isFinite(testMaxEstimatedJobUsd) && testMaxEstimatedJobUsd > 0 ? testMaxEstimatedJobUsd : 0,
       modality: isGenerationProviderKind(testModality ?? "") ? testModality as GenerationProviderKind : null,
       runId: process.env.VAST_TEST_RUN_ID?.trim() || null,
+      session: {
+        enabled: Boolean(testSessionId) && Number.isFinite(testSessionBudgetUsd) && testSessionBudgetUsd > 0,
+        id: testSessionId || null,
+        budgetUsd: Number.isFinite(testSessionBudgetUsd) && testSessionBudgetUsd > 0 ? testSessionBudgetUsd : 0,
+        reserveUsd: Number.isFinite(testReserveUsd) && testReserveUsd >= 0 ? testReserveUsd : 0.40,
+      },
     },
   };
 }

@@ -49,7 +49,7 @@ const initialState: CharacterBuilderState = {
   lore: "",
   prompt: "",
   negativePrompt: "baja calidad, desenfoque, manos deformes",
-  model: "flux-1-dev",
+  model: "flux-schnell-reference",
   aspectRatio: "4:5",
   cfgScale: 7,
   steps: 28,

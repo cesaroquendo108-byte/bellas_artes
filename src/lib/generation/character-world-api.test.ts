@@ -6,8 +6,8 @@ vi.mock("@/utils/supabase/server", () => ({ createClient: vi.fn(async () => ({ a
 import { POST as postCharacter } from "@/app/api/generate/character/route"
 import { POST as postWorld } from "@/app/api/generate/world/route"
 
-const character = { mode: "prompt", prompt: "Retrato editorial", model: "flux-1-dev", aspectRatio: "4:5", cfgScale: 7, steps: 28, seed: 1, randomSeed: true, faceWeight: 0.8 }
-const world = { prompt: "Bosque bioluminiscente", model: "flux-1-dev", aspectRatio: "16:9", cfgScale: 7, seed: 1, randomSeed: true }
+const character = { mode: "prompt", prompt: "Retrato editorial", model: "flux-schnell-reference", aspectRatio: "4:5", cfgScale: 7, steps: 28, seed: 1, randomSeed: true, faceWeight: 0.8 }
+const world = { prompt: "Bosque bioluminiscente", model: "flux-schnell-world", aspectRatio: "16:9", cfgScale: 7, seed: 1, randomSeed: true }
 
 describe("Character & World API", () => {
   beforeEach(() => getUser.mockReset())

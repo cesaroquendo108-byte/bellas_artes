@@ -17,10 +17,10 @@ function configuredRoute(): ProviderRoute {
 }
 
 export function resolveImageRoute(model: string, params?: Record<string, unknown>): GenerationRouteSpec {
-  const premium = model === "flux-1-dev" || model === "flux-dev";
+  const premium = model === "flux-dev";
   const backendModel = premium ? "flux-dev" : "flux-schnell";
   return {
-    publicModel: model,
+    publicModel: premium ? "flux-dev" : "flux-schnell",
     backendModel,
     workflowVersion: premium ? "image/flux-dev-v1" : "image/flux-schnell-v1",
     providerRoute: configuredRoute(),
@@ -43,10 +43,10 @@ export function resolveVideoRoute(operation: string, model: string, params?: Rec
 }
 
 export function resolveCharacterRoute(model: string, params?: Record<string, unknown>): GenerationRouteSpec {
-  const premium = model === "flux-1-dev" || model === "kling-3-omni";
+  const premium = model === "flux-dev-reference";
   const backendModel = premium ? "flux-dev-reference" : "flux-schnell-reference";
   return {
-    publicModel: model,
+    publicModel: premium ? "flux-dev-reference" : "flux-schnell-reference",
     backendModel,
     workflowVersion: "characters/flux-reference-v1",
     providerRoute: configuredRoute(),
@@ -55,9 +55,10 @@ export function resolveCharacterRoute(model: string, params?: Record<string, unk
 }
 
 export function resolveWorldRoute(model: string, params?: Record<string, unknown>): GenerationRouteSpec {
-  const backendModel = model === "flux-1-dev" ? "flux-dev-world" : "flux-schnell-world";
+  const premium = model === "flux-dev-world";
+  const backendModel = premium ? "flux-dev-world" : "flux-schnell-world";
   return {
-    publicModel: model,
+    publicModel: backendModel,
     backendModel,
     workflowVersion: "worlds/flux-world-v1",
     providerRoute: configuredRoute(),

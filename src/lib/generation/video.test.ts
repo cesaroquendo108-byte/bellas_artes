@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { videoGenerationRequestSchema, videoOperations } from "./video"
 
 const base = {
-  model: "openart-video-v2",
+  model: "hunyuan-video-1.5-8.3b",
   prompt: "Una escena cinematográfica con movimiento suave",
   aspectRatio: "16:9" as const,
   parameters: {},

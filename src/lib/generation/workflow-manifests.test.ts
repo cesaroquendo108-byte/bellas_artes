@@ -31,6 +31,21 @@ describe("workflow manifests", () => {
     expect(validateWorkflowGraph("image/flux-schnell-v1", {})).toBe(false);
   });
 
+  it("rechaza nodos sin tipo, conexiones rotas y salidas incompatibles", () => {
+    const template = loadWorkflow("image/flux-schnell-v1");
+    const missingType = structuredClone(template);
+    delete (missingType["6"] as { class_type?: string }).class_type;
+    expect(validateWorkflowGraph("image/flux-schnell-v1", missingType)).toBe(false);
+
+    const brokenConnection = structuredClone(template);
+    (brokenConnection["8"] as { inputs: Record<string, unknown> }).inputs.samples = ["missing", 0];
+    expect(validateWorkflowGraph("image/flux-schnell-v1", brokenConnection)).toBe(false);
+
+    const wrongOutput = structuredClone(template);
+    (wrongOutput["9"] as { class_type: string }).class_type = "PreviewImage";
+    expect(validateWorkflowGraph("image/flux-schnell-v1", wrongOutput)).toBe(false);
+  });
+
   it("declara límites distintos para video estándar y Pro/B2B", () => {
     expect(loadWorkflowManifest("video/hunyuan-8.3b-t2v-v1").limits.minimumVramGb).toBe(48);
     expect(loadWorkflowManifest("video/hunyuan-13b-t2v-v1").limits.minimumVramGb).toBe(80);

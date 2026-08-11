@@ -4,7 +4,7 @@ import { characterGenerationRequestSchema, normalizeCharacterGenerationRequest, 
 
 const assetId = "11111111-1111-4111-8111-111111111111"
 const characterBase = {
-  model: "flux-1-dev" as const,
+  model: "flux-schnell-reference" as const,
   aspectRatio: "4:5" as const,
   cfgScale: 7,
   steps: 28,
@@ -35,7 +35,7 @@ describe("characterGenerationRequestSchema", () => {
 })
 
 describe("worldGenerationRequestSchema", () => {
-  const valid = { prompt: "Ciudad flotante entre tepuyes", model: "kling-3-omni", aspectRatio: "16:9", cfgScale: 8, seed: 9, randomSeed: true }
+  const valid = { prompt: "Ciudad flotante entre tepuyes", model: "flux-schnell-world", aspectRatio: "16:9", cfgScale: 8, seed: 9, randomSeed: true }
   it("acepta un mundo válido", () => expect(worldGenerationRequestSchema.safeParse(valid).success).toBe(true))
   it("rechaza prompt vacío", () => expect(worldGenerationRequestSchema.safeParse({ ...valid, prompt: "" }).success).toBe(false))
   it("rechaza modelo o ratio inválidos", () => {

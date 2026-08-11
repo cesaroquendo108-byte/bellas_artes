@@ -105,7 +105,7 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
           <Badge className="border border-violet-400/20 bg-white/10 text-violet-100">Centro de medios</Badge>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Creación gratuita de videos con IA</h1>
           <p className="mt-3 text-sm leading-6 text-slate-400">Accede a tus herramientas y organiza imágenes, videos y audio desde una única biblioteca privada.</p>
-          <div className="mt-5 flex flex-wrap gap-2">{["Kling 3.0", "Seedance", "Sora 2", "Veo 3.1"].map((model) => <Badge key={model} variant="outline" className="border-white/10 bg-white/[0.06] text-slate-300">{model}</Badge>)}</div>
+          <div className="mt-5 flex flex-wrap gap-2">{["Flux Schnell · Admin Preview", "HunyuanVideo · En preparación", "F5-TTS · En preparación", "RVC · En preparación"].map((model) => <Badge key={model} variant="outline" className="border-white/10 bg-white/[0.06] text-slate-300">{model}</Badge>)}</div>
           <Button render={<Link href="/video/t2v" />} nativeButton={false} size="lg" className="mt-7 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"><Clapperboard /> Crear gratis</Button>
         </div>
       </section>

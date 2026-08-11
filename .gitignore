@@ -40,6 +40,11 @@ yarn-error.log*
 # local multi-agent orchestration metadata
 .agents/
 
+# local diagnostics and Supabase CLI state
+/scratch.ts
+/scratch/
+/supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

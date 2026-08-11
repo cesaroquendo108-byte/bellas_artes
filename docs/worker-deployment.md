@@ -40,7 +40,12 @@ RUN_GENERATION_WORKER=true
 GENERATION_ENABLED=false
 GENERATION_MAX_ATTEMPTS=3
 WORKER_CONCURRENCY=1
-WORKER_QUEUE_KINDS=image,video,audio,character,world
+WORKER_QUEUE_KINDS=image
+GENERATION_ACCESS_MODE=admin
+GENERATION_BILLING_MODE=shadow
+GENERATION_AUDIT_ENABLED=true
+GENERATION_REQUIRE_AUDIT=true
+GENERATION_RATE_LIMIT_ENABLED=true
 VAST_SERVERLESS_MIN_LOAD=0
 VAST_SERVERLESS_COLD_WORKERS=0
 VAST_SERVERLESS_MAX_WORKERS=1
@@ -50,7 +55,14 @@ VAST_API_KEY=<secreto de servidor>
 VAST_IMAGE_SERVERLESS_ENDPOINT=ba-image-sandbox
 VAST_SERVERLESS_ROUTE_URL=https://run.vast.ai/route/
 GENERATION_JOB_TIMEOUT_SECONDS=600
+GENERATION_MODERATION_LEVEL=l1
+GENERATION_REQUIRE_PROVENANCE=false
 ```
+
+Durante la aceptación, el arnés exige además una sesión global de presupuesto
+con techo máximo de US$3.20 y reserva mínima de US$0.40. L2 y la firma de
+procedencia deben cambiarse a obligatorios antes de permitir usuarios invitados;
+si sus proveedores o claves no están configurados, el sistema falla cerrado.
 
 Para activar una modalidad se añaden únicamente sus variables de proveedor y
 workflows versionados. Nunca se copian estas credenciales a Vercel ni a

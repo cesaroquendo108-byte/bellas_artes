@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import * as z from "zod/v4";
 import { getOwnedGenerationJob } from "@/lib/generation/db";
+import { listGenerationCapabilities } from "@/lib/generation/capabilities";
 import { resolveImageRoute, resolveVideoRoute } from "@/lib/generation/registry";
 import { enqueueGeneration } from "@/lib/generation/service";
 import { getPrivateObjectUrl } from "@/lib/storage/r2";
@@ -12,13 +13,16 @@ function text(value: unknown) {
 
 export function createBellasArtesMcpServer(userId: string) {
   const server = new McpServer({ name: "bellas-artes", version: "1.0.0" });
+  const capabilities = listGenerationCapabilities();
+  const imageConfigured = capabilities.some((capability) => capability.id === "image-flux-schnell" && capability.workflowConfigured);
+  const videoConfigured = capabilities.some((capability) => capability.kind === "video" && capability.workflowConfigured);
 
-  server.registerTool("create_image", {
+  if (imageConfigured) server.registerTool("create_image", {
     title: "Create image",
     description: "Encola una generación de imagen open source en Bellas Artes.",
     inputSchema: {
       prompt: z.string().min(1).max(4000),
-      model: z.string().default("gpt-image-2"),
+      model: z.enum(["flux-schnell", "flux-dev"]).default("flux-schnell"),
       aspectRatio: z.enum(["1:1", "16:9", "9:16", "4:5"]).default("1:1"),
       resolution: z.enum(["1k", "2k"]).default("1k"),
       quality: z.enum(["low", "medium", "high"]).default("medium"),
@@ -33,13 +37,13 @@ export function createBellasArtesMcpServer(userId: string) {
     assetIds: referenceAssetIds,
   })));
 
-  server.registerTool("create_video", {
+  if (videoConfigured) server.registerTool("create_video", {
     title: "Create video",
     description: "Encola una generación de video HunyuanVideo en Bellas Artes.",
     inputSchema: {
       operation: z.enum(["t2v", "i2v", "v2v", "action-sync", "effects", "upscale", "lip-sync", "replace-character", "extend"]).default("t2v"),
       prompt: z.string().max(4000).optional(),
-      model: z.string().default("hunyuan-video-8b"),
+      model: z.enum(["hunyuan-video-1.5-8.3b", "hunyuan-video-13b"]).default("hunyuan-video-1.5-8.3b"),
       aspectRatio: z.enum(["16:9", "9:16", "1:1", "4:3"]).default("16:9"),
       sourceAssetIds: z.array(z.string().uuid()).max(4).optional(),
       referenceAssetIds: z.array(z.string().uuid()).max(8).optional(),
@@ -83,7 +87,14 @@ export function createBellasArtesMcpServer(userId: string) {
   });
 
   server.registerResource("generation-capabilities", "bellas-artes://capabilities", { mimeType: "application/json" }, async () => ({
-    contents: [{ uri: "bellas-artes://capabilities", mimeType: "application/json", text: JSON.stringify({ models: ["flux-schnell", "hunyuan-video", "f5-tts", "rvc"], credits: { image: 1, video: 80 }, status: "queued/processing/completed/failed/canceled" }) }],
+    contents: [{
+      uri: "bellas-artes://capabilities",
+      mimeType: "application/json",
+      text: JSON.stringify({
+        capabilities: capabilities.map(({ id, label, kind, model, operation, workflowVersion, status }) => ({ id, label, kind, model, operation, workflowVersion, status })),
+        jobStatuses: ["queued", "processing", "completed", "failed", "canceled"],
+      }),
+    }],
   }));
 
   return server;

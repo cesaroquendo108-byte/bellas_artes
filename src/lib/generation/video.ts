@@ -19,10 +19,21 @@ export const videoOperations = [
   "extend",
 ] as const
 
+export const videoModels = [
+  "hunyuan-video-1.5-8.3b",
+  "hunyuan-video-13b-pro",
+  "liveportrait-motion-v1",
+  "video-vfx-v1",
+  "video-upscale-v1",
+  "liveportrait-lipsync-v1",
+  "flux-character-video-v1",
+  "hunyuan-video-extend-v1",
+] as const
+
 export const videoGenerationRequestSchema = z
   .object({
     operation: z.enum(videoOperations),
-    model: z.string().trim().min(1),
+    model: z.enum(videoModels),
     prompt: z.string().trim().optional(),
     negativePrompt: z.string().trim().optional(),
     aspectRatio: z.enum(["16:9", "9:16", "1:1", "4:3"]).optional(),

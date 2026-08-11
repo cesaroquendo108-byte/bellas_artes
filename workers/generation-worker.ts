@@ -61,6 +61,7 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
     : await selectProvider({ kind: record.kind });
   let result: ProviderResult;
   let submittedAt: number;
+  let providerTimings: Record<string, number> | undefined;
 
   if (usesServerlessRouter && provider.execute) {
     const cancellationController = new AbortController();
@@ -84,6 +85,7 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
         },
       });
       result = execution.result;
+      providerTimings = execution.timings;
     } catch (error) {
       if (error instanceof ProviderError && error.code === "CANCELED") {
         await refundGenerationJob({ jobId: record.id, code: "CANCELED", message: "El job fue cancelado.", canceled: true });
@@ -125,9 +127,12 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
   }
 
   const finishedAt = Date.now();
-  const inferenceMs = Math.max(finishedAt - submittedAt, 0);
-  const totalMs = Math.max(finishedAt - Date.parse(record.created_at), 0);
-  const startupMs = resumingExistingProviderJob && !usesServerlessRouter ? 0 : Math.max(submittedAt - attemptStartedAt, 0);
+  const timings = resolveProviderTimingMetrics(providerTimings, {
+    inferenceMs: Math.max(finishedAt - submittedAt, 0),
+    totalMs: Math.max(finishedAt - Date.parse(record.created_at), 0),
+    startupMs: resumingExistingProviderJob && !usesServerlessRouter ? 0 : Math.max(submittedAt - attemptStartedAt, 0),
+  });
+  const { startupMs, inferenceMs, totalMs } = timings;
   const estimatedCostUsd = (inferenceMs / 1000) * getEstimatedVastCostRate(record.kind);
   await recordGenerationMetrics({
     jobId: record.id,
@@ -187,12 +192,15 @@ export function startGenerationWorkers() {
           return null;
         });
         if (budget) {
-          log(budget.overBudget ? "error" : "info", "Presupuesto Vast medido.", {
+          log(budget.overBudget || budget.overSessionBudget ? "error" : "info", "Presupuesto Vast medido.", {
             kind,
             jobId: job.data.jobId,
             jobCostUsd: budget.jobCostUsd,
             totalSpentUsd: budget.totalSpentUsd,
             overBudget: budget.overBudget,
+            sessionSpentUsd: budget.sessionSpentUsd,
+            sessionCeilingUsd: budget.sessionCeilingUsd,
+            overSessionBudget: budget.overSessionBudget,
           });
           await recordGenerationActualCost({
             jobId: job.data.jobId,
@@ -239,6 +247,32 @@ export function getConfiguredQueueKinds(value = process.env.WORKER_QUEUE_KINDS ?
     .split(",")
     .map((kind) => kind.trim())
     .filter((kind): kind is GenerationQueueKind => ["image", "video", "audio", "character", "world"].includes(kind)))];
+}
+
+type TimingMetrics = { startupMs: number; inferenceMs: number; totalMs: number };
+
+export function resolveProviderTimingMetrics(providerTimings: Record<string, number> | undefined, fallback: TimingMetrics): TimingMetrics {
+  return {
+    startupMs: readProviderDuration(providerTimings, ["startup_ms", "startupMs", "cold_start_ms", "coldStartMs"], ["startup_seconds", "cold_start_seconds"]) ?? fallback.startupMs,
+    inferenceMs: readProviderDuration(providerTimings, ["inference_ms", "inferenceMs", "execution_ms", "executionMs"], ["inference_seconds", "execution_seconds"]) ?? fallback.inferenceMs,
+    totalMs: readProviderDuration(providerTimings, ["total_ms", "totalMs", "duration_ms", "durationMs"], ["total_seconds", "duration_seconds"]) ?? fallback.totalMs,
+  };
+}
+
+function readProviderDuration(
+  timings: Record<string, number> | undefined,
+  millisecondKeys: string[],
+  secondKeys: string[],
+) {
+  for (const key of millisecondKeys) {
+    const value = timings?.[key];
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) return Math.round(value);
+  }
+  for (const key of secondKeys) {
+    const value = timings?.[key];
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) return Math.round(value * 1_000);
+  }
+  return undefined;
 }
 
 function installShutdownHandlers() {

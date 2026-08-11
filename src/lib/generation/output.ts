@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { uploadPrivateObject } from "@/lib/storage/r2";
 import { createAdminClient } from "@/utils/supabase/admin";
 import type { ProviderResult } from "./providers/types";
+import { createProvenanceEnvelope } from "./provenance";
 
 const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp", "video/mp4", "video/webm", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/mp4", "audio/webm", "audio/ogg"]);
 
@@ -20,6 +21,12 @@ export async function persistGenerationOutput(input: {
   if (!allowedTypes.has(input.result.contentType)) throw new Error(`Tipo de salida no permitido: ${input.result.contentType}`);
   if (!input.result.bytes.byteLength || input.result.bytes.byteLength > 250 * 1024 * 1024) throw new Error("El resultado excede el límite permitido.");
   const digest = createHash("sha256").update(input.result.bytes).digest("hex");
+  const provenance = createProvenanceEnvelope({
+    userId: input.userId,
+    jobId: input.jobId,
+    sha256: digest,
+    contentType: input.result.contentType,
+  });
   const type = input.kind === "character" || input.kind === "world" ? "image" : input.kind;
   const key = `users/${input.userId}/generated/${type}/${input.jobId}-${digest.slice(0, 16)}.${extension(input.result.contentType)}`;
   await uploadPrivateObject({
@@ -31,6 +38,8 @@ export async function persistGenerationOutput(input: {
       generationJobId: input.jobId,
       sha256: digest,
       provenance: "bellas-artes-ai-generation",
+      provenanceVersion: provenance?.version ?? "unsigned",
+      provenanceSignature: provenance?.signature ?? "unsigned",
     },
   });
   const { data, error } = await createAdminClient().from("assets").insert({
@@ -42,8 +51,8 @@ export async function persistGenerationOutput(input: {
     bytes: input.result.bytes.byteLength,
     metadata: {
       source: "generation",
-      provenance: "bellas-artes-ai-generation",
-      watermark: "metadata",
+      provenance: provenance ?? { version: "unsigned" },
+      watermark: provenance ? "signed-provenance" : "metadata-only",
       generationJobId: input.jobId,
       sha256: digest,
       backend: input.result.metadata ?? {},

@@ -43,6 +43,7 @@ describe("generation safety defaults", () => {
   it("sólo activa el arnés Vast con presupuesto y máximo de jobs válidos", () => {
     vi.stubEnv("VAST_TEST_BUDGET_USD", "0.50");
     vi.stubEnv("VAST_TEST_MAX_JOBS", "5");
+    vi.stubEnv("VAST_TEST_MAX_ESTIMATED_JOB_USD", "0.20");
     vi.stubEnv("VAST_TEST_MODALITY", "image");
     vi.stubEnv("VAST_TEST_RUN_ID", "flux-schnell-acceptance");
 
@@ -50,9 +51,23 @@ describe("generation safety defaults", () => {
       enabled: true,
       budgetUsd: 0.5,
       maxJobs: 5,
+      maxEstimatedJobUsd: 0.2,
       modality: "image",
       runId: "flux-schnell-acceptance",
+      session: {
+        enabled: false,
+        id: null,
+        budgetUsd: 0,
+        reserveUsd: 0.4,
+      },
     });
+  });
+
+  it("configura una sesión global de pruebas con reserva", () => {
+    vi.stubEnv("VAST_TEST_SESSION_ID", "final-pass");
+    vi.stubEnv("VAST_TEST_SESSION_BUDGET_USD", "3.20");
+    vi.stubEnv("VAST_TEST_RESERVE_USD", "0.40");
+    expect(getGenerationConfig().vastTest.session).toEqual({ enabled: true, id: "final-pass", budgetUsd: 3.2, reserveUsd: 0.4 });
   });
 
   it("resuelve endpoints Vast por modalidad con fallback compatible", () => {

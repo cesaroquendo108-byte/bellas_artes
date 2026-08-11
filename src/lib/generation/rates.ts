@@ -30,7 +30,7 @@ export const MODEL_BASE_COSTS: Record<string, number> = {
   // Imágenes
   "flux-schnell": 1,
   "flux-dev": 8,
-  "flux-1-dev": 8,
+  "flux-dev-world": 8,
   "sdxl-turbo": 1,
   "sdxl-lightning": 1,
 

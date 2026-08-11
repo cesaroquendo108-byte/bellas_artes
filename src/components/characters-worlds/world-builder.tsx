@@ -36,7 +36,7 @@ export function WorldBuilder({ assets, initialPrompt = "" }: { assets: Character
   const inputId = useId();
   const [prompt, setPrompt] = useState(initialPrompt.slice(0, 4_000));
   const [model, setModel] =
-    useState<WorldGenerationRequest["model"]>("flux-1-dev");
+    useState<WorldGenerationRequest["model"]>("flux-schnell-world");
   const [aspectRatio, setAspectRatio] =
     useState<WorldGenerationRequest["aspectRatio"]>("16:9");
   const [cfgScale, setCfgScale] = useState(7);
@@ -151,8 +151,8 @@ export function WorldBuilder({ assets, initialPrompt = "" }: { assets: Character
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="flux-1-dev">Flux.1 Dev</SelectItem>
-              <SelectItem value="kling-3-omni">Kling 3.0 Omni</SelectItem>
+              <SelectItem value="flux-schnell-world">Flux Schnell World · En preparación</SelectItem>
+              <SelectItem value="flux-dev-world" disabled>Flux Dev World · Pro/B2B</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -5,7 +5,7 @@ import { imageGenerationRequestSchema } from "./image"
 const validRequest = {
   mode: "create" as const,
   prompt: "Un retrato editorial con iluminación violeta",
-  model: "gpt-image-2" as const,
+  model: "flux-schnell" as const,
   autoPolish: true,
   aspectRatio: "1:1" as const,
   resolution: "1k" as const,
@@ -43,5 +43,9 @@ describe("imageGenerationRequestSchema", () => {
       userId: "otro-usuario",
     })
     expect(result.success).toBe(false)
+  })
+
+  it("rechaza aliases cerrados fuera del contrato público", () => {
+    expect(imageGenerationRequestSchema.safeParse({ ...validRequest, model: "gpt-image-2" }).success).toBe(false)
   })
 })

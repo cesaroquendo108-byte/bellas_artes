@@ -17,6 +17,7 @@ export interface WorkflowManifest {
   kind: GenerationProviderKind;
   operation?: string;
   bindings: WorkflowBinding[];
+  outputNodes: Array<{ nodeId: string; classTypes: string[] }>;
   limits: {
     maxWidth?: number;
     maxHeight?: number;
@@ -49,6 +50,7 @@ const fluxSchnellManifest: WorkflowManifest = {
     { nodeId: "5", input: "width", source: { type: "computed", value: "image-width" } },
     { nodeId: "5", input: "height", source: { type: "computed", value: "image-height" } },
   ],
+  outputNodes: [{ nodeId: "9", classTypes: ["SaveImage"] }],
   limits: { maxWidth: 2048, maxHeight: 2048, timeoutSeconds: 600, estimatedBudgetUsd: 0.10, minimumVramGb: 24 },
   outputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
 };
@@ -75,6 +77,7 @@ const manifests: Record<string, WorkflowManifest> = {
     version: "characters/flux-reference-v1",
     kind: "character",
     bindings: imageReferenceBindings,
+    outputNodes: [{ nodeId: "output", classTypes: ["SaveImage"] }],
     limits: { maxWidth: 2048, maxHeight: 2048, timeoutSeconds: 900, estimatedBudgetUsd: 0.20, minimumVramGb: 24 },
     assetInputs: [0, 1, 2].map((index) => ({ role: "reference" as const, index, mimeTypes: ["image/png", "image/jpeg", "image/webp"] })),
     inputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
@@ -84,6 +87,7 @@ const manifests: Record<string, WorkflowManifest> = {
     version: "worlds/flux-world-v1",
     kind: "world",
     bindings: imageReferenceBindings.filter((binding) => binding.nodeId !== "face_lock"),
+    outputNodes: [{ nodeId: "output", classTypes: ["SaveImage"] }],
     limits: { maxWidth: 2048, maxHeight: 2048, timeoutSeconds: 900, estimatedBudgetUsd: 0.20, minimumVramGb: 24 },
     assetInputs: [0, 1, 2].map((index) => ({ role: "reference" as const, index, mimeTypes: ["image/png", "image/jpeg", "image/webp"] })),
     inputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
@@ -97,6 +101,7 @@ const manifests: Record<string, WorkflowManifest> = {
       { nodeId: "portrait", input: "url", source: { type: "asset", role: "source", index: 0 }, required: true },
       { nodeId: "driving", input: "url", source: { type: "asset", role: "source", index: 1 }, required: true },
     ],
+    outputNodes: [{ nodeId: "output", classTypes: ["VHS_VideoCombine", "VideoCombine", "SaveVideo"] }],
     limits: { maxWidth: 1024, maxHeight: 1024, maxDurationSeconds: 15, maxFrames: 450, timeoutSeconds: 900, minimumVramGb: 24 },
     assetInputs: [
       { role: "source", index: 0, required: true, mimeTypes: ["image/png", "image/jpeg", "image/webp"] },
@@ -114,6 +119,7 @@ const manifests: Record<string, WorkflowManifest> = {
       { nodeId: "reference_audio", input: "url", source: { type: "asset", role: "reference", index: 0 } },
       { nodeId: "voice", input: "language", source: { type: "request", path: "language" } },
     ],
+    outputNodes: [{ nodeId: "output", classTypes: ["SaveAudio", "VHS_AudioCombine", "PreviewAudio"] }],
     limits: { maxDurationSeconds: 120, timeoutSeconds: 600, estimatedBudgetUsd: 0.10, minimumVramGb: 16 },
     assetInputs: [{ role: "reference", index: 0, mimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"], maxDurationSeconds: 30 }],
     inputMimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"],
@@ -128,6 +134,7 @@ const manifests: Record<string, WorkflowManifest> = {
       { nodeId: "voice_model", input: "id", source: { type: "request", path: "voiceId" }, required: true },
       { nodeId: "pitch", input: "semitones", source: { type: "request", path: "pitch" } },
     ],
+    outputNodes: [{ nodeId: "output", classTypes: ["SaveAudio", "VHS_AudioCombine", "PreviewAudio"] }],
     limits: { maxDurationSeconds: 300, timeoutSeconds: 900, estimatedBudgetUsd: 0.10, minimumVramGb: 16 },
     assetInputs: [{ role: "source", index: 0, required: true, mimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"], maxDurationSeconds: 300 }],
     inputMimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"],
@@ -167,6 +174,7 @@ for (const model of ["hunyuan-8.3b", "hunyuan-13b"] as const) {
         { nodeId: "video", input: "duration", source: { type: "request", path: "parameters.duration" } },
         { nodeId: "video", input: "frames", source: { type: "request", path: "parameters.frames" } },
       ],
+      outputNodes: [{ nodeId: "output", classTypes: ["VHS_VideoCombine", "VideoCombine", "SaveVideo"] }],
       limits: {
         maxWidth: premium ? 1920 : 1280,
         maxHeight: premium ? 1080 : 720,
@@ -222,13 +230,35 @@ export function bindWorkflow(input: {
 
 export function validateWorkflowGraph(workflowVersion: string, workflow: Record<string, unknown>) {
   const manifest = loadWorkflowManifest(workflowVersion);
+  for (const [nodeId, value] of Object.entries(workflow)) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const node = value as { class_type?: unknown; inputs?: unknown };
+    if (typeof node.class_type !== "string" || !node.class_type.trim()) return false;
+    if (!node.inputs || typeof node.inputs !== "object" || Array.isArray(node.inputs)) return false;
+    for (const inputValue of Object.values(node.inputs)) {
+      if (isNodeConnection(inputValue) && !workflow[inputValue[0]]) return false;
+    }
+    if (!nodeId.trim()) return false;
+  }
   for (const binding of manifest.bindings) {
     const node = workflow[binding.nodeId];
     if (!node || typeof node !== "object") return false;
     const inputs = (node as { inputs?: unknown }).inputs;
     if (!inputs || typeof inputs !== "object" || Array.isArray(inputs)) return false;
+    if (!(binding.input in inputs)) return false;
+  }
+  for (const output of manifest.outputNodes) {
+    const node = workflow[output.nodeId] as { class_type?: unknown } | undefined;
+    if (!node || typeof node.class_type !== "string" || !output.classTypes.includes(node.class_type)) return false;
   }
   return true;
+}
+
+function isNodeConnection(value: unknown): value is [string, number] {
+  return Array.isArray(value)
+    && value.length === 2
+    && typeof value[0] === "string"
+    && Number.isInteger(value[1]);
 }
 
 export function validateWorkflowAssets(

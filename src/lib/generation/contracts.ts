@@ -41,7 +41,7 @@ export type ImageQuality = "low" | "medium" | "high"
 export interface ImageGenerationRequest {
   mode: ImageGenerationMode
   prompt: string
-  model: "gpt-image-2"
+  model: "flux-schnell" | "flux-dev"
   autoPolish: boolean
   aspectRatio: ImageAspectRatio
   resolution: ImageResolution
