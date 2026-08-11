@@ -102,7 +102,9 @@ export default async function LoginPage({
 
               <div className="flex flex-col gap-2 mt-4">
                 <button
+                  type="submit"
                   formAction={loginWithGoogle}
+                  formNoValidate
                   disabled={configMissing}
                   className="w-full bg-white hover:bg-neutral-200 text-black font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                 >
