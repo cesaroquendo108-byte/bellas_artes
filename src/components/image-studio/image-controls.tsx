@@ -99,7 +99,7 @@ export function ImageControls({
                   Estudio de imágenes
                 </h1>
                 <p className="text-[11px] text-slate-500">
-                  Crea, explora y vuelve a imaginar
+                  Flux Schnell · Admin Preview
                 </p>
               </div>
             </div>
@@ -122,7 +122,7 @@ export function ImageControls({
             <Select
               value={settings.model}
               itemToStringLabel={(value) =>
-                value === "gpt-image-2" ? "GPT Image 2" : String(value)
+                value === "gpt-image-2" ? "Flux Schnell" : String(value)
               }
               onValueChange={(value) =>
                 value && update("model", value as "gpt-image-2")
@@ -135,7 +135,7 @@ export function ImageControls({
                 </div>
               </SelectTrigger>
               <SelectContent align="start">
-                <SelectItem value="gpt-image-2">GPT Image 2</SelectItem>
+                <SelectItem value="gpt-image-2">Flux Schnell · Admin Preview</SelectItem>
               </SelectContent>
             </Select>
           </div>

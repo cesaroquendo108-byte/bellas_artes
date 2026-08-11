@@ -3,6 +3,7 @@ import { ArrowRight, AudioLines, BadgePlus, Clapperboard, Expand, Film, ImagePla
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { CapabilityStatusBadge } from "@/components/landing/capability-status"
 import { cn } from "@/lib/utils"
 
 import { VIDEO_TOOL_META } from "@/components/video-studio/config"
@@ -36,6 +37,7 @@ function ToolCard({ operation }: { operation: VideoOperation }) {
       <div className="relative mt-7">
         <div className="flex items-center gap-2"><h3 className="text-sm font-semibold text-white">{tool.title}</h3><ArrowRight className="size-3.5 -translate-x-1 text-violet-300 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100" /></div>
         <p className="mt-2 text-xs leading-5 text-slate-500">{tool.description}</p>
+        <CapabilityStatusBadge status="beta" className="mt-4" />
       </div>
     </Link>
   )
@@ -60,7 +62,7 @@ export function VideoHub() {
           </div>
         </div>
         <div className="relative mt-8 flex flex-wrap gap-2">
-          {["Seedance 1.5 Pro", "Veo 3.1", "Kling 2.1", "Wan 2.2"].map((model) => <Badge key={model} variant="outline" className="border-white/10 bg-black/20 text-slate-400">{model}</Badge>)}
+          {["HunyuanVideo 8.3B · En preparación", "HunyuanVideo 13B · Pro/B2B"].map((model) => <Badge key={model} variant="outline" className="border-white/10 bg-black/20 text-slate-400">{model}</Badge>)}
         </div>
       </section>
 

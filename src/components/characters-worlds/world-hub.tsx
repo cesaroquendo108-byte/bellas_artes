@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CapabilityStatusBadge } from "@/components/landing/capability-status";
 import {
   Sheet,
   SheetContent,
@@ -60,7 +61,8 @@ export function WorldHub({
   assets,
   libraryError,
   createOpen = false,
-}: LibraryStateProps & { createOpen?: boolean }) {
+  initialPrompt = "",
+}: LibraryStateProps & { createOpen?: boolean; initialPrompt?: string }) {
   const [builderOpen, setBuilderOpen] = useState(createOpen);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<LibraryFilter>("all");
@@ -88,9 +90,10 @@ export function WorldHub({
       <header className="relative overflow-hidden rounded-3xl border border-violet-400/20 bg-[#111114] p-7 sm:p-10">
         <div className="absolute -top-24 right-0 size-72 rounded-full bg-blue-600/20 blur-3xl" />
         <div className="relative max-w-2xl">
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
-            Worlds
-          </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">Mundos</Badge>
+            <CapabilityStatusBadge status="beta" />
+          </div>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
             Escenarios con memoria visual.
           </h1>
@@ -163,7 +166,7 @@ export function WorldHub({
               Construye un entorno sin salir de la biblioteca.
             </SheetDescription>
           </SheetHeader>
-          <WorldBuilder assets={assets} />
+          <WorldBuilder assets={assets} initialPrompt={initialPrompt} />
         </SheetContent>
       </Sheet>
     </div>

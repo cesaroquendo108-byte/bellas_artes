@@ -474,13 +474,16 @@ function Workspace({ assets }: { assets: CharacterWorldAsset[] }) {
 export function CharacterBuilder({
   assets,
   initialReferenceId,
+  initialPrompt,
 }: {
   assets: CharacterWorldAsset[];
   initialReferenceId?: string;
+  initialPrompt?: string;
 }) {
   return (
     <CharacterBuilderProvider
       initialReference={assets.find((asset) => asset.id === initialReferenceId)}
+      initialPrompt={initialPrompt}
     >
       <Workspace assets={assets} />
     </CharacterBuilderProvider>

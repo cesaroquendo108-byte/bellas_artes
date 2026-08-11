@@ -213,13 +213,15 @@ export function VideoStudioShell({
   operation,
   assets,
   assetsUnavailable,
+  initialPrompt,
 }: {
   operation: VideoOperation;
   assets: StudioAsset[];
   assetsUnavailable?: boolean;
+  initialPrompt?: string;
 }) {
   return (
-    <VideoStudioProvider operation={operation}>
+    <VideoStudioProvider operation={operation} initialPrompt={initialPrompt}>
       <Workspace assets={assets} assetsUnavailable={assetsUnavailable} />
     </VideoStudioProvider>
   );

@@ -50,12 +50,12 @@ interface VideoStudioContextValue {
 
 const VideoStudioContext = createContext<VideoStudioContextValue | null>(null);
 
-function createInitialState(operation: VideoOperation): VideoStudioState {
+function createInitialState({ operation, initialPrompt }: { operation: VideoOperation; initialPrompt?: string }): VideoStudioState {
   return {
     operation,
     fields: {
       model: VIDEO_TOOL_META[operation].defaultModel,
-      prompt: "",
+      prompt: initialPrompt?.slice(0, 4_000) ?? "",
       negativePrompt: "",
       aspectRatio: "16:9",
       durationSeconds: 5,
@@ -115,12 +115,14 @@ function reducer(state: VideoStudioState, action: Action): VideoStudioState {
 
 export function VideoStudioProvider({
   operation,
+  initialPrompt,
   children,
 }: {
   operation: VideoOperation;
+  initialPrompt?: string;
   children: React.ReactNode;
 }) {
-  const [state, dispatch] = useReducer(reducer, operation, createInitialState);
+  const [state, dispatch] = useReducer(reducer, { operation, initialPrompt }, createInitialState);
   const stateRef = useRef(state);
 
   useEffect(() => {

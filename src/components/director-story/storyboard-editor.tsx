@@ -454,12 +454,14 @@ export function StoryboardEditor({
   template = "custom",
   kind = "story",
   initialView = "storyboard",
+  initialPrompt = "",
 }: {
   project?: CreativeProject | null;
   assets: StoryAssetOption[];
   template?: StoryTemplate;
   kind?: CreativeProjectKind;
   initialView?: StoryEditorView;
+  initialPrompt?: string;
 }) {
   return (
     <StoryProjectProvider
@@ -468,6 +470,7 @@ export function StoryboardEditor({
       template={template}
       kind={kind}
       initialView={initialView}
+      initialPrompt={initialPrompt}
     >
       <EditorWorkspace />
     </StoryProjectProvider>

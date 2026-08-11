@@ -13,25 +13,15 @@ import {
 
 import { useVideoStudio } from "./video-studio-context";
 
-const models = [
-  { value: "openart-video-v2", label: "OpenArt Video V2" },
-  { value: "openart-animate-v2", label: "OpenArt Animate V2" },
-  { value: "openart-v2v-2.5", label: "OpenArt V2V 2.5" },
-  { value: "motion-sync-v2", label: "Sincronía de movimiento V2" },
-  { value: "seedance-2", label: "Seedance 2" },
-  { value: "video-upscaler-v2", label: "Mejora de video V2" },
-  { value: "lip-sync-v2.5", label: "Sincronía labial V2.5" },
-  { value: "character-swap-v2", label: "Intercambio de personaje V2" },
-  { value: "kling-extend-v1.5", label: "Extensión Kling 1.5" },
-  { value: "seedance-1.5-pro", label: "Seedance 1.5 Pro" },
-  { value: "veo-3.1", label: "Veo 3.1" },
-  { value: "kling-2.1", label: "Kling 2.1" },
-  { value: "wan-2.2", label: "Wan 2.2" },
-  { value: "topaz-video", label: "Topaz Video" },
-];
-
 export function VideoModelSelector() {
   const { state, setField } = useVideoStudio();
+  const generative = state.operation === "t2v" || state.operation === "i2v" || state.operation === "v2v";
+  const models = generative
+    ? [
+        { value: "hunyuan-video-1.5-8.3b", label: "HunyuanVideo 8.3B · En preparación" },
+        { value: "hunyuan-video-13b", label: "HunyuanVideo 13B · Pro/B2B" },
+      ]
+    : [{ value: state.fields.model, label: "Workflow dedicado · En preparación" }];
   return (
     <div className="space-y-2">
       <Label className="text-[11px] text-slate-400">Modelo</Label>

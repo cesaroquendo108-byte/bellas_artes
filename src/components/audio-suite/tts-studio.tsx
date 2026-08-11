@@ -46,15 +46,17 @@ export function TtsStudio({
   jobs,
   setupPending,
   providerMessage,
+  initialScript = "",
 }: {
   voices: AudioVoice[];
   jobs: AudioLibraryItem[];
   setupPending: boolean;
   providerMessage: string;
+  initialScript?: string;
 }) {
   const [query, setQuery] = useState("");
   const [voiceId, setVoiceId] = useState(voices[0]?.id ?? "");
-  const [script, setScript] = useState("");
+  const [script, setScript] = useState(initialScript.slice(0, 10_000));
   const [format, setFormat] = useState<"mp3" | "wav">("mp3");
   const [values, setValues] = useState<VoiceValues>({
     speed: 1,

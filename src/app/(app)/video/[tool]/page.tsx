@@ -6,6 +6,7 @@ import { getAssets } from "@/lib/assets/queries"
 
 interface PageProps {
   params: Promise<{ tool: string }>
+  searchParams: Promise<{ prompt?: string }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -14,8 +15,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title: `${VIDEO_TOOL_META[tool].title} · Bellas Artes`, description: VIDEO_TOOL_META[tool].description }
 }
 
-export default async function VideoToolPage({ params }: PageProps) {
-  const { tool } = await params
+export default async function VideoToolPage({ params, searchParams }: PageProps) {
+  const [{ tool }, { prompt }] = await Promise.all([params, searchParams])
   if (!isVideoOperation(tool)) notFound()
 
   let assets: StudioAsset[] = []
@@ -34,5 +35,5 @@ export default async function VideoToolPage({ params }: PageProps) {
     assetsUnavailable = true
   }
 
-  return <div className="-m-4 min-w-0 sm:-m-6 lg:-m-8"><VideoStudioShell operation={tool} assets={assets} assetsUnavailable={assetsUnavailable} /></div>
+  return <div className="-m-4 min-w-0 sm:-m-6 lg:-m-8"><VideoStudioShell operation={tool} assets={assets} assetsUnavailable={assetsUnavailable} initialPrompt={typeof prompt === "string" ? prompt : ""} /></div>
 }

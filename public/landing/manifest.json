@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "key": "hero-director",
+      "path": "/landing/hero-director.webp",
+      "width": 1920,
+      "height": 561,
+      "sourceKey": "image_-EQsdk0u",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-music-video",
+      "path": "/landing/template-music-video.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_X3b0ngBP",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-product-ad",
+      "path": "/landing/template-product-ad.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_CM1nXcB",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-ad-remake",
+      "path": "/landing/template-ad-remake.webp",
+      "width": 720,
+      "height": 540,
+      "sourceKey": "image_66bog3Yc",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-social",
+      "path": "/landing/template-social.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_PsMBXGu1",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-ugc",
+      "path": "/landing/template-ugc.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_FxcHHMQ",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-micro-drama",
+      "path": "/landing/template-micro-drama.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_u6LhAbd2",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-brand-film",
+      "path": "/landing/template-brand-film.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_xLx6Fatx",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-explainer",
+      "path": "/landing/template-explainer.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_MsxVHXIc",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "template-trailer",
+      "path": "/landing/template-trailer.webp",
+      "width": 640,
+      "height": 480,
+      "sourceKey": "image_oSSe714A",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "capability-image",
+      "path": "/landing/capability-image.webp",
+      "width": 1008,
+      "height": 1008,
+      "sourceKey": "image_GfcFA9_m",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "capability-video",
+      "path": "/landing/capability-video.webp",
+      "width": 1008,
+      "height": 1008,
+      "sourceKey": "image_xipRGNqK",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "capability-audio",
+      "path": "/landing/capability-audio.webp",
+      "width": 1080,
+      "height": 1080,
+      "sourceKey": "image_TF9nhVdU",
+      "provenance": "reference-pack:user-confirmed"
+    },
+    {
+      "key": "capability-character",
+      "path": "/landing/capability-character.webp",
+      "width": 1080,
+      "height": 1080,
+      "sourceKey": "image_Y3N965sJ",
+      "provenance": "reference-pack:user-confirmed"
+    }
+  ]
+}

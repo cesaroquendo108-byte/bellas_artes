@@ -276,6 +276,7 @@ export function StoryProjectProvider({
   template = "custom",
   kind = "story",
   initialView = "storyboard",
+  initialPrompt = "",
   assets,
   children,
 }: {
@@ -283,6 +284,7 @@ export function StoryProjectProvider({
   template?: StoryTemplate;
   kind?: CreativeProjectKind;
   initialView?: StoryEditorView;
+  initialPrompt?: string;
   assets: StoryAssetOption[];
   children: React.ReactNode;
 }) {
@@ -295,7 +297,26 @@ export function StoryProjectProvider({
     description: project?.description ?? "",
     storyType: project?.storyType ?? template,
     coverAssetId: project?.coverAssetId ?? null,
-    document: project?.document ?? { version: 1, scenes: [] },
+    document: project?.document ?? (initialPrompt.trim() ? {
+      version: 1,
+      scenes: [{
+        id: "00000000-0000-4000-8000-000000000001",
+        title: "Escena 1",
+        order: 0,
+        durationSeconds: 5,
+        notes: "Idea importada desde la portada.",
+        shots: [{
+          id: "00000000-0000-4000-8000-000000000002",
+          title: "Plano 1",
+          order: 0,
+          durationSeconds: 5,
+          prompt: initialPrompt.trim().slice(0, 4_000),
+          camera: null,
+          transition: null,
+          assetIds: [],
+        }],
+      }],
+    } : { version: 1, scenes: [] }),
     view: initialView,
     saveState: "idle",
     message: null,

@@ -17,7 +17,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "T2V",
     description: "Convierte una idea escrita en una secuencia cinematográfica.",
     category: "create",
-    defaultModel: "openart-video-v2",
+    defaultModel: "hunyuan-video-1.5-8.3b",
     accent: "from-violet-600 to-indigo-500",
   },
   i2v: {
@@ -26,7 +26,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "I2V",
     description: "Anima una imagen con movimiento, cámara y atmósfera.",
     category: "create",
-    defaultModel: "openart-animate-v2",
+    defaultModel: "hunyuan-video-1.5-8.3b",
     accent: "from-fuchsia-600 to-violet-500",
   },
   v2v: {
@@ -35,7 +35,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "V2V",
     description: "Reinterpreta un video manteniendo su estructura y movimiento.",
     category: "create",
-    defaultModel: "openart-v2v-2.5",
+    defaultModel: "hunyuan-video-1.5-8.3b",
     accent: "from-indigo-600 to-cyan-500",
   },
   "action-sync": {
@@ -44,7 +44,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "Movimiento",
     description: "Transfiere una actuación o baile a un personaje de referencia.",
     category: "edit",
-    defaultModel: "motion-sync-v2",
+    defaultModel: "liveportrait-motion-v1",
     accent: "from-orange-500 to-fuchsia-600",
   },
   effects: {
@@ -53,7 +53,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "VFX",
     description: "Aplica efectos generativos con plantillas y dirección por texto.",
     category: "edit",
-    defaultModel: "seedance-2",
+    defaultModel: "video-vfx-v1",
     accent: "from-pink-600 to-orange-500",
   },
   upscale: {
@@ -62,7 +62,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "Mejora",
     description: "Mejora detalle, nitidez y resolución hasta 4K.",
     category: "edit",
-    defaultModel: "video-upscaler-v2",
+    defaultModel: "video-upscale-v1",
     accent: "from-emerald-500 to-cyan-500",
   },
   "lip-sync": {
@@ -71,7 +71,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "Sincronía labial",
     description: "Sincroniza un rostro con texto o una pista de voz.",
     category: "edit",
-    defaultModel: "lip-sync-v2.5",
+    defaultModel: "liveportrait-lipsync-v1",
     accent: "from-violet-600 to-pink-500",
   },
   "replace-character": {
@@ -80,7 +80,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "Reemplazar",
     description: "Sustituye un personaje conservando gesto, movimiento y fondo.",
     category: "edit",
-    defaultModel: "character-swap-v2",
+    defaultModel: "flux-character-video-v1",
     accent: "from-amber-500 to-violet-600",
   },
   extend: {
@@ -89,7 +89,7 @@ export const VIDEO_TOOL_META: Record<VideoOperation, VideoToolMeta> = {
     shortTitle: "Extender",
     description: "Amplía la duración o el encuadre de un video existente.",
     category: "edit",
-    defaultModel: "kling-extend-v1.5",
+    defaultModel: "hunyuan-video-extend-v1",
     accent: "from-blue-600 to-violet-500",
   },
 }

@@ -51,18 +51,22 @@ interface ImageStudioProps {
   initialAssets: ImageGalleryAsset[];
   galleryError: string | null;
   brandKits: ImageStudioBrandKit[];
+  initialPrompt?: string;
 }
 
 export function ImageStudio({
   initialAssets,
   galleryError,
   brandKits,
+  initialPrompt = "",
 }: ImageStudioProps) {
   const [panelWidth, setPanelWidth] = useState(400);
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
   const [mode, setMode] = useState<ImageGenerationMode>("create");
-  const [settings, setSettings] =
-    useState<ImageStudioSettings>(initialSettings);
+  const [settings, setSettings] = useState<ImageStudioSettings>(() => ({
+    ...initialSettings,
+    prompt: initialPrompt.slice(0, 4_000),
+  }));
   const [references, setReferences] =
     useState<LocalReferences>(emptyReferences);
   const referencesRef = useRef(references);
@@ -282,7 +286,7 @@ export function ImageStudio({
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-white">Estudio de imágenes</p>
           <p className="truncate text-[10px] text-slate-500">
-            GPT Image 2 · {settings.aspectRatio} · {settings.resolution}
+            Flux Schnell · Admin Preview · {settings.aspectRatio} · {settings.resolution}
           </p>
         </div>
         <Button

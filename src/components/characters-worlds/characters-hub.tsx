@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CapabilityStatusBadge } from "@/components/landing/capability-status";
 import { cn } from "@/lib/utils";
 
 import { AssetFilterToolbar } from "./asset-filter-toolbar";
@@ -127,9 +128,10 @@ export function CharactersHub({
     <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
       <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
-            Characters
-          </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">Personajes</Badge>
+            <CapabilityStatusBadge status="beta" />
+          </div>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
             Personajes que permanecen reconocibles.
           </h1>

@@ -32,9 +32,9 @@ import { cn } from "@/lib/utils";
 
 import type { CharacterWorldAsset } from "./types";
 
-export function WorldBuilder({ assets }: { assets: CharacterWorldAsset[] }) {
+export function WorldBuilder({ assets, initialPrompt = "" }: { assets: CharacterWorldAsset[]; initialPrompt?: string }) {
   const inputId = useId();
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(initialPrompt.slice(0, 4_000));
   const [model, setModel] =
     useState<WorldGenerationRequest["model"]>("flux-1-dev");
   const [aspectRatio, setAspectRatio] =

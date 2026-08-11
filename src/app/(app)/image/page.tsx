@@ -9,11 +9,12 @@ export const metadata: Metadata = {
   description: "Estudio privado para crear y reinventar imágenes con IA.",
 }
 
-export default async function ImageStudioPage() {
+export default async function ImageStudioPage({ searchParams }: { searchParams: Promise<{ prompt?: string }> }) {
   let initialAssets: ImageGalleryAsset[] = []
   let galleryError: string | null = null
 
-  const [brandKitResult, assetsResult] = await Promise.all([
+  const [{ prompt }, brandKitResult, assetsResult] = await Promise.all([
+    searchParams,
     getBrandKitsForPage(),
     getAssets({ type: "image" }, undefined, 24).catch(() => null),
   ])
@@ -34,6 +35,7 @@ export default async function ImageStudioPage() {
       <ImageStudio
         initialAssets={initialAssets}
         galleryError={galleryError}
+        initialPrompt={typeof prompt === "string" ? prompt : ""}
         brandKits={brandKitResult.kits.map((kit) => ({
           id: kit.id,
           name: kit.name,

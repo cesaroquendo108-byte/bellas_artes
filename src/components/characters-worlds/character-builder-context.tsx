@@ -96,12 +96,15 @@ const Context = createContext<ContextValue | null>(null);
 export function CharacterBuilderProvider({
   children,
   initialReference,
+  initialPrompt,
 }: {
   children: React.ReactNode;
   initialReference?: CharacterWorldAsset;
+  initialPrompt?: string;
 }) {
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
+    prompt: initialPrompt?.slice(0, 4_000) ?? "",
     savedReference: initialReference,
   });
   const stateRef = useRef(state);

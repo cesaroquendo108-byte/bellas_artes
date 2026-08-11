@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CreativeProject } from "@/lib/story/contracts";
+import { directorTemplates } from "@/lib/landing/content";
 
 import { DirectorInspirations } from "./director-inspirations";
 import { DirectorProjectCard } from "./director-project-card";
@@ -54,11 +55,19 @@ export function DirectorHub({
   projects,
   community,
   error,
+  initialTemplate,
+  initialPrompt = "",
 }: {
   projects: CreativeProject[];
   community: CreativeProject[];
   error?: string | null;
+  initialTemplate?: string;
+  initialPrompt?: string;
 }) {
+  const selectedTemplate = directorTemplates.find((item) => item.id === initialTemplate);
+  const supportedTemplate = initialTemplate === "music-video" || initialTemplate === "explainer" ? initialTemplate : "custom";
+  const createParams = new URLSearchParams({ kind: "director", template: supportedTemplate });
+  if (initialPrompt.trim()) createParams.set("prompt", initialPrompt.trim());
   return (
     <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
       <header className="relative overflow-hidden rounded-3xl border border-violet-400/20 bg-[#111114] p-7 sm:p-10">
@@ -95,6 +104,18 @@ export function DirectorHub({
           </div>
         </div>
       </header>
+      {selectedTemplate && (
+        <section className="mt-5 flex flex-col gap-4 rounded-2xl border border-fuchsia-300/15 bg-gradient-to-r from-violet-500/[0.09] to-fuchsia-500/[0.06] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-fuchsia-200">Plantilla seleccionada</p>
+            <h2 className="mt-2 text-lg font-semibold">{selectedTemplate.title}</h2>
+            <p className="mt-1 text-xs leading-5 text-slate-500">{selectedTemplate.description}</p>
+          </div>
+          <Button render={<Link href={`/story/create?${createParams.toString()}`} />} nativeButton={false} className="bg-white text-black hover:bg-zinc-200">
+            Continuar con esta estructura <ArrowRight />
+          </Button>
+        </section>
+      )}
       <section className="mt-10">
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -110,8 +131,8 @@ export function DirectorHub({
           {starts.map(([title, template, Icon, tone]) => (
             <Link
               key={template}
-              href={`/story/create?kind=director&template=${template}`}
-              className="group relative min-h-40 overflow-hidden rounded-2xl border border-white/10 p-4 transition hover:-translate-y-1 hover:border-violet-400/40"
+              href={`/director?template=${template}`}
+              className={`group relative min-h-40 overflow-hidden rounded-2xl border p-4 transition hover:-translate-y-1 hover:border-violet-400/40 ${initialTemplate === template ? "border-fuchsia-300/60 ring-2 ring-fuchsia-400/15" : "border-white/10"}`}
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${tone} opacity-75 transition group-hover:scale-105`}
