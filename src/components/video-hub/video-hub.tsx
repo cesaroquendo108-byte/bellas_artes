@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CapabilityStatusBadge } from "@/components/landing/capability-status"
 import { cn } from "@/lib/utils"
+import { SpotlightCard, StatusPill } from "@/components/ui/motion-effects"
 
 import { VIDEO_TOOL_META } from "@/components/video-studio/config"
 import type { VideoOperation } from "@/lib/generation/contracts"
@@ -31,15 +32,15 @@ function ToolCard({ operation }: { operation: VideoOperation }) {
   const tool = VIDEO_TOOL_META[operation]
   const Icon = icons[operation]
   return (
-    <Link href={`/video/${operation}`} className="group relative min-h-52 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111114] p-5 transition duration-300 hover:-translate-y-1 hover:border-violet-400/40 hover:shadow-2xl hover:shadow-violet-950/30">
+    <SpotlightCard className="min-h-52 rounded-2xl" contentClassName="p-5"><Link href={`/video/${operation}`} className="group relative block size-full">
       <div className={`absolute inset-x-0 top-0 h-28 bg-gradient-to-br ${tool.accent} opacity-15 blur-2xl transition group-hover:opacity-25`} />
       <div className={cn("relative flex size-11 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", tool.accent)}><Icon className="size-5 text-white" /></div>
       <div className="relative mt-7">
         <div className="flex items-center gap-2"><h3 className="text-sm font-semibold text-white">{tool.title}</h3><ArrowRight className="size-3.5 -translate-x-1 text-violet-300 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100" /></div>
         <p className="mt-2 text-xs leading-5 text-slate-500">{tool.description}</p>
-        <CapabilityStatusBadge status="beta" className="mt-4" />
+        <div className="mt-4 flex flex-wrap items-center gap-2"><CapabilityStatusBadge status="beta" /><StatusPill state="preparing" tone="warning" /></div>
       </div>
-    </Link>
+    </Link></SpotlightCard>
   )
 }
 

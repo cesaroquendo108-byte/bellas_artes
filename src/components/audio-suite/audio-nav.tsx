@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AudioLines, Library, MicVocal, SlidersHorizontal } from "lucide-react";
+import { StatusPill } from "@/components/ui/motion-effects";
 
 const links = [
   { href: "/audio/tts", label: "Texto a voz", icon: AudioLines },
@@ -15,8 +16,8 @@ export function AudioNav({ current }: { current: string }) {
 }
 
 export function ProviderNotice({ setupPending, message }: { setupPending: boolean; message: string }) {
-  return <div className="flex items-start gap-3 border-l-2 border-amber-400 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-100">
+  return <div className="flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-100">
     <span className="mt-1 size-2 shrink-0 rounded-full bg-amber-300" />
-    <div><p className="font-medium">{setupPending ? "Infraestructura pendiente de aplicar" : "Proveedor de audio no conectado"}</p><p className="mt-1 text-xs leading-5 text-amber-200/65">{setupPending ? "La interfaz está lista, pero la migración de Audio Suite aún no está aplicada en este entorno." : message} No se consumirán créditos.</p></div>
+    <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><p className="font-medium">{setupPending ? "Infraestructura pendiente de aplicar" : "Proveedor de audio no conectado"}</p><StatusPill state="preparing" tone="warning" /></div><p className="mt-1 text-xs leading-5 text-amber-200/65">{setupPending ? "La interfaz está lista, pero la migración de Audio Suite aún no está aplicada en este entorno." : message} No se consumirán créditos.</p></div>
   </div>;
 }

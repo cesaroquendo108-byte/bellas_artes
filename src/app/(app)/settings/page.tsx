@@ -1,6 +1,7 @@
 import { PageHeading } from "@/components/page-heading";
 import { updateProfile } from "@/app/actions/settings";
 import { requireUser } from "@/lib/auth";
+import { SpotlightCard, StatusPill } from "@/components/ui/motion-effects";
 
 export default async function SettingsPage({
   searchParams,
@@ -28,7 +29,7 @@ export default async function SettingsPage({
           </p>
         )}
 
-        <form action={updateProfile} className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-5">
+        <SpotlightCard className="max-w-2xl rounded-2xl" contentClassName="p-5"><form action={updateProfile}>
           <label htmlFor="displayName" className="text-sm font-medium text-white">
             Nombre visible
           </label>
@@ -47,9 +48,9 @@ export default async function SettingsPage({
               Guardar
             </button>
           </div>
-        </form>
+        </form></SpotlightCard>
 
-        <div className="divide-y divide-white/[0.06] rounded-lg border border-white/[0.08] bg-white/[0.03]">
+        <SpotlightCard className="max-w-2xl rounded-2xl" contentClassName="divide-y divide-white/[0.06]">
           {[
             ["Correo", profile.email],
             ["Plan", profile.planTier.toUpperCase()],
@@ -58,10 +59,10 @@ export default async function SettingsPage({
           ].map(([key, value]) => (
             <div key={key} className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr]">
               <span className="text-sm text-slate-500">{key}</span>
-              <span className="text-sm text-white">{value}</span>
+              <span className="flex items-center justify-between gap-3 text-sm text-white">{value}{key === "Rol" && <StatusPill state={String(value)} tone={profile.role === "admin" ? "info" : "neutral"} />}</span>
             </div>
           ))}
-        </div>
+        </SpotlightCard>
       </div>
     </>
   );
