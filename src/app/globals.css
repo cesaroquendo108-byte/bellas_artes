@@ -66,6 +66,100 @@ body {
   box-shadow: inset 0px -1px 0px 0px rgba(255,255,255,0.15), inset 0px 1px 0px 0px rgba(255,255,255,0.25);
 }
 
+.spotlight-card {
+  --spotlight-x: 50%;
+  --spotlight-y: 0%;
+  isolation: isolate;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 20, 0.9);
+  transition: border-color 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.spotlight-card::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: radial-gradient(280px circle at var(--spotlight-x) var(--spotlight-y), rgba(196, 181, 253, 0.14), transparent 70%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.spotlight-card:hover,
+.spotlight-card:focus-within {
+  border-color: rgba(196, 181, 253, 0.25);
+  box-shadow: 0 18px 50px rgba(76, 29, 149, 0.16);
+}
+
+.spotlight-card:hover::before,
+.spotlight-card:focus-within::before {
+  opacity: 1;
+}
+
+.shimmer-button {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.9rem;
+  background: linear-gradient(110deg, #7c3aed, #d946ef 45%, #f43f5e 75%, #7c3aed);
+  background-size: 220% 100%;
+  padding: 0.75rem 1.25rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(192, 38, 211, 0.2);
+  transition: transform 220ms ease, filter 220ms ease, box-shadow 220ms ease;
+}
+
+.shimmer-button::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.3) 48%, transparent 68%);
+  transform: translateX(-120%);
+  transition: transform 550ms ease;
+}
+
+.shimmer-button:hover,
+.shimmer-button:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 16px 36px rgba(192, 38, 211, 0.28);
+}
+
+.shimmer-button:hover::after,
+.shimmer-button:focus-visible::after {
+  transform: translateX(120%);
+}
+
+.generation-skeleton {
+  min-height: 12rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1.5rem;
+  background: linear-gradient(110deg, rgba(255,255,255,0.04) 8%, rgba(255,255,255,0.09) 18%, rgba(255,255,255,0.04) 33%);
+  background-size: 200% 100%;
+  animation: ui-shimmer 1.8s linear infinite;
+}
+
+@keyframes ui-shimmer {
+  to { background-position-x: -200%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-card,
+  .shimmer-button,
+  .shimmer-button::after {
+    transition: none;
+  }
+
+  .generation-skeleton {
+    animation: none;
+  }
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);

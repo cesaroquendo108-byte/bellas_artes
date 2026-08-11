@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+import { StatusPill } from "@/components/ui/motion-effects";
 import type { AudioLibraryItem, AudioVoice } from "@/lib/audio/types";
 
 import { AudioNav, ProviderNotice } from "./audio-nav";
@@ -107,7 +108,7 @@ export function TtsStudio({
     <div className="space-y-6">
       <AudioNav current="/audio/tts" />
       <header>
-        <p className="text-xs font-semibold uppercase text-violet-300">Suite de audio</p>
+        <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase text-violet-300">Suite de audio</p><StatusPill state={setupPending ? "preparing" : "ready"} tone={setupPending ? "warning" : "success"} /></div>
         <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">
           Convierte tus palabras en una voz
         </h1>

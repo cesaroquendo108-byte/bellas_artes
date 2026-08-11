@@ -4,6 +4,7 @@ import { SlidersHorizontal, WandSparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { StatusPill } from "@/components/ui/motion-effects";
 import {
   Sheet,
   SheetContent,
@@ -289,6 +290,7 @@ export function ImageStudio({
             Flux Schnell · Admin Preview · {settings.aspectRatio} · {settings.resolution}
           </p>
         </div>
+        <StatusPill state="Admin Preview" tone="info" />
         <Button
           type="button"
           variant="outline"

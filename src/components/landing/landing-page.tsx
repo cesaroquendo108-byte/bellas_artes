@@ -30,6 +30,12 @@ import {
 
 import { CapabilityStatusBadge } from "./capability-status";
 import { PromptLauncher } from "./prompt-launcher";
+import {
+  AnimatedGradientText,
+  MotionReveal,
+  ShimmerLink,
+  SpotlightCard,
+} from "@/components/ui/motion-effects";
 
 const icons: Record<LandingCategory, React.ComponentType<{ className?: string }>> = {
   director: Clapperboard,
@@ -93,13 +99,13 @@ export function LandingPage() {
               Tu estudio, una historia a la vez
             </div>
             <h1 className="mt-7 max-w-4xl text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-7xl xl:text-[84px]">
-              De una idea a una <span className="landing-gradient-text">historia visual.</span>
+              De una idea a una <AnimatedGradientText>historia visual.</AnimatedGradientText>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-400 sm:text-lg">
               Imagen, video, personajes, mundos y voz reunidos en una experiencia creativa diseñada para Venezuela.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/login?next=/dashboard" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Abrir mi estudio <ArrowRight className="size-4" /></Link>
+              <ShimmerLink href="/login?next=/dashboard">Abrir mi estudio <ArrowRight className="size-4" /></ShimmerLink>
               <Link href="/inspire" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:bg-white/[0.08]">Explorar inspiración</Link>
             </div>
           </div>
@@ -126,7 +132,7 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="lg:col-span-2"><PromptLauncher /></div>
+          <MotionReveal className="lg:col-span-2" level="expressive"><PromptLauncher /></MotionReveal>
         </div>
       </section>
 
@@ -136,10 +142,12 @@ export function LandingPage() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
             {quickStarts.map((item) => {
               const Icon = icons[item.category];
-              return <Link key={item.id} href={item.href} className="group rounded-2xl border border-white/[0.07] bg-[#101012] p-4 transition hover:-translate-y-1 hover:border-fuchsia-300/25 hover:bg-white/[0.045]">
-                <div className="flex items-start justify-between gap-2"><span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/25 to-fuchsia-500/15 text-fuchsia-200"><Icon className="size-4" /></span><ChevronRight className="size-4 text-zinc-700 transition group-hover:translate-x-0.5 group-hover:text-white" /></div>
-                <h3 className="mt-5 font-medium">{item.title}</h3><p className="mt-2 text-xs leading-5 text-zinc-500">{item.description}</p><CapabilityStatusBadge status={item.status} className="mt-4" />
-              </Link>;
+              return <SpotlightCard key={item.id} className="rounded-2xl" contentClassName="p-4">
+                <Link href={item.href} className="block size-full">
+                  <div className="flex items-start justify-between gap-2"><span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/25 to-fuchsia-500/15 text-fuchsia-200"><Icon className="size-4" /></span><ChevronRight className="size-4 text-zinc-700 transition group-hover:translate-x-0.5 group-hover:text-white" /></div>
+                  <h3 className="mt-5 font-medium">{item.title}</h3><p className="mt-2 text-xs leading-5 text-zinc-500">{item.description}</p><CapabilityStatusBadge status={item.status} className="mt-4" />
+                </Link>
+              </SpotlightCard>;
             })}
           </div>
         </div>
@@ -148,11 +156,13 @@ export function LandingPage() {
       <section className="mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <SectionHeading eyebrow="Vibe Direct" title="Elige el tono. Director organiza la historia." copy="Plantillas reales para empezar con una estructura, sin prometer una generación automática desde la portada." />
         <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
-          {directorTemplates.map((template, index) => <Link key={template.id} href={template.href} className={`group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111114] ${index === 0 ? "col-span-2 row-span-2 min-h-80 md:min-h-0 xl:col-span-2" : "min-h-48"}`}>
-            {template.imageKey && <Image src={landingAssets[template.imageKey]} alt={`Referencia visual para ${template.title}`} fill sizes={index === 0 ? "(max-width: 768px) 92vw, 420px" : "240px"} className="object-cover transition duration-500 group-hover:scale-105" />}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-4"><CapabilityStatusBadge status={template.status} /><h3 className="mt-3 text-sm font-semibold">{template.title}</h3><p className="mt-1 hidden text-xs leading-5 text-zinc-400 sm:block">{template.description}</p></div>
-          </Link>)}
+          {directorTemplates.map((template, index) => <SpotlightCard key={template.id} className={`rounded-2xl ${index === 0 ? "col-span-2 row-span-2 min-h-80 md:min-h-0 xl:col-span-2" : "min-h-48"}`}>
+            <Link href={template.href} className="absolute inset-0 block">
+              {template.imageKey && <Image src={landingAssets[template.imageKey]} alt={`Referencia visual para ${template.title}`} fill sizes={index === 0 ? "(max-width: 768px) 92vw, 420px" : "240px"} className="object-cover transition duration-500 group-hover:scale-105" />}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-4"><CapabilityStatusBadge status={template.status} /><h3 className="mt-3 text-sm font-semibold">{template.title}</h3><p className="mt-1 hidden text-xs leading-5 text-zinc-400 sm:block">{template.description}</p></div>
+            </Link>
+          </SpotlightCard>)}
         </div>
       </section>
 
@@ -162,11 +172,13 @@ export function LandingPage() {
           <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {suiteCapabilities.map((capability) => {
               const Icon = icons[capability.category];
-              return <Link key={capability.id} href={capability.href} className="group relative min-h-72 overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#111114] p-6 transition hover:border-violet-300/25">
+              return <SpotlightCard key={capability.id} className="min-h-72 rounded-[24px]" contentClassName="p-6">
+                <Link href={capability.href} className="group relative block size-full">
                 {capability.imageKey && <Image src={landingAssets[capability.imageKey]} alt={`Vista de ${capability.title}`} fill sizes="(max-width: 768px) 92vw, 520px" className="object-cover opacity-55 transition duration-500 group-hover:scale-105 group-hover:opacity-70" />}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/75 to-transparent" />
                 <div className="relative flex h-full flex-col"><div className="flex items-start justify-between"><span className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-black/40 backdrop-blur"><Icon className="size-5" /></span><CapabilityStatusBadge status={capability.status} /></div><div className="mt-auto pt-24"><h3 className="text-xl font-semibold">{capability.title}</h3><p className="mt-2 max-w-sm text-sm leading-6 text-zinc-400">{capability.description}</p><span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-fuchsia-200">Abrir superficie <ArrowRight className="size-3.5 transition group-hover:translate-x-1" /></span></div></div>
-              </Link>;
+                </Link>
+              </SpotlightCard>;
             })}
           </div>
         </div>
@@ -175,10 +187,10 @@ export function LandingPage() {
       <section className="mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <SectionHeading eyebrow="Modelos y estado" title="Sabes qué motor está listo antes de crear." copy="Sin nombres decorativos ni proveedores presentados como activos. Estos son los motores que forman parte del roadmap real." />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {models.map((model, index) => <article key={model.id} className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111114] p-5">
+          {models.map((model, index) => <SpotlightCard key={model.id} className="rounded-2xl" contentClassName="p-5">
             <div className={`absolute inset-x-0 top-0 h-1 ${index === 0 ? "bg-gradient-to-r from-violet-400 to-fuchsia-400" : "bg-white/5"}`} />
             <p className="text-[10px] uppercase tracking-[.2em] text-zinc-600">{model.category}</p><h3 className="mt-4 text-lg font-semibold">{model.title}</h3><p className="mt-3 min-h-20 text-xs leading-5 text-zinc-500">{model.copy}</p><CapabilityStatusBadge status={model.status} className="mt-4" />
-          </article>)}
+          </SpotlightCard>)}
         </div>
       </section>
 
@@ -196,7 +208,7 @@ export function LandingPage() {
 
       <section className="px-4 pb-20 sm:px-6 lg:px-10">
         <div className="landing-cta mx-auto max-w-[1480px] overflow-hidden rounded-[32px] border border-fuchsia-300/15 px-6 py-12 text-center sm:px-12 sm:py-16">
-          <MonitorUp className="mx-auto size-7 text-fuchsia-200" /><h2 className="mx-auto mt-5 max-w-3xl text-balance text-3xl font-semibold tracking-[-.035em] sm:text-5xl">Tu próxima historia puede empezar con una sola línea.</h2><p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-400">Entra a tu estudio, organiza referencias y prepara el proyecto mientras completamos la beta privada.</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Link href="/login?next=/dashboard" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black">Abrir mi estudio <ArrowRight className="size-4" /></Link><Link href="/mcp" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-5 py-3 text-sm font-semibold text-white"><WandSparkles className="size-4" /> Conocer MCP</Link></div>
+          <MonitorUp className="mx-auto size-7 text-fuchsia-200" /><h2 className="mx-auto mt-5 max-w-3xl text-balance text-3xl font-semibold tracking-[-.035em] sm:text-5xl">Tu próxima historia puede empezar con una sola línea.</h2><p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-400">Entra a tu estudio, organiza referencias y prepara el proyecto mientras completamos la beta privada.</p><div className="mt-7 flex flex-wrap justify-center gap-3"><ShimmerLink href="/login?next=/dashboard">Abrir mi estudio <ArrowRight className="size-4" /></ShimmerLink><Link href="/mcp" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-5 py-3 text-sm font-semibold text-white"><WandSparkles className="size-4" /> Conocer MCP</Link></div>
         </div>
       </section>
 

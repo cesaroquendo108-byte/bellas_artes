@@ -26,6 +26,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { StatusPill } from "@/components/ui/motion-effects";
 
 import { ImageReferenceDropzones } from "./image-reference-dropzones";
 import type {
@@ -102,6 +103,7 @@ export function ImageControls({
                   Flux Schnell · Admin Preview
                 </p>
               </div>
+              <StatusPill state="Admin Preview" tone="info" className="ml-auto" />
             </div>
           </div>
 

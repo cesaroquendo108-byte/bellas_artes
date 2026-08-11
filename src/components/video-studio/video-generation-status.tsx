@@ -2,6 +2,8 @@
 
 import { AlertCircle, LoaderCircle, ServerOff } from "lucide-react";
 
+import { GenerationSkeleton, StatusPill } from "@/components/ui/motion-effects";
+
 import { useVideoStudio } from "./video-studio-context";
 
 export function VideoGenerationStatus() {
@@ -9,8 +11,9 @@ export function VideoGenerationStatus() {
 
   if (state.submitting) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-violet-400/20 bg-violet-500/10 p-3 text-xs text-violet-200">
-        <LoaderCircle className="size-4 animate-spin" /> Validando solicitud…
+      <div className="space-y-3 rounded-xl border border-violet-400/20 bg-violet-500/10 p-3 text-xs text-violet-200">
+        <div className="flex items-center gap-2"><LoaderCircle className="size-4 animate-spin" /> <StatusPill state="loading" tone="info" /> Validando solicitud…</div>
+        <GenerationSkeleton className="min-h-16 rounded-xl" />
       </div>
     );
   }
