@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 const adminItems = [
@@ -25,6 +26,7 @@ const adminItems = [
 
 export function AdminSidebar({ email, displayName }: { email: string; displayName: string | null }) {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
   const initials = (displayName || email || "BA")
     .split(/[\s@._-]+/)
     .filter(Boolean)
@@ -35,7 +37,7 @@ export function AdminSidebar({ email, displayName }: { email: string; displayNam
   return (
     <Sidebar variant="inset" className="border-r border-amber-300/10 bg-[#080808] text-slate-300">
       <SidebarHeader className="p-4">
-        <Link href="/admin" className="flex items-center gap-3">
+        <Link href="/admin" className="flex items-center gap-3" onClick={() => setOpenMobile(false)}>
           <span className="flex size-9 items-center justify-center rounded-lg bg-amber-400/15 text-amber-300 shadow-lg shadow-amber-950/20">
             <ShieldCheck className="size-4" />
           </span>
@@ -55,7 +57,7 @@ export function AdminSidebar({ email, displayName }: { email: string; displayNam
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
-                  render={<Link href={item.href} />}
+                  render={<Link href={item.href} onClick={() => setOpenMobile(false)} />}
                   isActive={active}
                   tooltip={item.title}
                   className="h-9 text-slate-400 hover:bg-white/[0.06] hover:text-white data-[active=true]:bg-amber-400/10 data-[active=true]:text-amber-300"
@@ -70,7 +72,7 @@ export function AdminSidebar({ email, displayName }: { email: string; displayNam
         <SidebarSeparator className="my-3 bg-white/[0.06]" />
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton render={<Link href="/dashboard" />} className="h-9 text-slate-500 hover:bg-violet-400/10 hover:text-violet-200">
+            <SidebarMenuButton render={<Link href="/dashboard" onClick={() => setOpenMobile(false)} />} className="h-9 text-slate-500 hover:bg-violet-400/10 hover:text-violet-200">
               <Sparkles className="size-4" />
               <span>Volver al estudio</span>
             </SidebarMenuButton>

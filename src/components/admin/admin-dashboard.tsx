@@ -135,7 +135,7 @@ export function AdminDashboard({ initialSnapshot }: { initialSnapshot: AdminDash
   ], [snapshot]);
 
   return (
-    <div className="space-y-6 text-white">
+    <div className="min-w-0 space-y-6 text-white">
       <section className="relative overflow-hidden rounded-[28px] border border-amber-300/10 bg-gradient-to-br from-amber-400/[0.08] via-[#111113] to-violet-500/[0.06] p-5 sm:p-7">
         <div className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-amber-300/10 blur-3xl" />
         <div className="relative flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
@@ -217,7 +217,7 @@ export function AdminDashboard({ initialSnapshot }: { initialSnapshot: AdminDash
 }
 
 function Panel({ title, description, icon: Icon, children }: { title: string; description: string; icon: typeof Gauge; children: React.ReactNode }) {
-  return <section className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5"><header className="mb-4 flex items-start gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300"><Icon className="size-4" /></span><div><h2 className="text-sm font-semibold">{title}</h2><p className="mt-1 text-xs leading-5 text-slate-600">{description}</p></div></header>{children}</section>;
+  return <section className="min-w-0 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5"><header className="mb-4 flex items-start gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300"><Icon className="size-4" /></span><div className="min-w-0"><h2 className="text-sm font-semibold">{title}</h2><p className="mt-1 text-xs leading-5 text-slate-600">{description}</p></div></header>{children}</section>;
 }
 
 function Intervention({ href, label, value, icon: Icon }: { href?: string; label: string; value: number; icon: typeof Gauge }) {
