@@ -13,6 +13,7 @@ const EXPECTED_ENDPOINT_ID = 33225;
 const EXPECTED_WORKERGROUP_ID = 41706;
 const EXPECTED_VOLUME_ID = 47343353;
 const TERMINAL = new Set(["completed", "failed", "canceled"]);
+type AcceptanceExecutionMode = "serverless" | "direct";
 
 const cases = [
   {
@@ -49,11 +50,20 @@ function emit(event: string, details: Record<string, unknown>) {
 function requireSafeConfiguration() {
   const config = getGenerationConfig();
   const endpoint = process.env.VAST_IMAGE_SERVERLESS_ENDPOINT?.trim();
+  const executionMode: AcceptanceExecutionMode = process.env.VAST_TEST_EXECUTION_MODE === "direct" ? "direct" : "serverless";
+  const directBaseUrl = process.env.VAST_IMAGE_COMFY_BASE_URL?.trim();
+  const directInstanceId = Number(process.env.VAST_TEST_DIRECT_INSTANCE_ID ?? 0);
   if (!config.enabled || !config.adminOnly || config.billingMode !== "shadow" || config.route !== "vast") {
     throw new Error("La aceptación exige generación activa, admin-only, billing shadow y proveedor Vast.");
   }
-  if (!config.vastServerless.safe || endpoint !== EXPECTED_ENDPOINT) {
+  if (!config.vastServerless.safe) {
     throw new Error("La configuración Vast no coincide con el endpoint seguro 0/0/1/600.");
+  }
+  if (executionMode === "serverless" && endpoint !== EXPECTED_ENDPOINT) {
+    throw new Error("La aceptación Serverless exige el endpoint controlado de imagen.");
+  }
+  if (executionMode === "direct" && (endpoint || !directBaseUrl || !/^https?:\/\//.test(directBaseUrl) || !Number.isInteger(directInstanceId) || directInstanceId <= 0)) {
+    throw new Error("La aceptación directa exige una instancia Vast temporal y una URL Comfy explícita, sin endpoint Serverless.");
   }
   if (!config.vastTest.enabled
     || config.vastTest.modality !== "image"
@@ -74,11 +84,28 @@ function requireSafeConfiguration() {
   if (config.vastTest.session.budgetUsd > 3.2 || config.vastTest.session.reserveUsd < 0.4) {
     throw new Error("La sesión Vast debe respetar el techo US$3.20 y la reserva mínima US$0.40.");
   }
-  return config;
+  return { config, executionMode, directInstanceId };
 }
 
-async function assertVastControlPlane() {
+async function assertVastControlPlane(executionMode: AcceptanceExecutionMode, directInstanceId: number) {
   const headers = { authorization: `Bearer ${process.env.VAST_API_KEY}` };
+  if (executionMode === "direct") {
+    const response = await fetch(`https://console.vast.ai/api/v0/instances/${directInstanceId}/`, {
+      headers,
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) throw new Error("No se pudo verificar la instancia Vast temporal.");
+    const payload = await response.json() as { instances?: Record<string, unknown> };
+    const instance = payload.instances;
+    if (!instance
+      || Number(instance.id) !== directInstanceId
+      || instance.actual_status !== "running"
+      || Number(instance.num_gpus) !== 1
+      || !String(instance.label ?? "").startsWith("ba-flux-acceptance-")) {
+      throw new Error("La instancia Vast temporal no coincide con la ejecución controlada de una GPU.");
+    }
+    return;
+  }
   const [endpointResponse, workergroupResponse] = await Promise.all([
     fetch("https://console.vast.ai/api/v0/endptjobs/", { headers, signal: AbortSignal.timeout(15_000) }),
     fetch("https://console.vast.ai/api/v0/workergroups/", { headers, signal: AbortSignal.timeout(15_000) }),
@@ -239,8 +266,8 @@ async function waitForScaleZero(timeoutMs = 15 * 60_000) {
 }
 
 async function main() {
-  const config = requireSafeConfiguration();
-  await assertVastControlPlane();
+  const { config, executionMode, directInstanceId } = requireSafeConfiguration();
+  await assertVastControlPlane(executionMode, directInstanceId);
   const userId = await findServiceAdminId();
   const userHash = createHash("sha256").update(userId).digest("hex").slice(0, 12);
   const balanceBefore = await vastBalance();
@@ -260,6 +287,8 @@ async function main() {
     maxEstimatedJobUsd: config.vastTest.maxEstimatedJobUsd,
     sessionCeilingUsd,
     reserveUsd: config.vastTest.session.reserveUsd,
+    executionMode,
+    directInstanceId: executionMode === "direct" ? directInstanceId : undefined,
   });
 
   const evidence: Array<Record<string, unknown>> = [];
@@ -328,11 +357,19 @@ async function main() {
     emit("job-verified", item);
   }
 
-  await waitForScaleZero();
+  if (executionMode === "serverless") await waitForScaleZero();
   const balanceAfter = await vastBalance();
   const spentUsd = Math.max(balanceBefore - balanceAfter, 0);
   if (spentUsd > config.vastTest.budgetUsd) throw new Error(`El gasto real US$${spentUsd.toFixed(6)} excedió el presupuesto.`);
-  emit("run-complete", { runId: config.vastTest.runId, jobs: evidence.length, balanceBefore, balanceAfter, spentUsd, scaleZero: true });
+  emit("run-complete", {
+    runId: config.vastTest.runId,
+    jobs: evidence.length,
+    balanceBefore,
+    balanceAfter,
+    spentUsd,
+    scaleZero: executionMode === "serverless",
+    directCleanupRequired: executionMode === "direct",
+  });
 }
 
 main()
