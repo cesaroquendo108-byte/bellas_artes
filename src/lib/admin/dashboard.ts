@@ -102,6 +102,7 @@ export async function getAdminDashboardSnapshot(
   const queueMetrics = Array.isArray(metric.queues) ? metric.queues as QueueMetricRow[] : [];
   const capabilities = listGenerationCapabilities();
   const workerHeartbeat = heartbeatByKey.get("worker:generation");
+  const workerProvider = heartbeatProvider(workerHeartbeat);
   const workerAvailable = workerHeartbeat
     ? classifyHeartbeat(workerHeartbeat.reported_status, workerHeartbeat.observed_at, now) === "healthy"
     : false;
@@ -141,7 +142,7 @@ export async function getAdminDashboardSnapshot(
       effectiveEnabled: config.enabled && !runtimeControl.emergencyPaused,
       accessMode: config.accessMode,
       billingMode: config.billingMode,
-      provider: config.route,
+      provider: config.route ?? workerProvider,
       pauseReason: runtimeControl.pauseReason,
       pausedAt: runtimeControl.pausedAt,
     },
@@ -213,18 +214,22 @@ function buildServiceHealth(
     && process.env.GENERATION_MODERATION_PROVIDER === "openrouter"
     && Boolean(process.env.OPENROUTER_API_KEY?.trim())
     && Boolean(process.env.GENERATION_MODERATION_MODEL?.trim());
+  const workerHeartbeat = heartbeats.get("worker:generation");
+  const vastConfiguredByWorker = heartbeatProvider(workerHeartbeat) === "vast"
+    && workerHeartbeat?.details?.hasVast === true
+    && workerHeartbeat.details.serverlessSafe === true;
 
   return [
     { key: "web", label: "Aplicación", state: "healthy", summary: "La aplicación administrativa respondió.", observedAt: generatedAt },
     { key: "supabase", label: "Supabase", state: "healthy", summary: "Consultas administrativas disponibles.", observedAt: generatedAt },
-    config.redisConfigured
+    heartbeats.has("redis") || config.redisConfigured
       ? fromHeartbeat("redis", "Redis", "stale", "Configurado, sin heartbeat reciente del worker.")
       : { key: "redis", label: "Redis", state: "not_configured", summary: "REDIS_URL no está configurado.", observedAt: null },
     fromHeartbeat("worker:generation", "Worker BullMQ", config.enabled ? "stale" : "stopped", config.enabled ? "Sin heartbeat reciente." : "Generación deshabilitada; no consume jobs."),
     r2Configured
       ? { key: "r2", label: "Cloudflare R2", state: "degraded", summary: "Configurado; se valida durante operaciones privadas.", observedAt: null }
       : { key: "r2", label: "Cloudflare R2", state: "not_configured", summary: "Credenciales o bucket incompletos.", observedAt: null },
-    config.hasVast
+    config.hasVast || vastConfiguredByWorker
       ? { key: "vast", label: "Vast.ai", state: config.enabled ? "degraded" : "stopped", summary: config.enabled ? "Configurado; sin consulta que levante GPU." : "Generación deshabilitada; no se consulta el proveedor.", observedAt: null }
       : { key: "vast", label: "Vast.ai", state: "not_configured", summary: "No hay endpoint activo configurado.", observedAt: null },
     process.env.CRON_SECRET?.trim()
@@ -234,6 +239,11 @@ function buildServiceHealth(
       ? { key: "moderation", label: "Moderación L2", state: "healthy", summary: "Proveedor L2 configurado en modo fail-closed.", observedAt: generatedAt }
       : { key: "moderation", label: "Moderación", state: "stopped", summary: "Sólo filtro local; L2 no está activo.", observedAt: null },
   ];
+}
+
+function heartbeatProvider(heartbeat: HeartbeatRow | undefined): "vast" | "fake" | null {
+  const provider = heartbeat?.details?.provider;
+  return provider === "vast" || provider === "fake" ? provider : null;
 }
 
 function heartbeatSummary(key: string, details: Record<string, unknown> | null) {

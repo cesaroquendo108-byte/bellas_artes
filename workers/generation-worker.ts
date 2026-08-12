@@ -163,7 +163,11 @@ export function startGenerationWorkers() {
 
   installShutdownHandlers();
   connection.on("error", (error) => log("error", "Error de conexión Redis.", { error: error.message }));
-  startHeartbeatLoop(connection, configuredKinds, config.enabled, config.workerConcurrency);
+  startHeartbeatLoop(connection, configuredKinds, config.enabled, config.workerConcurrency, {
+    provider: config.route,
+    hasVast: config.hasVast,
+    serverlessSafe: config.vastServerless.safe,
+  });
 
   if (!config.enabled) {
     log("info", "Worker en modo inactivo; no consumirá jobs.", { kinds: configuredKinds, generationEnabled: false });
@@ -250,6 +254,7 @@ function startHeartbeatLoop(
   kinds: GenerationQueueKind[],
   generationEnabled: boolean,
   concurrency: number,
+  provider: { provider: string | null; hasVast: boolean; serverlessSafe: boolean },
 ) {
   const report = async () => {
     try {
@@ -282,6 +287,9 @@ function startHeartbeatLoop(
           generationEnabled,
           concurrency,
           kinds: kinds.join(","),
+          provider: provider.provider,
+          hasVast: provider.hasVast,
+          serverlessSafe: provider.serverlessSafe,
         },
       });
     } catch (error) {
@@ -291,7 +299,7 @@ function startHeartbeatLoop(
       await recordServiceHeartbeat({
         serviceKey: "worker:generation",
         status: "error",
-        details: { generationEnabled, concurrency },
+        details: { generationEnabled, concurrency, provider: provider.provider },
       }).catch(() => undefined);
     }
   };
