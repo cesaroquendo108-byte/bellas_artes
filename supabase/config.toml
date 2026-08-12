@@ -18,5 +18,8 @@ port = 54323
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
+site_url = "https://bellasartes-xi.vercel.app"
+additional_redirect_urls = [
+  "https://bellasartes-xi.vercel.app/**",
+  "http://localhost:3000/**",
+]
