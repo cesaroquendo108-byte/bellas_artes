@@ -231,7 +231,7 @@ export function VideoAudioStudio({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="audio-workspace workspace-page space-y-6">
       <AudioNav current="/video/audio" />
       <header>
         <p className="text-xs font-semibold uppercase text-violet-300">Video · Audio</p>

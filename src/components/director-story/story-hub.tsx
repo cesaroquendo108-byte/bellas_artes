@@ -23,7 +23,7 @@ export function StoryHub({
   error?: string | null;
 }) {
   return (
-    <div className="min-h-screen bg-[#080809] text-white">
+    <div className="workspace-page">
       <StoryNavigation />
       <div className="px-4 py-8 sm:px-7 lg:px-10">
         <header>

@@ -7,5 +7,5 @@ export const metadata: Metadata = { title: "Historias de la comunidad · Bellas 
 
 export default async function CommunityStoriesPage() {
   const result = await getProjectsForPage({ kind: "story", scope: "community", limit: 20 })
-  return <div className="-m-4 sm:-m-6 lg:-m-8"><CommunityStories initialProjects={result.projects} initialCursor={result.nextCursor} initialError={result.error} /></div>
+  return <CommunityStories initialProjects={result.projects} initialCursor={result.nextCursor} initialError={result.error} />
 }

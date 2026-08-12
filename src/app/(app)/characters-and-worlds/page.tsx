@@ -9,5 +9,5 @@ const categories = new Set<UnifiedCategory>(["all", "characters", "worlds", "obj
 export default async function CharactersWorldsPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const [{ category }, library] = await Promise.all([searchParams, getCharacterWorldLibrary()])
   const initialCategory = categories.has(category as UnifiedCategory) ? category as UnifiedCategory : "all"
-  return <div className="-m-4 sm:-m-6 lg:-m-8"><CharactersAndWorldsHub assets={library.assets} libraryError={library.error} initialCategory={initialCategory} /></div>
+  return <CharactersAndWorldsHub assets={library.assets} libraryError={library.error} initialCategory={initialCategory} />
 }

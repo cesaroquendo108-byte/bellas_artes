@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { surfaceStateLabels, uiStatusToneClasses } from "./visual";
+import { surfaceStateLabels, uiStatusToneClasses, workspacePalette } from "./visual";
 
 describe("visual UI contracts", () => {
   it("covers every public surface state", () => {
@@ -25,5 +25,10 @@ describe("visual UI contracts", () => {
     ]);
     expect(Object.values(uiStatusToneClasses).every((value) => value.includes("border"))).toBe(true);
   });
-});
 
+  it("keeps the authenticated workspace palette independent from the dark landing", () => {
+    expect(workspacePalette.canvas).toBe("#F7F4EC");
+    expect(workspacePalette.primary).toBe("#7C3AED");
+    expect(workspacePalette.surface).not.toBe("#0A0A0A");
+  });
+});

@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function VideoHubPage() {
-  return <div className="-m-4 sm:-m-6 lg:-m-8"><VideoHub /></div>
+  return <VideoHub />
 }

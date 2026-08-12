@@ -13,6 +13,8 @@ No se cargan scripts remotos de estas páginas en producción.
 | NumberFlow | Créditos y métricas | Dependencia explícita `@number-flow/react` | MIT |
 | Component Gallery | Auditoría de patrones UX | Referencia visual, no código de producción | No aplica |
 | Watermelon | Inspiración de sistema visual | Referencia, no dependencia | Revisar fuente específica si se incorpora código |
+| Alacena (archivo local del usuario) | Claridad del workspace, canvas cálido, tarjetas, navegación inferior y jerarquía móvil | Referencia visual; no se importó código, marca, copy, assets, variables de entorno ni runtime | Material local aportado por el propietario del proyecto |
+| Proyecto Arocha Redesign (archivo local del usuario) | Densidad del backoffice, sidebar, KPIs, tablas y estados operativos | Referencia visual; no se importó código, marca, datos, PocketBase ni secretos | Material local aportado por el propietario del proyecto |
 
 ## Reglas
 
@@ -21,4 +23,6 @@ No se cargan scripts remotos de estas páginas en producción.
 - Registrar cambios relevantes en la bitácora de Obsidian.
 - Preferir código local copiable sobre dependencias grandes.
 - Ejecutar `npm run security:secrets` después de añadir componentes.
-
+- Mantener la landing pública y el backoffice en lenguaje oscuro; el workspace
+  autenticado usa la paleta cálida Bellas Artes inspirada en Alacena.
+- Los archivos de referencia nunca se incorporan al bundle de producción.

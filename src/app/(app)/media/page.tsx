@@ -22,5 +22,5 @@ export default async function MediaPage() {
   } catch {
     libraryError = "No se pudo cargar la biblioteca privada. Las herramientas siguen disponibles."
   }
-  return <div className="-m-4 sm:-m-6 lg:-m-8"><MediaHub initialAssets={assets} libraryError={libraryError} /></div>
+  return <MediaHub initialAssets={assets} libraryError={libraryError} />
 }

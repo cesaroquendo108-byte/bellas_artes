@@ -112,7 +112,7 @@ export function StatusPill({
   className?: string;
 }) {
   const label = state in surfaceStateLabels ? surfaceStateLabels[state as SurfaceState] : state;
-  return <span className={cn("inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium", uiStatusToneClasses[tone], className)}>{label}</span>;
+  return <span className={cn("ba-status inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold", uiStatusToneClasses[tone], className)}>{label}</span>;
 }
 
 export function GenerationSkeleton({ className }: { className?: string }) {
@@ -131,10 +131,10 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center", className)}>
-      <div className="mx-auto flex size-12 items-center justify-center rounded-2xl border border-violet-300/15 bg-violet-300/10 text-violet-200" aria-hidden="true">✦</div>
-      <h3 className="mt-4 text-sm font-semibold text-white">{title}</h3>
-      <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-slate-500">{description}</p>
+    <div className={cn("ba-empty-state rounded-3xl border border-dashed p-8 text-center", className)}>
+      <div className="ba-empty-state__icon mx-auto flex size-12 items-center justify-center rounded-2xl border" aria-hidden="true">✦</div>
+      <h3 className="ba-empty-state__title mt-4 text-sm font-semibold">{title}</h3>
+      <p className="ba-empty-state__description mx-auto mt-2 max-w-md text-xs leading-5">{description}</p>
       {action ? <div className="mt-5 flex justify-center">{action}</div> : null}
     </div>
   );
@@ -157,4 +157,3 @@ export function ProgressRing({ value, className }: { value: number; className?: 
     </svg>
   );
 }
-

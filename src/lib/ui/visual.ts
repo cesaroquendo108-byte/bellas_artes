@@ -27,10 +27,22 @@ export const surfaceStateLabels: Record<SurfaceState, string> = {
 };
 
 export const uiStatusToneClasses: Record<UiStatusTone, string> = {
-  neutral: "border-white/10 bg-white/[0.05] text-slate-300",
-  success: "border-emerald-300/20 bg-emerald-300/10 text-emerald-200",
-  warning: "border-amber-300/20 bg-amber-300/10 text-amber-200",
-  danger: "border-rose-300/20 bg-rose-300/10 text-rose-200",
-  info: "border-cyan-300/20 bg-cyan-300/10 text-cyan-200",
+  neutral: "border ba-status--neutral",
+  success: "border ba-status--success",
+  warning: "border ba-status--warning",
+  danger: "border ba-status--danger",
+  info: "border ba-status--info",
 };
 
+export const workspacePalette = {
+  canvas: "#F7F4EC",
+  surface: "#FFFDF8",
+  surfaceStrong: "#FFFFFF",
+  ink: "#241F2E",
+  muted: "#6F6878",
+  border: "#E6DED1",
+  primary: "#7C3AED",
+  primarySoft: "#F0E9FF",
+  fuchsia: "#D946EF",
+  cyan: "#0891B2",
+} as const;

@@ -46,32 +46,32 @@ export function ImageGallery({ assets, error, onRecreate }: ImageGalleryProps) {
   }, [assets, filter, query]);
 
   return (
-    <section className="min-w-0 bg-[#0a0a0a] lg:h-full lg:overflow-y-auto">
-      <div className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#0a0a0a]/90 px-4 py-4 backdrop-blur-xl sm:px-6">
+    <section className="min-w-0 bg-transparent lg:h-full lg:overflow-y-auto">
+      <div className="sticky top-0 z-20 border-b border-[#e6ded1] bg-[#fffdf8]/92 px-4 py-4 backdrop-blur-xl sm:px-6">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold tracking-tight text-white">
-                Your visual library
+              <h2 className="text-lg font-semibold tracking-tight text-[#241f2e]">
+                Tu biblioteca visual
               </h2>
               <Badge
                 variant="outline"
-                className="border-violet-400/20 bg-violet-500/[0.08] text-violet-200"
+                className="border-violet-200 bg-violet-50 text-violet-700"
               >
                 {assets.length}
               </Badge>
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-[#827986]">
               Tus imágenes guardadas, listas para volver a crear.
             </p>
           </div>
           <div className="relative w-full xl:max-w-xs">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-slate-500" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-[#8b828f]" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search creations"
-              className="h-9 border-white/10 bg-white/[0.035] pl-9 text-xs"
+              placeholder="Buscar creaciones"
+              className="h-9 border-[#ded4c6] bg-white pl-9 text-xs text-[#241f2e] placeholder:text-[#9b929f]"
             />
           </div>
         </div>
@@ -88,8 +88,8 @@ export function ImageGallery({ assets, error, onRecreate }: ImageGalleryProps) {
               className={cn(
                 "shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-medium transition-colors",
                 filter === item
-                  ? "bg-white text-black"
-                  : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white",
+                  ? "bg-violet-600 text-white"
+                  : "bg-white/70 text-[#6f6878] hover:bg-violet-50 hover:text-violet-700",
               )}
             >
               {filterLabels[item]}
@@ -100,11 +100,11 @@ export function ImageGallery({ assets, error, onRecreate }: ImageGalleryProps) {
 
       <div className="p-4 sm:p-6">
         {error && (
-          <div className="mb-5 flex gap-3 rounded-xl border border-amber-400/20 bg-amber-500/[0.08] p-4 text-xs leading-5 text-amber-100">
-            <FolderOpen className="mt-0.5 size-4 shrink-0 text-amber-300" />
+          <div className="mb-5 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-5 text-amber-900">
+            <FolderOpen className="mt-0.5 size-4 shrink-0 text-amber-600" />
             <div>
               <p className="font-medium">La biblioteca no pudo conectarse</p>
-              <p className="mt-0.5 text-amber-200/60">{error}</p>
+              <p className="mt-0.5 text-amber-700">{error}</p>
             </div>
           </div>
         )}
@@ -175,27 +175,27 @@ function EmptyGallery({
     hasAssets &&
     (Boolean(query.trim()) || !["all", "unsorted"].includes(filter));
   return (
-    <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-white/[0.09] bg-gradient-to-b from-white/[0.025] to-transparent px-6 text-center">
+    <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-dashed border-[#dcd2c4] bg-[#fffdf8]/70 px-6 text-center">
       <div className="max-w-sm">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10 shadow-2xl shadow-violet-500/10">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 shadow-lg shadow-violet-100">
           {isFiltered ? (
-            <Search className="size-6 text-violet-300" />
+            <Search className="size-6 text-violet-700" />
           ) : (
-            <ImageIcon className="size-6 text-violet-300" />
+            <ImageIcon className="size-6 text-violet-700" />
           )}
         </div>
-        <h3 className="mt-5 text-base font-semibold text-white">
+        <h3 className="mt-5 text-base font-semibold text-[#241f2e]">
           {isFiltered
             ? "No encontramos coincidencias"
             : "Tu biblioteca visual empieza aquí"}
         </h3>
-        <p className="mt-2 text-xs leading-5 text-slate-500">
+        <p className="mt-2 text-xs leading-5 text-[#827986]">
           {isFiltered
             ? "Prueba otro término o vuelve al filtro Todos."
             : "Cuando conectemos el motor de generación, tus imágenes reales aparecerán en este espacio."}
         </p>
         {!isFiltered && (
-          <div className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-medium text-violet-300">
+          <div className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-medium text-violet-600">
             <Sparkles className="size-3" /> Sin resultados simulados
           </div>
         )}

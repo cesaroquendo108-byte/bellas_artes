@@ -1,16 +1,72 @@
 import Link from "next/link";
-import { FileImage, Music, Video } from "lucide-react";
+import { ArrowUpRight, FileImage, LockKeyhole, Music, Video } from "lucide-react";
+
 import { PageHeading } from "@/components/page-heading";
-import { EmptyState, SpotlightCard, StatusPill } from "@/components/ui/motion-effects";
+import { EmptyState, StatusPill } from "@/components/ui/motion-effects";
+import { MediaCard } from "@/components/ui/workspace";
 import { getAssets } from "@/lib/assets/queries";
 import type { AssetType } from "@/lib/types";
 
+const filters: Array<{ value?: AssetType; label: string }> = [
+  { label: "Todos" },
+  { value: "image", label: "Imágenes" },
+  { value: "video", label: "Videos" },
+  { value: "audio", label: "Audio" },
+];
+
+const icons = { image: FileImage, video: Video, audio: Music };
+
 export default async function AssetsPage({ searchParams }: { searchParams: Promise<{ type?: string; cursor?: string }> }) {
-  const p = await searchParams; const type = (["image","video","audio"].includes(p.type || "") ? p.type : undefined) as AssetType | undefined;
-  let result: Awaited<ReturnType<typeof getAssets>> | null = null; let error = ""; try { result = await getAssets({ type }, p.cursor); } catch (e) { error = e instanceof Error ? e.message : "No se pudo abrir la biblioteca."; }
-  const icons = { image: FileImage, video: Video, audio: Music };
-  return <><div className="flex flex-wrap items-end justify-between gap-4"><PageHeading eyebrow="Biblioteca" title="Tus archivos" description="Assets privados, accesibles mediante enlaces temporales. El plan gratuito conserva archivos durante 15 días." /><StatusPill state="ready" tone="info" /></div><div className="mb-6 flex max-w-full gap-2 overflow-x-auto pb-1">{[["Todos",""][0],].length && ["","image","video","audio"].map(t=><Link key={t || "all"} href={t ? `/assets?type=${t}` : "/assets"} className={`min-w-fit rounded-xl border px-3 py-2 text-xs transition ${type === (t || undefined) ? "border-violet-400/40 bg-violet-500/10 text-violet-200" : "border-white/10 text-slate-400 hover:bg-white/[0.04] hover:text-white"}`}>{t ? ({image:"Imágenes",video:"Videos",audio:"Audio"} as Record<string,string>)[t] : "Todos"}</Link>)}</div>
-    {error ? <div className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] p-5 text-sm text-amber-200">{error}</div> : result?.assets.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{result.assets.map(a=>{const Icon=icons[a.type as AssetType];return <SpotlightCard key={a.id} className="rounded-2xl" contentClassName="p-5"><a href={a.signedUrl} target="_blank" rel="noreferrer" className="block size-full"><Icon className="size-5 text-violet-300"/><p className="mt-4 truncate font-medium text-white">{a.name}</p><p className="mt-1 text-xs text-slate-500">{a.type} · {Math.ceil(Number(a.bytes)/1024)} KB</p></a></SpotlightCard>})}</div> : <EmptyState title="Tu biblioteca está vacía" description="Cuando existan assets privados, aparecerán aquí con acceso temporal firmado." />}
-    {result?.nextCursor && <Link href={`/assets?${type ? `type=${type}&` : ""}cursor=${encodeURIComponent(result.nextCursor)}`} className="mt-5 inline-flex rounded-xl border border-white/10 px-4 py-2 text-sm transition hover:border-violet-300/30 hover:bg-white/[0.04]">Ver más</Link>}
-  </>;
+  const params = await searchParams;
+  const type = (["image", "video", "audio"].includes(params.type ?? "") ? params.type : undefined) as AssetType | undefined;
+  let result: Awaited<ReturnType<typeof getAssets>> | null = null;
+  let error = "";
+  try {
+    result = await getAssets({ type }, params.cursor);
+  } catch (reason) {
+    error = reason instanceof Error ? reason.message : "No se pudo abrir la biblioteca.";
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <PageHeading eyebrow="Biblioteca" title="Tus archivos, siempre bajo control" description="Imágenes, videos y audios privados, organizados en una superficie simple con enlaces temporales firmados." />
+        <div className="mb-8 flex items-center gap-2"><LockKeyhole className="size-4 text-violet-700" /><StatusPill state="Privado" tone="success" /></div>
+      </div>
+
+      <nav aria-label="Filtrar biblioteca" className="flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-[#e6ded1] bg-white/70 p-1.5 shadow-sm">
+        {filters.map((filter) => {
+          const active = type === filter.value;
+          return <Link key={filter.label} href={filter.value ? `/assets?type=${filter.value}` : "/assets"} aria-current={active ? "page" : undefined} className={`min-w-fit rounded-xl px-4 py-2 text-xs font-semibold transition ${active ? "bg-violet-100 text-violet-700 shadow-sm" : "text-[#756d7c] hover:bg-white hover:text-[#4c1d95]"}`}>{filter.label}</Link>;
+        })}
+      </nav>
+
+      {error ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">{error}</div>
+      ) : result?.assets.length ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {result.assets.map((asset) => {
+            const Icon = icons[asset.type as AssetType];
+            const preview = asset.type === "image"
+              ? <div role="img" aria-label={asset.name} className="size-full bg-cover bg-center transition duration-500 group-hover:scale-105 motion-reduce:transform-none" style={{ backgroundImage: `url(${asset.signedUrl})` }} />
+              : <div className="flex size-full items-center justify-center bg-gradient-to-br from-violet-100 via-fuchsia-50 to-cyan-50"><Icon className="size-9 text-violet-600" /></div>;
+            return (
+              <MediaCard
+                key={asset.id}
+                preview={preview}
+                title={asset.name}
+                description={`${Math.ceil(Number(asset.bytes) / 1024)} KB · ${asset.expires_at ? `expira ${new Date(asset.expires_at).toLocaleDateString("es-VE")}` : "retención permanente"}`}
+                meta={`${asset.type} · privado`}
+                action={<a href={asset.signedUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700 hover:underline">Abrir archivo <ArrowUpRight className="size-3.5" /></a>}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <EmptyState title="Tu biblioteca está vacía" description="Cuando existan assets privados, aparecerán aquí con acceso temporal firmado." action={<Link href="/image" className="rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white">Abrir estudio de imágenes</Link>} />
+      )}
+
+      {result?.nextCursor ? <Link href={`/assets?${type ? `type=${type}&` : ""}cursor=${encodeURIComponent(result.nextCursor)}`} className="inline-flex rounded-xl border border-[#ded4c6] bg-white px-4 py-2 text-sm font-semibold text-[#4c4455] shadow-sm transition hover:border-violet-200 hover:text-violet-700">Ver más</Link> : null}
+    </div>
+  );
 }

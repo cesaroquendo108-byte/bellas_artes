@@ -174,7 +174,7 @@ function Workspace({
   }
 
   return (
-    <div className="flex min-h-[calc(100dvh-1rem)] min-w-0 flex-col overflow-hidden bg-[#080809] text-slate-100 lg:h-[calc(100dvh-1rem)]">
+    <div className="workspace-surface flex min-h-[calc(100dvh-5rem)] min-w-0 flex-col overflow-hidden rounded-[24px] text-slate-100 lg:h-[calc(100dvh-6rem)]">
       <VideoStudioHeader onOpenControls={() => setControlsOpen(true)} />
       {assetsUnavailable && (
         <div className="border-b border-amber-400/20 bg-amber-500/[0.07] px-4 py-2 text-center text-[10px] text-amber-200">

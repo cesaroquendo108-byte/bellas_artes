@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function ImageStudioLoading() {
   return (
-    <div className="-m-4 grid min-h-[calc(100vh-3.5rem)] overflow-hidden bg-[#0a0a0a] sm:-m-6 lg:-m-8 lg:grid-cols-[400px_1fr]">
+    <div className="workspace-surface grid min-h-[calc(100vh-6rem)] overflow-hidden rounded-[24px] lg:grid-cols-[400px_1fr]">
       <div className="hidden space-y-5 border-r border-white/[0.06] bg-[#101012] p-5 lg:block">
         <Skeleton className="h-10 w-44 bg-white/[0.06]" />
         <Skeleton className="h-9 w-full bg-white/[0.06]" />

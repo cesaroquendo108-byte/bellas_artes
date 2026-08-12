@@ -272,6 +272,164 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Bellas Artes workspace: warm, calm and mobile-first. The public site and
+   administrative backoffice deliberately keep their dark visual language. */
+.workspace-theme {
+  --background: #f7f4ec;
+  --foreground: #241f2e;
+  --card: #fffdf8;
+  --card-foreground: #241f2e;
+  --popover: #ffffff;
+  --popover-foreground: #241f2e;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #eee8f8;
+  --secondary-foreground: #352a43;
+  --muted: #eee9df;
+  --muted-foreground: #756d7c;
+  --accent: #efe8ff;
+  --accent-foreground: #5b21b6;
+  --border: #e6ded1;
+  --input: #ded4c6;
+  --ring: #8b5cf6;
+  --sidebar: #fcfaf5;
+  --sidebar-foreground: #332c3d;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0e9ff;
+  --sidebar-accent-foreground: #5b21b6;
+  --sidebar-border: #e6ded1;
+  --sidebar-ring: #8b5cf6;
+  --workspace-canvas: #f7f4ec;
+  --workspace-surface: #fffdf8;
+  --workspace-surface-strong: #ffffff;
+  --workspace-ink: #241f2e;
+  --workspace-muted: #756d7c;
+  --workspace-subtle: #a39aa9;
+  --workspace-border: #e6ded1;
+  --workspace-primary: #7c3aed;
+  min-height: 100svh;
+  color: var(--workspace-ink);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.08), transparent 29rem),
+    radial-gradient(circle at 92% 18%, rgba(217, 70, 239, 0.045), transparent 25rem),
+    var(--workspace-canvas);
+}
+
+.workspace-theme .spotlight-card {
+  border-color: var(--workspace-border);
+  background: color-mix(in srgb, var(--workspace-surface) 94%, transparent);
+  box-shadow: 0 14px 36px rgba(66, 51, 81, 0.055);
+}
+
+.workspace-theme .spotlight-card::before {
+  background: radial-gradient(280px circle at var(--spotlight-x) var(--spotlight-y), rgba(139, 92, 246, 0.11), transparent 70%);
+}
+
+.workspace-theme .spotlight-card:hover,
+.workspace-theme .spotlight-card:focus-within {
+  border-color: rgba(124, 58, 237, 0.24);
+  box-shadow: 0 20px 45px rgba(76, 29, 149, 0.09);
+}
+
+.workspace-page {
+  min-height: calc(100svh - 3.5rem);
+  color: var(--workspace-ink);
+  background: transparent;
+}
+
+.workspace-surface {
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-surface);
+  box-shadow: 0 12px 34px rgba(66, 51, 81, 0.055);
+}
+
+.workspace-theme .audio-workspace [class*="border-white"][class*="bg-"] {
+  border-radius: 1rem;
+  box-shadow: 0 10px 28px rgba(66, 51, 81, 0.045);
+}
+
+.workspace-theme .ba-page-heading__eyebrow { color: #7c3aed; letter-spacing: 0.15em; }
+.workspace-theme .ba-page-heading__title { color: var(--workspace-ink); letter-spacing: -0.035em; }
+.workspace-theme .ba-page-heading__description { color: var(--workspace-muted); }
+.ba-page-heading__eyebrow { letter-spacing: 0.15em; color: #c4b5fd; }
+.ba-page-heading__title { color: white; letter-spacing: -0.035em; }
+.ba-page-heading__description { color: #94a3b8; }
+
+.ba-status--neutral { border-color: rgba(255,255,255,.1); background: rgba(255,255,255,.05); color: #cbd5e1; }
+.ba-status--success { border-color: rgba(110,231,183,.2); background: rgba(110,231,183,.1); color: #a7f3d0; }
+.ba-status--warning { border-color: rgba(252,211,77,.2); background: rgba(252,211,77,.1); color: #fde68a; }
+.ba-status--danger { border-color: rgba(253,164,175,.2); background: rgba(253,164,175,.1); color: #fecdd3; }
+.ba-status--info { border-color: rgba(103,232,249,.2); background: rgba(103,232,249,.1); color: #a5f3fc; }
+
+.workspace-theme .ba-status--neutral { border-color: #ded6ca; background: #f4efe7; color: #625a69; }
+.workspace-theme .ba-status--success { border-color: #b7e4d4; background: #e9f8f1; color: #08785c; }
+.workspace-theme .ba-status--warning { border-color: #efd49a; background: #fff6da; color: #946200; }
+.workspace-theme .ba-status--danger { border-color: #efbdc7; background: #fff0f2; color: #b4233b; }
+.workspace-theme .ba-status--info { border-color: #b7dce8; background: #eaf7fb; color: #08768e; }
+
+.ba-empty-state { border-color: rgba(255,255,255,.1); background: rgba(255,255,255,.02); }
+.ba-empty-state__icon { border-color: rgba(196,181,253,.15); background: rgba(196,181,253,.1); color: #ddd6fe; }
+.ba-empty-state__title { color: white; }
+.ba-empty-state__description { color: #64748b; }
+.workspace-theme .ba-empty-state { border-color: #dcd2c4; background: rgba(255,253,248,.7); }
+.workspace-theme .ba-empty-state__icon { border-color: #d9caf8; background: #f0e9ff; color: #6d28d9; }
+.workspace-theme .ba-empty-state__title { color: var(--workspace-ink); }
+.workspace-theme .ba-empty-state__description { color: var(--workspace-muted); }
+
+.ba-metric-card__label,
+.ba-metric-card__detail { color: #64748b; }
+.ba-metric-card__value { color: white; }
+.ba-metric-card__icon { display: inline-flex; width: 2rem; height: 2rem; align-items: center; justify-content: center; border-radius: .75rem; }
+.ba-metric-card__icon--violet { background: rgba(139,92,246,.12); color: #c4b5fd; }
+.ba-metric-card__icon--fuchsia { background: rgba(217,70,239,.12); color: #f0abfc; }
+.ba-metric-card__icon--cyan { background: rgba(6,182,212,.12); color: #67e8f9; }
+.ba-metric-card__icon--neutral { background: rgba(148,163,184,.1); color: #cbd5e1; }
+.workspace-theme .ba-metric-card__label,
+.workspace-theme .ba-metric-card__detail { color: var(--workspace-muted); }
+.workspace-theme .ba-metric-card__value { color: var(--workspace-ink); }
+.workspace-theme .ba-metric-card__icon--violet { background: #f0e9ff; color: #6d28d9; }
+.workspace-theme .ba-metric-card__icon--fuchsia { background: #fae8ff; color: #a21caf; }
+.workspace-theme .ba-metric-card__icon--cyan { background: #e7f8fc; color: #08768e; }
+.workspace-theme .ba-metric-card__icon--neutral { background: #f0ece5; color: #625a69; }
+
+/* Compatibility layer for legacy dark utility classes inside the authenticated
+   product. New components should prefer semantic workspace classes. */
+.workspace-theme .text-white { color: var(--workspace-ink); }
+.workspace-theme .text-slate-100,
+.workspace-theme .text-slate-200,
+.workspace-theme .text-slate-300 { color: #4c4455; }
+.workspace-theme .text-slate-400 { color: #6f6878; }
+.workspace-theme .text-slate-500 { color: #827986; }
+.workspace-theme .text-slate-600,
+.workspace-theme .text-slate-700 { color: #9b929f; }
+.workspace-theme [class*="border-white"] { border-color: rgba(69, 55, 82, 0.13); }
+.workspace-theme [class*="bg-white/"] { background-color: rgba(255, 255, 255, 0.66); }
+.workspace-theme [class*="bg-[#080809]"],
+.workspace-theme [class*="bg-[#0a0a0a]"] { background-color: transparent; }
+.workspace-theme [class*="bg-[#101012]"],
+.workspace-theme [class*="bg-[#111114]"],
+.workspace-theme [class*="bg-[#0d0d10]"] { background-color: var(--workspace-surface); }
+.workspace-theme [class*="bg-primary"][class~="text-white"],
+.workspace-theme [class*="bg-violet"][class~="text-white"],
+.workspace-theme [class*="from-violet"][class~="text-white"],
+.workspace-theme [class*="from-fuchsia"][class~="text-white"],
+.workspace-theme [class*="from-pink"][class~="text-white"],
+.workspace-theme [class*="from-indigo"][class~="text-white"],
+.workspace-theme [class*="from-rose"][class~="text-white"],
+.workspace-theme [class*="from-orange"][class~="text-white"],
+.workspace-theme [class*="from-blue"][class~="text-white"],
+.workspace-theme [class*="from-emerald"][class~="text-white"],
+.workspace-theme [class*="from-teal"][class~="text-white"],
+.workspace-theme [class*="from-slate"][class~="text-white"],
+.workspace-theme [class*="from-"] .text-white,
+.workspace-theme [class*="bg-black"] .text-white,
+.workspace-theme .shimmer-button { color: white; }
+
+@media (max-width: 767px) {
+  .workspace-theme [data-slot="sidebar-inset"] { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

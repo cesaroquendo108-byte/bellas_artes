@@ -129,7 +129,7 @@ export function BrandKitEditor({ initialKit }: { initialKit: BrandKit }) {
     }
   }
   return (
-    <div className="min-h-screen bg-[#080809] p-4 text-white sm:p-7 lg:p-10">
+    <div className="workspace-page p-0 sm:p-2 lg:p-4">
       <header className="flex flex-wrap items-center gap-3 border-b border-white/[0.07] pb-5">
         <Button
           render={<Link href="/brand-kits" />}

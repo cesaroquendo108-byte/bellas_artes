@@ -125,7 +125,7 @@ export function CharactersHub({
   );
 
   return (
-    <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
+    <div className="workspace-page px-0 py-2 sm:py-4">
       <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">

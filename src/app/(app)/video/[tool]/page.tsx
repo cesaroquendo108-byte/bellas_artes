@@ -35,5 +35,5 @@ export default async function VideoToolPage({ params, searchParams }: PageProps)
     assetsUnavailable = true
   }
 
-  return <div className="-m-4 min-w-0 sm:-m-6 lg:-m-8"><VideoStudioShell operation={tool} assets={assets} assetsUnavailable={assetsUnavailable} initialPrompt={typeof prompt === "string" ? prompt : ""} /></div>
+  return <div className="min-w-0"><VideoStudioShell operation={tool} assets={assets} assetsUnavailable={assetsUnavailable} initialPrompt={typeof prompt === "string" ? prompt : ""} /></div>
 }

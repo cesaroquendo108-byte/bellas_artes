@@ -98,15 +98,15 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
   }
 
   return (
-    <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
-      <section className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-r from-purple-950/70 via-[#111114] to-black p-7 sm:p-10">
+    <div className="workspace-page px-0 py-2 sm:py-4">
+      <section className="workspace-surface relative overflow-hidden rounded-[30px] p-7 sm:p-10">
         <div className="absolute top-[-6rem] right-[-2rem] size-72 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="relative max-w-2xl">
-          <Badge className="border border-violet-400/20 bg-white/10 text-violet-100">Centro de medios</Badge>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Creación gratuita de videos con IA</h1>
+          <Badge className="border border-violet-200 bg-violet-50 text-violet-700">Centro de medios</Badge>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Todo tu contenido, en un solo lugar</h1>
           <p className="mt-3 text-sm leading-6 text-slate-400">Accede a tus herramientas y organiza imágenes, videos y audio desde una única biblioteca privada.</p>
           <div className="mt-5 flex flex-wrap gap-2">{["Flux Schnell · Admin Preview", "HunyuanVideo · En preparación", "F5-TTS · En preparación", "RVC · En preparación"].map((model) => <Badge key={model} variant="outline" className="border-white/10 bg-white/[0.06] text-slate-300">{model}</Badge>)}</div>
-          <Button render={<Link href="/video/t2v" />} nativeButton={false} size="lg" className="mt-7 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"><Clapperboard /> Crear gratis</Button>
+          <Button render={<Link href="/video/t2v" />} nativeButton={false} size="lg" className="mt-7 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"><Clapperboard /> Abrir estudio de video</Button>
         </div>
       </section>
 
@@ -139,8 +139,8 @@ export function MediaHub({ initialAssets, libraryError }: { initialAssets: Media
             {visibleAssets.map((asset, index) => {
               const isSelected = selected.has(asset.id)
               return (
-                <article key={asset.id} className={cn("group relative cursor-pointer overflow-hidden rounded-xl border bg-[#111114] transition", isSelected ? "border-violet-400 ring-2 ring-violet-400/20" : "border-white/[0.08] hover:border-white/20")} onClick={(event) => toggleAsset(index, event.shiftKey)}>
-                  <div className="aspect-square overflow-hidden bg-black"><AssetPreview asset={asset} /></div>
+                <article key={asset.id} className={cn("group relative cursor-pointer overflow-hidden rounded-2xl border bg-white shadow-sm transition", isSelected ? "border-violet-400 ring-2 ring-violet-400/20" : "border-[#e6ded1] hover:border-violet-200")} onClick={(event) => toggleAsset(index, event.shiftKey)}>
+                  <div className="workspace-media-preview aspect-square overflow-hidden bg-black"><AssetPreview asset={asset} /></div>
                   <div className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-md border border-white/20 bg-black/70 text-white backdrop-blur" role="checkbox" aria-checked={isSelected}>{isSelected && <Check className="size-3.5" />}</div>
                   <Button type="button" variant="ghost" size="icon-xs" className="absolute top-2 right-2 bg-black/70 text-white opacity-0 backdrop-blur transition group-hover:opacity-100" onClick={(event) => { event.stopPropagation(); download(asset) }} aria-label={`Descargar ${asset.name}`}><Download /></Button>
                   <div className="p-3"><div className="flex items-center gap-2"><Badge variant="outline" className="h-4 border-white/10 px-1 text-[8px] uppercase text-slate-500">{asset.type}</Badge><p className="min-w-0 flex-1 truncate text-[11px] text-slate-300">{asset.name}</p></div></div>

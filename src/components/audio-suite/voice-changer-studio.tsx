@@ -193,7 +193,7 @@ export function VoiceChangerStudio({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="audio-workspace workspace-page space-y-6">
       <AudioNav current="/audio/voice-changer" />
       <header>
         <p className="text-xs font-semibold uppercase text-violet-300">Suite de audio</p>

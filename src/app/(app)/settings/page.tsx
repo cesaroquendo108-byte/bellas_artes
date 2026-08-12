@@ -42,9 +42,9 @@ export default async function SettingsPage({
               minLength={2}
               maxLength={80}
               required
-              className="h-10 flex-1 rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white outline-none transition focus:border-violet-400/60"
+              className="h-11 flex-1 rounded-xl border border-[#ded4c6] bg-white px-3 text-sm text-[#241f2e] outline-none transition focus:border-violet-400 focus:ring-3 focus:ring-violet-200/50"
             />
-            <button type="submit" className="h-10 rounded-md bg-primary px-4 text-sm font-semibold text-white transition hover:bg-violet-500">
+            <button type="submit" className="h-11 rounded-xl bg-primary px-4 text-sm font-semibold text-white transition hover:bg-violet-500">
               Guardar
             </button>
           </div>

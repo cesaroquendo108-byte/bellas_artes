@@ -7,5 +7,5 @@ export const metadata: Metadata = { title: "Personajes · Bellas Artes", descrip
 
 export default async function CharactersPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const [{ view }, library] = await Promise.all([searchParams, getCharacterWorldLibrary()])
-  return <div className="-m-4 sm:-m-6 lg:-m-8"><CharactersHub assets={library.assets} libraryError={library.error} initialView={view === "community" ? "community" : "mine"} /></div>
+  return <CharactersHub assets={library.assets} libraryError={library.error} initialView={view === "community" ? "community" : "mine"} />
 }

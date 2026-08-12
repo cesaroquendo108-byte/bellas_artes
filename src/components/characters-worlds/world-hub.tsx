@@ -86,7 +86,7 @@ export function WorldHub({
     [assets, filter, query],
   );
   return (
-    <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
+    <div className="workspace-page px-0 py-2 sm:py-4">
       <header className="relative overflow-hidden rounded-3xl border border-violet-400/20 bg-[#111114] p-7 sm:p-10">
         <div className="absolute -top-24 right-0 size-72 rounded-full bg-blue-600/20 blur-3xl" />
         <div className="relative max-w-2xl">

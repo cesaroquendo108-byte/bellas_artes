@@ -126,7 +126,7 @@ export function AudioLibrary({
   }
 
   return (
-    <div className="space-y-6 pb-28">
+    <div className="audio-workspace workspace-page space-y-6 pb-12">
       <AudioNav current="/audio/my" />
       <header>
         <p className="text-xs font-semibold uppercase text-violet-300">Biblioteca privada</p>

@@ -105,7 +105,7 @@ export function TtsStudio({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="audio-workspace workspace-page space-y-6">
       <AudioNav current="/audio/tts" />
       <header>
         <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase text-violet-300">Suite de audio</p><StatusPill state={setupPending ? "preparing" : "ready"} tone={setupPending ? "warning" : "success"} /></div>

@@ -69,8 +69,8 @@ export function DirectorHub({
   const createParams = new URLSearchParams({ kind: "director", template: supportedTemplate });
   if (initialPrompt.trim()) createParams.set("prompt", initialPrompt.trim());
   return (
-    <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
-      <header className="relative overflow-hidden rounded-3xl border border-violet-400/20 bg-[#111114] p-7 sm:p-10">
+    <div className="workspace-page px-0 py-2 sm:py-4">
+      <header className="workspace-surface relative overflow-hidden rounded-[30px] p-7 sm:p-10">
         <div className="absolute -top-20 right-0 size-80 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="relative max-w-3xl">
           <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">

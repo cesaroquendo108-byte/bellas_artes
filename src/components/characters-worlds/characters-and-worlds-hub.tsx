@@ -134,7 +134,7 @@ export function CharactersAndWorldsHub({
     [active.kind, assets, filter, query],
   );
   return (
-    <div className="min-h-screen bg-[#080809] px-4 py-8 text-white sm:px-7 lg:px-10">
+    <div className="workspace-page px-0 py-2 sm:py-4">
       <header>
         <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
           Biblioteca de recursos

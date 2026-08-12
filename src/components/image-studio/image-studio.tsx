@@ -279,8 +279,8 @@ export function ImageStudio({
   );
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] overflow-x-hidden border border-white/[0.05] bg-[#0a0a0a] lg:h-[calc(100vh-3.5rem)] lg:min-h-0 lg:overflow-hidden">
-      <div className="flex items-center gap-3 border-b border-white/[0.06] bg-[#101012] px-4 py-3 lg:hidden">
+    <div className="workspace-surface min-h-[calc(100vh-5rem)] overflow-x-hidden rounded-[24px] lg:h-[calc(100vh-6rem)] lg:min-h-0 lg:overflow-hidden">
+      <div className="flex items-center gap-3 border-b border-[#e6ded1] bg-white/80 px-4 py-3 lg:hidden">
         <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500">
           <WandSparkles className="size-4 text-white" />
         </div>
@@ -306,7 +306,7 @@ export function ImageStudio({
         className="hidden h-full lg:grid"
         style={{ gridTemplateColumns: `${panelWidth}px 10px minmax(0, 1fr)` }}
       >
-        <aside className="h-full min-w-0 overflow-hidden bg-[#101012]">
+        <aside className="h-full min-w-0 overflow-hidden border-r border-[#e6ded1] bg-[#fffdf8]">
           {controls}
         </aside>
         <ImageStudioResizeHandle
@@ -331,7 +331,7 @@ export function ImageStudio({
       <Sheet open={mobileControlsOpen} onOpenChange={setMobileControlsOpen}>
         <SheetContent
           side="bottom"
-          className="h-[92dvh] max-h-[92dvh] gap-0 overflow-hidden rounded-t-3xl border-white/10 bg-[#101012] p-0 text-white lg:hidden"
+          className="workspace-theme h-[92dvh] max-h-[92dvh] gap-0 overflow-hidden rounded-t-3xl border-[#ded4c6] bg-[#fffdf8] p-0 text-[#241f2e] lg:hidden"
         >
           <SheetHeader className="sr-only">
         <SheetTitle>Controles del estudio de imágenes</SheetTitle>
