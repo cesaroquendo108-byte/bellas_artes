@@ -24,4 +24,18 @@ describe("getOAuthRedirectBaseUrl", () => {
 
     expect(getOAuthRedirectBaseUrl()).toBe("http://localhost:3000");
   });
+
+  it("ignores a localhost site URL in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
+
+    expect(getOAuthRedirectBaseUrl()).toBe("https://bellasartes-xi.vercel.app");
+  });
+
+  it("ignores loopback site URLs in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://127.0.0.1:3000");
+
+    expect(getOAuthRedirectBaseUrl()).toBe("https://bellasartes-xi.vercel.app");
+  });
 });

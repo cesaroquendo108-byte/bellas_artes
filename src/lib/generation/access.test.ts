@@ -13,6 +13,8 @@ describe("generation rollout access", () => {
     expect(evaluateGenerationAccess({ ...base, mode: "allowlist", profile: { role: "user", plan_tier: "free" }, grant: { enabled: true, access_level: "beta", allowed_kinds: ["image"] } })).toEqual({ allowed: true });
     expect(evaluateGenerationAccess({ ...base, mode: "allowlist", profile: { role: "user", plan_tier: "free" }, grant: { enabled: true, access_level: "beta", allowed_kinds: ["audio"] } })).toMatchObject({ allowed: false, code: "GENERATION_BETA_INVITE_REQUIRED" });
     expect(evaluateGenerationAccess({ ...base, mode: "allowlist", profile: { role: "user", plan_tier: "free" }, grant: { enabled: true, access_level: "beta", expires_at: "2026-08-09T00:00:00Z" } })).toMatchObject({ allowed: false });
+    expect(evaluateGenerationAccess({ ...base, mode: "allowlist", profile: { role: "admin", plan_tier: "free" }, grant: null })).toMatchObject({ allowed: false, code: "GENERATION_BETA_INVITE_REQUIRED" });
+    expect(evaluateGenerationAccess({ ...base, mode: "allowlist", profile: { role: "admin", plan_tier: "free" }, grant: { enabled: true, access_level: "service", allowed_kinds: ["image"] } })).toEqual({ allowed: true });
   });
 
   it("mantiene Flux Dev y Hunyuan 13B detrás de entitlement Pro/B2B", () => {

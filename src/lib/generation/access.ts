@@ -28,14 +28,13 @@ export function evaluateGenerationAccess(input: {
   now?: Date;
 }): GenerationAccessDecision {
   if (!input.profile) return unavailable();
-  if (input.profile.role === "admin") return { allowed: true };
-
   const grant = activeGrant(input.grant, input.now ?? new Date());
-  if (input.mode === "admin") {
-    return { allowed: false, code: "GENERATION_ADMIN_ONLY", message: "La generación está limitada temporalmente a administradores.", status: 403 };
-  }
   if (input.mode === "allowlist" && (!grant || !grantAllowsKind(grant, input.kind))) {
     return { allowed: false, code: "GENERATION_BETA_INVITE_REQUIRED", message: "Esta cuenta todavía no tiene acceso a la beta privada.", status: 403 };
+  }
+  if (input.profile.role === "admin") return { allowed: true };
+  if (input.mode === "admin") {
+    return { allowed: false, code: "GENERATION_ADMIN_ONLY", message: "La generación está limitada temporalmente a administradores.", status: 403 };
   }
   if (isPremiumBackend(input.backendModel) && !hasPremiumEntitlement(input.profile, grant)) {
     return { allowed: false, code: "GENERATION_PREMIUM_REQUIRED", message: "Este modelo requiere un entitlement Pro o B2B.", status: 403 };
@@ -58,7 +57,7 @@ export async function assertGenerationAccess(
 
   const config = getGenerationConfig();
   let grant: GenerationAccessGrant | null = null;
-  if (profile?.role !== "admin" && (config.accessMode === "allowlist" || isPremiumBackend(backendModel))) {
+  if (config.accessMode === "allowlist" || isPremiumBackend(backendModel)) {
     const { data, error } = await admin
       .from("generation_access_grants")
       .select("access_level,allowed_kinds,enabled,expires_at")
