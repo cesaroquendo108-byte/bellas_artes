@@ -21,5 +21,23 @@ enabled = true
 site_url = "https://bellasartes-xi.vercel.app"
 additional_redirect_urls = [
   "https://bellasartes-xi.vercel.app/**",
+  "https://bellasartes-git-codex-cons-df70ee-cesaroquendo10-4851s-projects.vercel.app/**",
   "http://localhost:3000/**",
 ]
+
+# Keep the linked cloud project's existing Auth posture when syncing redirect
+# URLs from this local configuration. These mirror the remote values; they are
+# unrelated to Preview OAuth and prevent local development defaults from
+# changing MFA or email-confirmation behavior.
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = false
+max_frequency = "1m0s"
+otp_length = 8
+otp_expiry = 3600
