@@ -8,7 +8,6 @@ import {
   Clapperboard,
   Globe2,
   ImageIcon,
-  Menu,
   MonitorUp,
   ShieldCheck,
   Sparkles,
@@ -29,6 +28,7 @@ import {
 } from "@/lib/landing/content";
 
 import { CapabilityStatusBadge } from "./capability-status";
+import { LandingMobileMenu } from "./landing-mobile-menu";
 import { PromptLauncher } from "./prompt-launcher";
 import {
   AnimatedGradientText,
@@ -81,13 +81,7 @@ export function LandingPage() {
             <Link href="/login" className="rounded-xl px-4 py-2 text-sm text-zinc-300 transition hover:bg-white/[0.06] hover:text-white">Entrar</Link>
             <Link href="/login?next=/dashboard" className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-zinc-200">Abrir mi estudio</Link>
           </div>
-          <details className="group ml-auto sm:hidden">
-            <summary className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-white/10 text-zinc-300"><Menu className="size-5" /><span className="sr-only">Abrir menú</span></summary>
-            <div className="absolute inset-x-3 top-[calc(100%+8px)] rounded-2xl border border-white/10 bg-[#111114] p-3 shadow-2xl">
-              {[{ href: "/inspire", label: "Inspiración" }, { href: "/tutorials", label: "Tutoriales" }, { href: "/blog", label: "Blog" }, { href: "/mcp", label: "MCP" }, { href: "/login", label: "Entrar" }].map((item) => <Link key={item.href} href={item.href} className="block rounded-xl px-4 py-3 text-sm text-zinc-300 hover:bg-white/[0.06]">{item.label}</Link>)}
-              <Link href="/login?next=/dashboard" className="mt-2 block rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-black">Abrir mi estudio</Link>
-            </div>
-          </details>
+          <LandingMobileMenu />
         </div>
       </header>
 
