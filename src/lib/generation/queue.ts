@@ -1,9 +1,9 @@
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { getGenerationConfig } from "./config";
+import type { GenerationQueueKind } from "./queue-contracts";
 
-export const generationQueueNames = ["image", "video", "audio", "character", "world"] as const;
-export type GenerationQueueKind = (typeof generationQueueNames)[number];
+export { generationQueueNames, type GenerationQueueKind } from "./queue-contracts";
 
 let connection: Redis | null = null;
 const queues = new Map<string, Queue>();

@@ -20,6 +20,7 @@ import {
 
 const adminItems = [
   { title: "Dashboard", href: "/admin", icon: Gauge },
+  { title: "Usuarios", href: "/admin/users", icon: UsersRound },
   { title: "Pagos", href: "/admin/payments", icon: CreditCard },
   { title: "Moderación", href: "/admin/community", icon: UsersRound },
 ];
