@@ -40,6 +40,7 @@ import {
   type AdminDashboardWindow,
   type ServiceHealthState,
 } from "@/lib/admin/contracts";
+import { formatAdminDateTime, formatRelativeAt } from "@/lib/admin/format";
 import { cn } from "@/lib/utils";
 
 const windowLabels: Record<AdminDashboardWindow, string> = { "24h": "24H", "7d": "7D", "30d": "30D" };
@@ -156,7 +157,7 @@ export function AdminDashboard({ initialSnapshot }: { initialSnapshot: AdminDash
           <StatusPill state={`Acceso ${snapshot.runtime.accessMode}`} tone="info" />
           <StatusPill state={`Billing ${snapshot.runtime.billingMode}`} tone="neutral" />
           <StatusPill state={`Proveedor ${snapshot.runtime.provider ?? "sin configurar"}`} tone="neutral" />
-          <span className="text-xs text-slate-600">Actualizado {formatRelative(snapshot.generatedAt)}</span>
+          <span className="text-xs text-slate-600">Actualizado {formatRelativeAt(snapshot.generatedAt, snapshot.generatedAt)}</span>
           {!snapshot.runtime.emergencyPaused && (
             <Dialog open={pauseOpen} onOpenChange={setPauseOpen}>
               <DialogTrigger className="ml-auto inline-flex h-8 items-center gap-2 rounded-lg border border-red-400/20 bg-red-500/5 px-3 text-xs font-medium text-red-300 transition hover:bg-red-500/10"><Ban className="size-3.5" />Pausa de emergencia</DialogTrigger>
@@ -168,7 +169,7 @@ export function AdminDashboard({ initialSnapshot }: { initialSnapshot: AdminDash
             </Dialog>
           )}
         </div>
-        {snapshot.runtime.emergencyPaused && <div className="relative mt-4 rounded-xl border border-red-400/20 bg-red-500/[0.07] p-4 text-xs text-red-200"><strong>Pausa activa.</strong> {snapshot.runtime.pauseReason || "Sin motivo registrado."}{snapshot.runtime.pausedAt ? ` · ${new Date(snapshot.runtime.pausedAt).toLocaleString("es-VE")}` : ""}</div>}
+        {snapshot.runtime.emergencyPaused && <div className="relative mt-4 rounded-xl border border-red-400/20 bg-red-500/[0.07] p-4 text-xs text-red-200"><strong>Pausa activa.</strong> {snapshot.runtime.pauseReason || "Sin motivo registrado."}{snapshot.runtime.pausedAt ? ` · ${formatAdminDateTime(snapshot.runtime.pausedAt)}` : ""}</div>}
       </section>
 
       {error && <div role="alert" className="rounded-xl border border-red-400/20 bg-red-500/[0.07] p-4 text-sm text-red-200">{error}</div>}
@@ -180,7 +181,7 @@ export function AdminDashboard({ initialSnapshot }: { initialSnapshot: AdminDash
       <div className="grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
         <Panel title="Salud de servicios" icon={Activity} description="Estado observado sin exponer configuración sensible.">
           <div className="grid gap-3 sm:grid-cols-2">
-            {snapshot.services.map((service) => <div key={service.key} className="rounded-xl border border-white/[0.07] bg-black/20 p-4"><div className="flex items-center justify-between gap-3"><p className="text-sm font-medium">{service.label}</p><StatusPill state={serviceLabels[service.state]} tone={serviceTone[service.state]} /></div><p className="mt-2 text-xs leading-5 text-slate-500">{service.summary}</p>{service.observedAt && <p className="mt-2 text-[10px] text-slate-700">{formatRelative(service.observedAt)}</p>}</div>)}
+            {snapshot.services.map((service) => <div key={service.key} className="rounded-xl border border-white/[0.07] bg-black/20 p-4"><div className="flex items-center justify-between gap-3"><p className="text-sm font-medium">{service.label}</p><StatusPill state={serviceLabels[service.state]} tone={serviceTone[service.state]} /></div><p className="mt-2 text-xs leading-5 text-slate-500">{service.summary}</p>{service.observedAt && <p className="mt-2 text-[10px] text-slate-700">{formatRelativeAt(service.observedAt, snapshot.generatedAt)}</p>}</div>)}
           </div>
         </Panel>
         <Panel title="Intervenciones" icon={AlertTriangle} description="Elementos que requieren revisión humana u operativa.">
@@ -197,7 +198,7 @@ export function AdminDashboard({ initialSnapshot }: { initialSnapshot: AdminDash
 
       <Panel title="Colas por modalidad" icon={ServerCog} description="Conteos persistidos y heartbeats del worker. Los workflows no operativos se muestran explícitamente.">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          {snapshot.queues.map((queue) => <article key={queue.kind} className="rounded-xl border border-white/[0.07] bg-black/20 p-4"><div className="flex items-center justify-between"><p className="text-sm font-semibold capitalize">{queue.kind}</p><span className={cn("size-2 rounded-full", queue.workerAvailable ? "bg-emerald-300" : "bg-slate-700")} /></div><div className="mt-4 grid grid-cols-2 gap-2 text-xs"><QueueCount label="En cola" value={queue.queued} /><QueueCount label="Procesando" value={queue.processing} /><QueueCount label="Fallidos" value={queue.failed} /><QueueCount label="DLQ" value={queue.dlq} /></div><div className="mt-4 border-t border-white/[0.06] pt-3"><StatusPill state={queue.workflowConfigured ? "Workflow real" : "Contrato solamente"} tone={queue.workflowConfigured ? "success" : "warning"} /></div>{queue.oldestQueuedAt && <p className="mt-2 text-[10px] text-slate-600">Más antiguo: {formatRelative(queue.oldestQueuedAt)}</p>}</article>)}
+          {snapshot.queues.map((queue) => <article key={queue.kind} className="rounded-xl border border-white/[0.07] bg-black/20 p-4"><div className="flex items-center justify-between"><p className="text-sm font-semibold capitalize">{queue.kind}</p><span className={cn("size-2 rounded-full", queue.workerAvailable ? "bg-emerald-300" : "bg-slate-700")} /></div><div className="mt-4 grid grid-cols-2 gap-2 text-xs"><QueueCount label="En cola" value={queue.queued} /><QueueCount label="Procesando" value={queue.processing} /><QueueCount label="Fallidos" value={queue.failed} /><QueueCount label="DLQ" value={queue.dlq} /></div><div className="mt-4 border-t border-white/[0.06] pt-3"><StatusPill state={queue.workflowConfigured ? "Workflow real" : "Contrato solamente"} tone={queue.workflowConfigured ? "success" : "warning"} /></div>{queue.oldestQueuedAt && <p className="mt-2 text-[10px] text-slate-600">Más antiguo: {formatRelativeAt(queue.oldestQueuedAt, snapshot.generatedAt)}</p>}</article>)}
         </div>
       </Panel>
 
@@ -231,4 +232,3 @@ function CostRow({ label, value, emphasized }: { label: string; value: string; e
 function jobTone(status: string): "success" | "warning" | "danger" | "neutral" | "info" { return status === "completed" ? "success" : status === "failed" ? "danger" : status === "processing" ? "info" : status === "queued" ? "warning" : "neutral"; }
 function formatUsd(value: number) { return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 6 }); }
 function formatDuration(value: number | null) { if (value === null) return "—"; if (value < 1_000) return `${value} ms`; const seconds = value / 1_000; return seconds < 60 ? `${seconds.toFixed(1)} s` : `${(seconds / 60).toFixed(1)} min`; }
-function formatRelative(value: string) { const seconds = Math.max(Math.round((Date.now() - Date.parse(value)) / 1_000), 0); if (seconds < 60) return `hace ${seconds}s`; if (seconds < 3_600) return `hace ${Math.floor(seconds / 60)}m`; if (seconds < 86_400) return `hace ${Math.floor(seconds / 3_600)}h`; return new Date(value).toLocaleString("es-VE"); }
