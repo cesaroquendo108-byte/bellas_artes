@@ -10,6 +10,7 @@ import type { GenerationKind, GenerationJobResponse } from "./contracts";
 import type { GenerationRouteSpec } from "./registry";
 import { hasWorkflowManifest, loadWorkflowManifest, validateWorkflowRequest } from "./workflow-manifests";
 import { assertGenerationAccess } from "./access";
+import { isGenerationEmergencyPaused } from "@/lib/admin/runtime-controls";
 
 export class GenerationServiceError extends Error {
   constructor(readonly code: string, message: string, readonly status = 422) {
@@ -56,6 +57,13 @@ export async function enqueueGeneration(input: {
         errorCode: `${input.kind.toUpperCase()}_PROVIDER_NOT_CONFIGURED`,
         message: `La generación de ${input.kind} todavía no está conectada.`,
       };
+    }
+    if (await isGenerationEmergencyPaused()) {
+      throw new GenerationServiceError(
+        "GENERATION_EMERGENCY_PAUSED",
+        "La generación está pausada temporalmente por operación.",
+        503,
+      );
     }
     const access = await assertGenerationAccess(input.userId, input.kind, input.route.backendModel);
     if (!access.allowed) throw new GenerationServiceError(access.code, access.message, access.status);

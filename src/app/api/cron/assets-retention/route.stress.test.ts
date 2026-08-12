@@ -4,9 +4,16 @@ import { NextRequest } from "next/server";
 vi.mock("server-only", () => ({}));
 
 const mockCleanupExpiredAssets = vi.fn();
+const mockRecordServiceHeartbeat = vi.fn();
 
 vi.mock("@/lib/assets/cleanup", () => ({
   cleanupExpiredAssets: () => mockCleanupExpiredAssets(),
+}));
+vi.mock("@/lib/admin/service-heartbeats", () => ({
+  recordServiceHeartbeat: (input: unknown) => {
+    mockRecordServiceHeartbeat(input);
+    return Promise.resolve();
+  },
 }));
 
 import { GET } from "./route";

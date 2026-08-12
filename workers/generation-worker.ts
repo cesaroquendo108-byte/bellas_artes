@@ -5,13 +5,15 @@ import { completeGenerationJob, getGenerationJob, markGenerationProcessing, reco
 import { persistGenerationOutput } from "@/lib/generation/output";
 import { getProvider, selectProvider, ProviderError, type ProviderJob, type ProviderResult } from "@/lib/generation/providers";
 import { getPrivateObjectUrl } from "@/lib/storage/r2";
-import { moveToDLQ, type GenerationQueueKind } from "@/lib/generation/queue";
+import { getDeadLetterQueue, getGenerationQueue, moveToDLQ, type GenerationQueueKind } from "@/lib/generation/queue";
 import { claimVastTestBudget, finalizeVastTestBudget } from "@/lib/generation/vast-test-budget";
 import { loadWorkflowManifest, validateWorkflowAssets } from "@/lib/generation/workflow-manifests";
+import { recordServiceHeartbeat } from "@/lib/admin/service-heartbeats";
 
 type WorkerPayload = { jobId: string };
 const activeConnections = new Set<Redis>();
 const activeWorkers = new Set<Worker<WorkerPayload>>();
+const activeHeartbeatIntervals = new Set<NodeJS.Timeout>();
 let shutdownHandlersInstalled = false;
 
 function log(level: "info" | "warn" | "error", message: string, meta?: Record<string, unknown>) {
@@ -161,6 +163,7 @@ export function startGenerationWorkers() {
 
   installShutdownHandlers();
   connection.on("error", (error) => log("error", "Error de conexión Redis.", { error: error.message }));
+  startHeartbeatLoop(connection, configuredKinds, config.enabled, config.workerConcurrency);
 
   if (!config.enabled) {
     log("info", "Worker en modo inactivo; no consumirá jobs.", { kinds: configuredKinds, generationEnabled: false });
@@ -242,6 +245,63 @@ export function startGenerationWorkers() {
   });
 }
 
+function startHeartbeatLoop(
+  connection: Redis,
+  kinds: GenerationQueueKind[],
+  generationEnabled: boolean,
+  concurrency: number,
+) {
+  const report = async () => {
+    try {
+      const pong = await connection.ping();
+      await recordServiceHeartbeat({
+        serviceKey: "redis",
+        status: pong === "PONG" ? "healthy" : "error",
+        details: { pong: pong === "PONG" },
+      });
+      await Promise.all(kinds.map(async (kind) => {
+        const [counts, dlqCounts] = await Promise.all([
+          getGenerationQueue(kind).getJobCounts("waiting", "active", "failed"),
+          getDeadLetterQueue(kind).getJobCounts("waiting", "active", "failed", "delayed"),
+        ]);
+        await recordServiceHeartbeat({
+          serviceKey: `queue:${kind}`,
+          status: generationEnabled ? "healthy" : "stopped",
+          details: {
+            waiting: counts.waiting ?? 0,
+            active: counts.active ?? 0,
+            failed: counts.failed ?? 0,
+            dlq: (dlqCounts.waiting ?? 0) + (dlqCounts.active ?? 0) + (dlqCounts.failed ?? 0) + (dlqCounts.delayed ?? 0),
+          },
+        });
+      }));
+      await recordServiceHeartbeat({
+        serviceKey: "worker:generation",
+        status: generationEnabled ? "healthy" : "stopped",
+        details: {
+          generationEnabled,
+          concurrency,
+          kinds: kinds.join(","),
+        },
+      });
+    } catch (error) {
+      log("warn", "No se pudo actualizar el heartbeat del worker.", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      await recordServiceHeartbeat({
+        serviceKey: "worker:generation",
+        status: "error",
+        details: { generationEnabled, concurrency },
+      }).catch(() => undefined);
+    }
+  };
+
+  void report();
+  const interval = setInterval(() => void report(), 30_000);
+  interval.unref();
+  activeHeartbeatIntervals.add(interval);
+}
+
 export function getConfiguredQueueKinds(value = process.env.WORKER_QUEUE_KINDS ?? "image,video,audio,character,world") {
   return [...new Set(value
     .split(",")
@@ -280,6 +340,8 @@ function installShutdownHandlers() {
   shutdownHandlersInstalled = true;
   const shutdown = async (signal: string) => {
     log("info", "Cerrando generation worker.", { signal });
+    activeHeartbeatIntervals.forEach((interval) => clearInterval(interval));
+    activeHeartbeatIntervals.clear();
     await Promise.allSettled([...activeWorkers].map((worker) => worker.close()));
     await Promise.allSettled([...activeConnections].map((connection) => connection.quit()));
     process.exit(0);
