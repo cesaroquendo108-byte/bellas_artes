@@ -19,6 +19,7 @@ import {
   type ModelBenchmarkEvidence,
 } from "@/lib/admin/model-benchmark";
 import { requireAdmin } from "@/lib/auth";
+import installState from "../../../../../infra/models/model-install-state.json";
 
 export const dynamic = "force-dynamic";
 
@@ -37,13 +38,32 @@ const evidenceLabels: Record<ModelBenchmarkEvidence, string> = {
   blocked: "Sin prueba real",
 };
 
+const installLabels = {
+  installed: "Pesos instalados",
+  installing: "Instalando",
+  partial: "Instalación parcial",
+  queued: "En cola de instalación",
+  gated: "Acceso gated pendiente",
+  blocked: "Instalación bloqueada",
+} as const;
+
+type ModelInstallState = {
+  state: keyof typeof installLabels;
+  note: string;
+};
+
 export default async function AdminModelsPage() {
   const { profile } = await requireAdmin();
   if (!isVastAdminOperator(profile.email, getVastAdminServerConfig())) {
     redirect("/admin");
   }
 
-  const models = listModelBenchmark();
+  const models = listModelBenchmark().map((model) => ({
+    ...model,
+    installation: installState.models[
+      model.id as keyof typeof installState.models
+    ] as ModelInstallState,
+  }));
   const summary = summarizeModelBenchmark();
 
   return (
@@ -73,6 +93,10 @@ export default async function AdminModelsPage() {
         <Metric label="Implementar" value={summary.implementNext} />
         <Metric label="Benchmark siguiente" value={summary.benchmarkNext} />
         <Metric label="Reemplazados/descartados" value={summary.replacedOrDiscarded} />
+        <Metric
+          label="Pesos instalados"
+          value={Object.values(installState.models).filter((item) => item.state === "installed").length}
+        />
       </section>
 
       <Card>
@@ -137,6 +161,12 @@ export default async function AdminModelsPage() {
                   {evidenceLabels[model.evidence]}
                 </Badge>
                 <Badge variant="outline">{model.workflowState.replace("_", " ")}</Badge>
+                <Badge
+                  variant="outline"
+                  className={model.installation.state === "installed" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-amber-300 bg-amber-50 text-amber-800"}
+                >
+                  {installLabels[model.installation.state]}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
@@ -153,6 +183,12 @@ export default async function AdminModelsPage() {
               <div className="rounded-xl border border-border bg-muted/35 p-3">
                 <p className="font-medium text-foreground">Evidencia</p>
                 <p className="mt-1 leading-5 text-muted-foreground">{model.evidenceNote}</p>
+              </div>
+              <div className="rounded-xl border border-border bg-muted/35 p-3">
+                <p className="font-medium text-foreground">Instalación privada</p>
+                <p className="mt-1 leading-5 text-muted-foreground">
+                  {model.installation.note}
+                </p>
               </div>
               <div>
                 <p className="font-medium text-foreground">Decisión</p>
@@ -183,4 +219,3 @@ function Metric({ label, value }: { label: string; value: number }) {
     </Card>
   );
 }
-

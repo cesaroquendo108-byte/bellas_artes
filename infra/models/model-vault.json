@@ -1,0 +1,417 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-13",
+  "models": [
+    {
+      "id": "flux-schnell",
+      "name": "FLUX.1 Schnell",
+      "category": "image",
+      "access": "gated",
+      "estimatedInstallGb": 34,
+      "packages": [
+        {
+          "type": "huggingface",
+          "repo": "black-forest-labs/FLUX.1-schnell",
+          "revision": "741f7c3ce8b383c54771c7003378a50191e9efe9",
+          "include": ["*.json", "*.md", "LICENSE*", "flux1-schnell.safetensors", "ae.safetensors", "text_encoder/**/*.json", "text_encoder/**/*.safetensors", "text_encoder_2/**/*.json", "text_encoder_2/**/*.safetensors"]
+        }
+      ]
+    },
+    {
+      "id": "sd35-medium",
+      "name": "Stable Diffusion 3.5 Medium",
+      "category": "image",
+      "access": "gated",
+      "estimatedInstallGb": 13,
+      "packages": [
+        {
+          "type": "huggingface",
+          "repo": "stabilityai/stable-diffusion-3.5-medium",
+          "revision": "b940f670f0eda2d07fbb75229e779da1ad11eb80",
+          "include": ["*.json", "*.md", "LICENSE*", "sd3.5_medium.safetensors", "text_encoders/t5xxl_fp8_e4m3fn.safetensors", "text_encoders/clip_g.safetensors", "text_encoders/clip_l.safetensors", "vae/**/*"]
+        }
+      ]
+    },
+    {
+      "id": "flux2-klein-4b",
+      "name": "FLUX.2 Klein 4B",
+      "category": "image",
+      "access": "public",
+      "estimatedInstallGb": 17,
+      "packages": [
+        {
+          "type": "huggingface",
+          "repo": "black-forest-labs/FLUX.2-klein-4B",
+          "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+          "include": ["*.json", "*.md", "LICENSE*", "flux-2-klein-4b.safetensors", "text_encoder/**/*.json", "text_encoder/**/*.safetensors", "vae/**/*"]
+        }
+      ]
+    },
+    {
+      "id": "pixart-sigma",
+      "name": "PixArt-Sigma XL 1024",
+      "category": "image",
+      "access": "public",
+      "estimatedInstallGb": 22,
+      "packages": [
+        {
+          "type": "huggingface",
+          "repo": "PixArt-alpha/PixArt-Sigma-XL-2-1024-MS",
+          "revision": "e102b3591cc82e97071b8b4cb90d834d0c487207"
+        }
+      ]
+    },
+    {
+      "id": "controlnet-dwpose",
+      "name": "ControlNet + DWPose",
+      "category": "character",
+      "access": "public",
+      "estimatedInstallGb": 3,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/IDEA-Research/DWPose.git",
+          "revision": "3dca5db79d9f9ffdd378753ddf6ec66535aace88"
+        },
+        {
+          "type": "huggingface",
+          "repo": "yzd-v/DWPose",
+          "revision": "1a7144101628d69ee7a3768d1ee3a094070dc388",
+          "include": ["*.md", "*.json", "yolox_l.onnx", "dw-ll_ucoco_384.onnx", "dw-ll_ucoco_384.pth"]
+        },
+        {
+          "type": "huggingface",
+          "repo": "lllyasviel/control_v11p_sd15_openpose",
+          "revision": "9ae9f970358db89e211b87c915f9535c6686d5ba",
+          "include": ["*.json", "*.md", "diffusion_pytorch_model.fp16.safetensors"]
+        }
+      ]
+    },
+    {
+      "id": "real-esrgan",
+      "name": "Real-ESRGAN",
+      "category": "postprocess",
+      "access": "public",
+      "estimatedInstallGb": 1,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/xinntao/Real-ESRGAN.git",
+          "revision": "a4abfb2979a7bbff3f69f58f58ae324608821e27"
+        },
+        {
+          "type": "url",
+          "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+          "filename": "RealESRGAN_x4plus.pth"
+        },
+        {
+          "type": "url",
+          "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth",
+          "filename": "realesr-animevideov3.pth"
+        }
+      ]
+    },
+    {
+      "id": "practical-rife",
+      "name": "Practical-RIFE 4.26",
+      "category": "postprocess",
+      "access": "public",
+      "estimatedInstallGb": 1,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/hzwer/Practical-RIFE.git",
+          "revision": "17d8c7a1005b37f4c97bfee04e316aaec7fdc536"
+        },
+        {
+          "type": "gdrive",
+          "fileId": "1gViYvvQrtETBgU1w8axZSsr7YUuw31uy",
+          "filename": "rife-v4.26.zip"
+        }
+      ]
+    },
+    {
+      "id": "rvc",
+      "name": "RVC",
+      "category": "audio",
+      "access": "public",
+      "estimatedInstallGb": 1,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI.git",
+          "revision": "81eed5e8f68b6bed1789f682fe78cdd324495afc"
+        },
+        {
+          "type": "huggingface",
+          "repo": "lj1995/VoiceConversionWebUI",
+          "revision": "e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+          "include": ["*.md", "rmvpe.onnx", "hubert_base.pt", "pretrained_v2/f0D40k.pth", "pretrained_v2/f0G40k.pth"]
+        }
+      ]
+    },
+    {
+      "id": "wan22-ti2v-5b",
+      "name": "Wan 2.2 TI2V-5B",
+      "category": "video",
+      "access": "public",
+      "estimatedInstallGb": 35,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/Wan-Video/Wan2.2.git",
+          "revision": "42bf4cfaa384bc21833865abc2f9e6c0e67233dc"
+        },
+        {
+          "type": "huggingface",
+          "repo": "Wan-AI/Wan2.2-TI2V-5B",
+          "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e"
+        }
+      ]
+    },
+    {
+      "id": "hunyuan-video-15-83b",
+      "name": "HunyuanVideo 1.5 8.3B",
+      "category": "video",
+      "access": "community",
+      "estimatedInstallGb": 60,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5.git",
+          "revision": "60783e704160023913bee78f0b47036d393d4dfa"
+        },
+        {
+          "type": "huggingface",
+          "repo": "tencent/HunyuanVideo-1.5",
+          "revision": "9b49404b3f5df2a8f0b31df27a0c7ab872e7b038",
+          "include": ["*.json", "*.md", "LICENSE*", "transformer/480p_t2v_distilled/**/*", "vae/**/*"]
+        },
+        {
+          "type": "huggingface",
+          "repo": "Qwen/Qwen2.5-VL-7B-Instruct",
+          "revision": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
+          "include": ["*.json", "*.md", "LICENSE*", "*.safetensors", "*.model", "*.txt"]
+        },
+        {
+          "type": "huggingface",
+          "repo": "google/byt5-small",
+          "revision": "68377bdc18a2ffec8a0533fef03b1c513a4dd49d",
+          "include": ["*.json", "*.md", "pytorch_model.bin"]
+        },
+        {
+          "type": "modelscope",
+          "repo": "AI-ModelScope/Glyph-SDXL-v2",
+          "revision": "b51a8604c03c9a4e71a389f4c7deeb526320f2e6"
+        }
+      ]
+    },
+    {
+      "id": "liveportrait-no-insightface",
+      "name": "LivePortrait sin InsightFace",
+      "category": "character",
+      "access": "public",
+      "estimatedInstallGb": 2,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/KlingAIResearch/LivePortrait.git",
+          "revision": "9b294b3d0536135442ea73cb01e6cb3ca7029dd3"
+        },
+        {
+          "type": "huggingface",
+          "repo": "KwaiVGI/LivePortrait",
+          "revision": "82a4fa6735ca58432b6ce39301b4b9ee066dea47",
+          "include": ["*.md", "LICENSE*", "liveportrait/**/*"]
+        }
+      ]
+    },
+    {
+      "id": "z-image",
+      "name": "Z-Image",
+      "category": "image",
+      "access": "public",
+      "estimatedInstallGb": 21,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/Tongyi-MAI/Z-Image.git",
+          "revision": "26f23eda626ffadda020b04ff79488e1d72004cd"
+        },
+        {
+          "type": "huggingface",
+          "repo": "Tongyi-MAI/Z-Image",
+          "revision": "04cc4abb7c5069926f75c9bfde9ef43d49423021"
+        }
+      ]
+    },
+    {
+      "id": "qwen-image",
+      "name": "Qwen-Image",
+      "category": "image",
+      "access": "public",
+      "estimatedInstallGb": 59,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/QwenLM/Qwen-Image.git",
+          "revision": "6b5e1f5cec987d404be5ac6657db3b9aacb56a89"
+        },
+        {
+          "type": "huggingface",
+          "repo": "Qwen/Qwen-Image",
+          "revision": "75e0b4be04f60ec59a75f475837eced720f823b6"
+        }
+      ]
+    },
+    {
+      "id": "flux-dev",
+      "name": "FLUX.1 Dev FP8 + BF16",
+      "category": "image",
+      "access": "gated-research",
+      "estimatedInstallGb": 37,
+      "packages": [
+        {
+          "type": "huggingface",
+          "repo": "black-forest-labs/FLUX.1-dev-FP8",
+          "revision": "2fcc6a7ddee78972c8834226b37a09cebff1b6de"
+        },
+        {
+          "type": "huggingface",
+          "repo": "black-forest-labs/FLUX.1-dev",
+          "revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+          "include": ["*.md", "LICENSE*", "flux1-dev.safetensors", "ae.safetensors"]
+        }
+      ]
+    },
+    {
+      "id": "flux2-klein-9b",
+      "name": "FLUX.2 Klein 9B FP8",
+      "category": "image",
+      "access": "gated-research",
+      "estimatedInstallGb": 10,
+      "packages": [
+        {
+          "type": "huggingface",
+          "repo": "black-forest-labs/FLUX.2-klein-9b-fp8",
+          "revision": "902d9d510b51533e07729f19211414a3648b77d2"
+        }
+      ]
+    },
+    {
+      "id": "juggernaut-xl",
+      "name": "Juggernaut XL Ragnarok",
+      "category": "image",
+      "access": "research",
+      "estimatedInstallGb": 7,
+      "packages": [
+        {
+          "type": "url",
+          "url": "https://civitai.com/api/download/models/1759168",
+          "filename": "juggernautXL_ragnarok.safetensors"
+        }
+      ]
+    },
+    {
+      "id": "dynavision-xl",
+      "name": "DynaVision XL 0.6.1",
+      "category": "image",
+      "access": "research",
+      "estimatedInstallGb": 7,
+      "packages": [
+        {
+          "type": "url",
+          "url": "https://civitai.com/api/download/models/297740",
+          "filename": "dynavisionXL_releaseV0610.safetensors"
+        }
+      ]
+    },
+    {
+      "id": "wai-ani-ponyxl",
+      "name": "WAI-ANI PonyXL 6.0",
+      "category": "image",
+      "access": "research-restricted",
+      "estimatedInstallGb": 7,
+      "packages": [
+        {
+          "type": "url",
+          "url": "https://civitai.com/api/download/models/952743",
+          "filename": "waiANIHENTAIPONYXL_v60.safetensors"
+        }
+      ]
+    },
+    {
+      "id": "f5-tts-official",
+      "name": "F5-TTS v1 Base",
+      "category": "audio",
+      "access": "gated-research",
+      "estimatedInstallGb": 2,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/SWivid/F5-TTS.git",
+          "revision": "9c614e9657089213efc6a7421b30630be138a3f5"
+        },
+        {
+          "type": "huggingface",
+          "repo": "SWivid/F5-TTS",
+          "revision": "84e5a410d9cead4de2f847e7c9369a6440bdfaca",
+          "include": ["*.md", "LICENSE*", "F5TTS_v1_Base/model_1250000.safetensors"]
+        }
+      ]
+    },
+    {
+      "id": "hunyuan-video-original",
+      "name": "HunyuanVideo original FP8",
+      "category": "video",
+      "access": "community",
+      "estimatedInstallGb": 15,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/Tencent-Hunyuan/HunyuanVideo.git",
+          "revision": "e748c73ac064728bf6bd15b1cdb8161e55a4f331"
+        },
+        {
+          "type": "huggingface",
+          "repo": "tencent/HunyuanVideo",
+          "revision": "6204ad6aea1a77ff5aba337c88278bb9500eb37d",
+          "include": ["*.md", "LICENSE*", "hunyuan-video-t2v-720p/transformers/mp_rank_00_model_states_fp8.pt", "hunyuan-video-t2v-720p/vae/**/*"]
+        }
+      ]
+    },
+    {
+      "id": "cmu-openpose",
+      "name": "CMU OpenPose",
+      "category": "dependency",
+      "access": "research",
+      "estimatedInstallGb": 1,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/CMU-Perceptual-Computing-Lab/openpose.git",
+          "revision": "5c5d96523ef917bd30301245fdc8343937cae48d"
+        }
+      ]
+    },
+    {
+      "id": "insightface-models",
+      "name": "InsightFace buffalo_l",
+      "category": "dependency",
+      "access": "research",
+      "estimatedInstallGb": 1,
+      "packages": [
+        {
+          "type": "git",
+          "url": "https://github.com/deepinsight/insightface.git",
+          "revision": "7fadd420c2351d0ffa8cac403421c1a3ed733365"
+        },
+        {
+          "type": "url",
+          "url": "https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip",
+          "filename": "buffalo_l.zip"
+        }
+      ]
+    }
+  ]
+}
