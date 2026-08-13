@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ToolCallCard } from "@/components/ui/motion-effects"
 
 type Platform = "claude" | "chatgpt" | "cursor" | "other"
 const platforms: { value: Platform; label: string }[] = [
@@ -110,6 +111,19 @@ export function McpLanding({ serverUrl }: { serverUrl: string | null }) {
               <p className="mt-2 text-xs leading-5 text-slate-500">{copy}</p>
             </Card>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-20 max-w-5xl">
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-300">Contrato visible</p>
+          <h2 className="mt-3 text-3xl font-semibold">Cada tool declara su estado real.</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-500">El endpoint puede listar herramientas aunque una operación de generación todavía esté en preparación. La interfaz no oculta esa diferencia.</p>
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <ToolCallCard name="list_tools" status={configured ? "ready" : "preparing"} description="Consulta el catálogo de herramientas y sus capacidades declaradas." />
+          <ToolCallCard name="create_image" status="preparing" description="Disponible como contrato; la generación real sigue restringida al flujo validado." />
+          <ToolCallCard name="create_video" status="preparing" description="Las operaciones de video requieren workflows operation-specific todavía no conectados." />
         </div>
       </section>
 

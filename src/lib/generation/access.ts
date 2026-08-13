@@ -32,6 +32,9 @@ export function evaluateGenerationAccess(input: {
   if (input.mode === "allowlist" && (!grant || !grantAllowsKind(grant, input.kind))) {
     return { allowed: false, code: "GENERATION_BETA_INVITE_REQUIRED", message: "Esta cuenta todavía no tiene acceso a la beta privada.", status: 403 };
   }
+  if (isAdminOnlyBackend(input.backendModel) && input.profile.role !== "admin") {
+    return { allowed: false, code: "GENERATION_ADMIN_ONLY", message: "Este modelo está reservado para validación administrativa.", status: 403 };
+  }
   if (input.profile.role === "admin") return { allowed: true };
   if (input.mode === "admin") {
     return { allowed: false, code: "GENERATION_ADMIN_ONLY", message: "La generación está limitada temporalmente a administradores.", status: 403 };
@@ -88,6 +91,10 @@ function grantAllowsKind(grant: GenerationAccessGrant, kind: GenerationProviderK
 
 function isPremiumBackend(backendModel: string) {
   return backendModel.includes("flux-dev") || backendModel.includes("hunyuan-video-13b");
+}
+
+function isAdminOnlyBackend(backendModel: string) {
+  return backendModel === "pixart-sigma" || backendModel === "sd35-medium";
 }
 
 function hasPremiumEntitlement(profile: GenerationAccessProfile, grant: GenerationAccessGrant | null) {

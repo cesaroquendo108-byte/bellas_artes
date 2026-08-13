@@ -37,11 +37,12 @@ export type ImageGenerationMode = "create" | "variation"
 export type ImageAspectRatio = "1:1" | "16:9" | "9:16" | "4:5"
 export type ImageResolution = "1k" | "2k"
 export type ImageQuality = "low" | "medium" | "high"
+export type ImageModel = "flux-schnell" | "flux-dev" | "pixart-sigma" | "sd35-medium"
 
 export interface ImageGenerationRequest {
   mode: ImageGenerationMode
   prompt: string
-  model: "flux-schnell" | "flux-dev"
+  model: ImageModel
   autoPolish: boolean
   aspectRatio: ImageAspectRatio
   resolution: ImageResolution

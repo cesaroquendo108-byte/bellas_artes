@@ -107,6 +107,7 @@ export function isGenerationConfigured() {
 export function isGenerationRouteConfigured(input: { providerRoute: ProviderRoute; workflowVersion: string }) {
   const config = getGenerationConfig();
   if (!config.enabled) return false;
+  if (!isGenerationSafetyConfigured()) return false;
   if (input.providerRoute === "fake") return process.env.NODE_ENV === "test";
   const workflowKind = input.workflowVersion.split("/", 1)[0];
   const kind = workflowKind === "characters" ? "character" : workflowKind === "worlds" ? "world" : workflowKind;
@@ -114,6 +115,26 @@ export function isGenerationRouteConfigured(input: { providerRoute: ProviderRout
     && isGenerationProviderKind(kind)
     && Boolean(getVastComfyBaseUrl(kind) || getVastServerlessEndpointName(kind, input.workflowVersion))
     && isWorkflowConfigured(input.workflowVersion);
+}
+
+/** Beta safety gates fail closed when they are explicitly required. */
+export function isGenerationSafetyConfigured() {
+  const auditRequired = process.env.GENERATION_REQUIRE_AUDIT === "true";
+  const auditConfigured = process.env.GENERATION_AUDIT_ENABLED === "true"
+    && Boolean(process.env.MODERATION_AUDIT_SALT?.trim());
+  if (auditRequired && !auditConfigured) return false;
+
+  const provenanceRequired = process.env.GENERATION_REQUIRE_PROVENANCE === "true";
+  if (provenanceRequired && !process.env.PROVENANCE_SIGNING_KEY?.trim()) return false;
+
+  const l2Required = process.env.GENERATION_MODERATION_LEVEL?.trim().toLowerCase() === "l2";
+  if (l2Required && (
+    process.env.GENERATION_MODERATION_PROVIDER !== "openrouter"
+    || !process.env.OPENROUTER_API_KEY?.trim()
+    || !process.env.GENERATION_MODERATION_MODEL?.trim()
+  )) return false;
+
+  return true;
 }
 
 export function isGenerationEnabled() {

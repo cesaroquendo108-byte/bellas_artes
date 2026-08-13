@@ -55,6 +55,39 @@ const fluxSchnellManifest: WorkflowManifest = {
   outputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
 };
 
+// These are deliberately contract manifests, not claims that the providers are ready.
+// The node ids describe the bindings a future exported ComfyUI graph must expose;
+// without a bundled graph or a valid WORKFLOW_* value, isWorkflowConfigured() stays false.
+function buildUnconfiguredImageManifest(input: {
+  version: string;
+  minimumVramGb: number;
+  estimatedBudgetUsd: number;
+  timeoutSeconds: number;
+}): WorkflowManifest {
+  return {
+    version: input.version,
+    kind: "image",
+    bindings: [
+      { nodeId: "prompt", input: "text", source: { type: "request", path: "prompt" }, required: true },
+      { nodeId: "sampler", input: "seed", source: { type: "request", path: "seed" } },
+      { nodeId: "sampler", input: "steps", source: { type: "request", path: "steps" } },
+      { nodeId: "sampler", input: "cfg", source: { type: "request", path: "cfgScale" } },
+      { nodeId: "latent", input: "width", source: { type: "computed", value: "image-width" } },
+      { nodeId: "latent", input: "height", source: { type: "computed", value: "image-height" } },
+    ],
+    outputNodes: [{ nodeId: "output", classTypes: ["SaveImage"] }],
+    limits: {
+      maxWidth: 2048,
+      maxHeight: 2048,
+      timeoutSeconds: input.timeoutSeconds,
+      estimatedBudgetUsd: input.estimatedBudgetUsd,
+      minimumVramGb: input.minimumVramGb,
+    },
+    inputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
+    outputMimeTypes: ["image/png", "image/jpeg", "image/webp"],
+  };
+}
+
 const imageReferenceBindings: WorkflowBinding[] = [
   { nodeId: "prompt", input: "text", source: { type: "request", path: "prompt" }, required: true },
   { nodeId: "reference", input: "url", source: { type: "asset", role: "reference", index: 0 } },
@@ -68,6 +101,18 @@ const imageReferenceBindings: WorkflowBinding[] = [
 
 const manifests: Record<string, WorkflowManifest> = {
   [fluxSchnellManifest.version]: fluxSchnellManifest,
+  "image/pixart-sigma-v1": buildUnconfiguredImageManifest({
+    version: "image/pixart-sigma-v1",
+    minimumVramGb: 16,
+    estimatedBudgetUsd: 0.04,
+    timeoutSeconds: 600,
+  }),
+  "image/sd35-medium-v1": buildUnconfiguredImageManifest({
+    version: "image/sd35-medium-v1",
+    minimumVramGb: 24,
+    estimatedBudgetUsd: 0.08,
+    timeoutSeconds: 900,
+  }),
   "image/flux-dev-v1": {
     ...fluxSchnellManifest,
     version: "image/flux-dev-v1",

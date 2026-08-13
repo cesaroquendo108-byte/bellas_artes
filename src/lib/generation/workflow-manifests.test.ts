@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bindWorkflow, loadWorkflowManifest, validateWorkflowAssets, validateWorkflowGraph, validateWorkflowRequest } from "./workflow-manifests";
+import { bindWorkflow, hasWorkflowManifest, loadWorkflowManifest, validateWorkflowAssets, validateWorkflowGraph, validateWorkflowRequest } from "./workflow-manifests";
 import { loadWorkflow } from "./workflows";
 
 describe("workflow manifests", () => {
@@ -49,6 +49,13 @@ describe("workflow manifests", () => {
   it("declara límites distintos para video estándar y Pro/B2B", () => {
     expect(loadWorkflowManifest("video/hunyuan-8.3b-t2v-v1").limits.minimumVramGb).toBe(48);
     expect(loadWorkflowManifest("video/hunyuan-13b-t2v-v1").limits.minimumVramGb).toBe(80);
+  });
+
+  it("mantiene manifests de modelos abiertos sin fingir que existe un grafo exportado", () => {
+    expect(hasWorkflowManifest("image/pixart-sigma-v1")).toBe(true);
+    expect(hasWorkflowManifest("image/sd35-medium-v1")).toBe(true);
+    expect(validateWorkflowGraph("image/pixart-sigma-v1", {})).toBe(false);
+    expect(loadWorkflowManifest("image/sd35-medium-v1").limits.minimumVramGb).toBe(24);
   });
 
   it("rechaza duración, frames y MIME fuera del contrato", () => {

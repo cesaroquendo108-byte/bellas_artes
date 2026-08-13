@@ -9,6 +9,8 @@ describe("generation registry", () => {
 
   it("mapea los modelos canónicos a workflows open source", () => {
     expect(resolveImageRoute("flux-schnell")).toMatchObject({ backendModel: "flux-schnell", workflowVersion: "image/flux-schnell-v1", credits: 1 });
+    expect(resolveImageRoute("pixart-sigma")).toMatchObject({ backendModel: "pixart-sigma", workflowVersion: "image/pixart-sigma-v1" });
+    expect(resolveImageRoute("sd35-medium")).toMatchObject({ backendModel: "sd35-medium", workflowVersion: "image/sd35-medium-v1" });
     expect(resolveVideoRoute("t2v", "hunyuan-video-1.5-8.3b")).toMatchObject({
       backendModel: "hunyuan-video-8.3b",
       workflowVersion: "video/hunyuan-8.3b-t2v-v1",

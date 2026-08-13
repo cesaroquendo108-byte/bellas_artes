@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getGenerationConfig, getVastComfyBaseUrl, isGenerationRouteConfigured } from "./config";
+import { getGenerationConfig, getVastComfyBaseUrl, isGenerationRouteConfigured, isGenerationSafetyConfigured } from "./config";
 
 describe("generation safety defaults", () => {
   afterEach(() => {
@@ -85,5 +85,23 @@ describe("generation safety defaults", () => {
     vi.stubEnv("VAST_SERVERLESS_MAX_WORKERS", "2");
 
     expect(isGenerationRouteConfigured({ providerRoute: "vast", workflowVersion: "image/flux-schnell-v1" })).toBe(false);
+  });
+
+  it("falla cerrado cuando beta exige auditoría, procedencia o L2 sin configuración", () => {
+    vi.stubEnv("GENERATION_REQUIRE_AUDIT", "true");
+    vi.stubEnv("GENERATION_AUDIT_ENABLED", "true");
+    expect(isGenerationSafetyConfigured()).toBe(false);
+
+    vi.stubEnv("MODERATION_AUDIT_SALT", "test-audit-salt");
+    vi.stubEnv("GENERATION_REQUIRE_PROVENANCE", "true");
+    expect(isGenerationSafetyConfigured()).toBe(false);
+
+    vi.stubEnv("PROVENANCE_SIGNING_KEY", "test-provenance-key");
+    vi.stubEnv("GENERATION_MODERATION_LEVEL", "l2");
+    expect(isGenerationSafetyConfigured()).toBe(false);
+    vi.stubEnv("GENERATION_MODERATION_PROVIDER", "openrouter");
+    vi.stubEnv("OPENROUTER_API_KEY", "test-openrouter-key");
+    vi.stubEnv("GENERATION_MODERATION_MODEL", "test-moderation-model");
+    expect(isGenerationSafetyConfigured()).toBe(true);
   });
 });

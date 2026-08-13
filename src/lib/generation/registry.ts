@@ -17,14 +17,19 @@ function configuredRoute(): ProviderRoute {
 }
 
 export function resolveImageRoute(model: string, params?: Record<string, unknown>): GenerationRouteSpec {
-  const premium = model === "flux-dev";
-  const backendModel = premium ? "flux-dev" : "flux-schnell";
+  const imageRoutes: Record<string, { backendModel: string; workflowVersion: string }> = {
+    "flux-schnell": { backendModel: "flux-schnell", workflowVersion: "image/flux-schnell-v1" },
+    "flux-dev": { backendModel: "flux-dev", workflowVersion: "image/flux-dev-v1" },
+    "pixart-sigma": { backendModel: "pixart-sigma", workflowVersion: "image/pixart-sigma-v1" },
+    "sd35-medium": { backendModel: "sd35-medium", workflowVersion: "image/sd35-medium-v1" },
+  };
+  const route = imageRoutes[model] ?? imageRoutes["flux-schnell"];
   return {
-    publicModel: premium ? "flux-dev" : "flux-schnell",
-    backendModel,
-    workflowVersion: premium ? "image/flux-dev-v1" : "image/flux-schnell-v1",
+    publicModel: model in imageRoutes ? model : "flux-schnell",
+    backendModel: route.backendModel,
+    workflowVersion: route.workflowVersion,
     providerRoute: configuredRoute(),
-    credits: getGenerationCreditCost("image", params, backendModel),
+    credits: getGenerationCreditCost("image", params, route.backendModel),
   };
 }
 

@@ -4,7 +4,7 @@ import { SlidersHorizontal, WandSparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { StatusPill } from "@/components/ui/motion-effects";
+import { GenerationStatusCard, StatusPill } from "@/components/ui/motion-effects";
 import {
   Sheet,
   SheetContent,
@@ -278,8 +278,39 @@ export function ImageStudio({
     />
   );
 
+  const generationStatus = pollingError
+    ? "failed"
+    : activeJob?.status ?? (isSubmitting ? "processing" : activeJobId ? "queued" : null);
+  const generationDescription = pollingError
+    ?? activeJob?.message
+    ?? (isSubmitting
+      ? "Validando la solicitud y preparando el job."
+      : activeJob?.status === "completed"
+        ? "El resultado quedó asociado a tu cuenta y se conserva privado."
+        : activeJob?.status === "not_configured"
+          ? "Este modelo tiene contrato, pero todavía no hay un workflow real conectado."
+          : "El worker informará cuando cambie el estado del job.");
+  const generationProgress = generationStatus === "completed"
+    ? 100
+    : generationStatus === "processing"
+      ? 55
+      : generationStatus === "queued"
+        ? 18
+        : undefined;
+
   return (
     <div className="workspace-surface min-h-[calc(100vh-5rem)] overflow-x-hidden rounded-[24px] lg:h-[calc(100vh-6rem)] lg:min-h-0 lg:overflow-hidden">
+      {generationStatus ? (
+        <div className="border-b border-[#e6ded1] bg-[#17131f] p-3">
+          <GenerationStatusCard
+            status={generationStatus}
+            title="Estado de la generación"
+            description={generationDescription}
+            progress={generationProgress}
+            className="border-white/[0.08] bg-black/20"
+          />
+        </div>
+      ) : null}
       <div className="flex items-center gap-3 border-b border-[#e6ded1] bg-white/80 px-4 py-3 lg:hidden">
         <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500">
           <WandSparkles className="size-4 text-white" />

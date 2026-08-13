@@ -124,7 +124,13 @@ export function ImageControls({
             <Select
               value={settings.model}
               itemToStringLabel={(value) =>
-                value === "flux-schnell" ? "Flux Schnell" : "Flux Dev"
+                value === "flux-schnell"
+                  ? "Flux Schnell"
+                  : value === "flux-dev"
+                    ? "Flux Dev"
+                    : value === "pixart-sigma"
+                      ? "PixArt-Sigma"
+                      : "Stable Diffusion 3.5 Medium"
               }
               onValueChange={(value) =>
                 value && update("model", value as ImageStudioSettings["model"])
@@ -139,6 +145,8 @@ export function ImageControls({
               <SelectContent align="start">
                 <SelectItem value="flux-schnell">Flux Schnell · Admin Preview</SelectItem>
                 <SelectItem value="flux-dev" disabled>Flux Dev · Pro/B2B en preparación</SelectItem>
+                <SelectItem value="pixart-sigma" disabled>PixArt-Sigma · En preparación</SelectItem>
+                <SelectItem value="sd35-medium" disabled>Stable Diffusion 3.5 Medium · En preparación</SelectItem>
               </SelectContent>
             </Select>
           </div>

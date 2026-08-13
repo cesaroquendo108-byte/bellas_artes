@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { surfaceStateLabels, uiStatusToneClasses, workspacePalette } from "./visual";
+import { generationStatusLabels, surfaceStateLabels, uiStatusToneClasses, visualDirectionPalettes, workspacePalette } from "./visual";
 
 describe("visual UI contracts", () => {
   it("covers every public surface state", () => {
@@ -30,5 +30,23 @@ describe("visual UI contracts", () => {
     expect(workspacePalette.canvas).toBe("#F7F4EC");
     expect(workspacePalette.primary).toBe("#7C3AED");
     expect(workspacePalette.surface).not.toBe("#0A0A0A");
+  });
+
+  it("defines honest generation states and controlled visual directions", () => {
+    expect(Object.keys(generationStatusLabels).sort()).toEqual([
+      "canceled",
+      "completed",
+      "failed",
+      "not_configured",
+      "processing",
+      "queued",
+    ]);
+    expect(Object.keys(visualDirectionPalettes).sort()).toEqual([
+      "caribe-electrico",
+      "cine-violeta",
+      "nocturno",
+      "tierra-de-estudio",
+    ]);
+    expect(Object.values(visualDirectionPalettes).every((palette) => palette.contrast.startsWith("#"))).toBe(true);
   });
 });

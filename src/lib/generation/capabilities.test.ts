@@ -22,4 +22,14 @@ describe("generation capabilities", () => {
     const serialized = JSON.stringify(listGenerationCapabilities());
     expect(serialized).not.toMatch(/gpt-image|kling|seedance|sora|veo/i);
   });
+
+  it("expone metadatos de procedencia sin convertir modelos declarativos en workflows operativos", () => {
+    expect(getGenerationCapability("image-pixart-sigma-v1")).toMatchObject({
+      model: "pixart-sigma",
+      workflowVersion: "image/pixart-sigma-v1",
+      workflowConfigured: false,
+      realWorkflowConfigured: false,
+      catalogStatus: "preparing",
+    });
+  });
 });

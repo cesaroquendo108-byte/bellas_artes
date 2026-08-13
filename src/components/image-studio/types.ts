@@ -3,6 +3,7 @@ import type {
   ImageGenerationMode,
   ImageQuality,
   ImageResolution,
+  ImageModel,
 } from "@/lib/generation/contracts"
 
 export interface ImageGalleryAsset {
@@ -26,7 +27,7 @@ export interface ImageStudioBrandKit {
 
 export interface ImageStudioSettings {
   prompt: string
-  model: "flux-schnell" | "flux-dev"
+  model: ImageModel
   autoPolish: boolean
   aspectRatio: ImageAspectRatio
   resolution: ImageResolution

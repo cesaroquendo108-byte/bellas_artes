@@ -144,6 +144,8 @@ export const suiteCapabilities = [
 export const models = [
   { id: "flux-schnell", title: "Flux Schnell", copy: "Workflow real de imagen; acceso restringido mientras se valida la infraestructura.", status: "admin_only" as const, category: "Imagen" },
   { id: "flux-dev", title: "Flux Dev", copy: "Ruta premium prevista para perfiles Pro y equipos B2B.", status: "preparing" as const, category: "Imagen Pro" },
+  { id: "pixart-sigma", title: "PixArt-Sigma", copy: "Borradores económicos previstos; falta exportar y validar su workflow.", status: "preparing" as const, category: "Imagen abierta" },
+  { id: "sd35-medium", title: "Stable Diffusion 3.5 Medium", copy: "Mayor control de texto en imagen; licencia gated pendiente de revisión.", status: "preparing" as const, category: "Imagen abierta" },
   { id: "hunyuan-video", title: "HunyuanVideo", copy: "Backends operation-specific para video estándar y premium.", status: "preparing" as const, category: "Video" },
   { id: "f5-rvc", title: "F5-TTS + RVC", copy: "Voz en español y cambio de voz con consentimiento explícito.", status: "preparing" as const, category: "Audio" },
 ];

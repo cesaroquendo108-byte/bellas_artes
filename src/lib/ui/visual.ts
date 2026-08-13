@@ -16,6 +16,16 @@ export type UiStatusTone =
   | "danger"
   | "info";
 
+export type GenerationSurfaceStatus =
+  | "queued"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "canceled"
+  | "not_configured";
+
+export type VisualDirection = "nocturno" | "cine-violeta" | "caribe-electrico" | "tierra-de-estudio";
+
 export const surfaceStateLabels: Record<SurfaceState, string> = {
   idle: "Listo",
   loading: "Cargando",
@@ -34,6 +44,24 @@ export const uiStatusToneClasses: Record<UiStatusTone, string> = {
   info: "border ba-status--info",
 };
 
+export const generationStatusLabels: Record<GenerationSurfaceStatus, string> = {
+  queued: "En cola",
+  processing: "Procesando",
+  completed: "Completado",
+  failed: "Falló",
+  canceled: "Cancelado",
+  not_configured: "En preparación",
+};
+
+export const generationStatusTones: Record<GenerationSurfaceStatus, UiStatusTone> = {
+  queued: "info",
+  processing: "info",
+  completed: "success",
+  failed: "danger",
+  canceled: "warning",
+  not_configured: "warning",
+};
+
 export const workspacePalette = {
   canvas: "#F7F4EC",
   surface: "#FFFDF8",
@@ -46,3 +74,15 @@ export const workspacePalette = {
   fuchsia: "#D946EF",
   cyan: "#0891B2",
 } as const;
+
+export const visualDirectionPalettes: Record<VisualDirection, {
+  canvas: string;
+  accent: string;
+  accentSoft: string;
+  contrast: string;
+}> = {
+  nocturno: { canvas: "#0A0A0A", accent: "#8B5CF6", accentSoft: "#2E1065", contrast: "#F5F3FF" },
+  "cine-violeta": { canvas: "#120D1F", accent: "#C084FC", accentSoft: "#3B176B", contrast: "#FAF5FF" },
+  "caribe-electrico": { canvas: "#071A22", accent: "#22D3EE", accentSoft: "#083344", contrast: "#ECFEFF" },
+  "tierra-de-estudio": { canvas: "#251B17", accent: "#F59E0B", accentSoft: "#542B05", contrast: "#FFFBEB" },
+};

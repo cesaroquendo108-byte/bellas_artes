@@ -21,4 +21,14 @@ describe("generation rollout access", () => {
     expect(evaluateGenerationAccess({ ...base, mode: "public", backendModel: "flux-dev", profile: { role: "user", plan_tier: "free" }, grant: null })).toMatchObject({ allowed: false, code: "GENERATION_PREMIUM_REQUIRED" });
     expect(evaluateGenerationAccess({ ...base, mode: "public", backendModel: "hunyuan-video-13b", profile: { role: "user", plan_tier: "b2b" }, grant: null })).toEqual({ allowed: true });
   });
+
+  it("mantiene PixArt-Sigma y SD3.5 reservados a administradores", () => {
+    for (const backendModel of ["pixart-sigma", "sd35-medium"]) {
+      expect(evaluateGenerationAccess({ ...base, mode: "public", backendModel, profile: { role: "user", plan_tier: "pro" }, grant: null })).toMatchObject({
+        allowed: false,
+        code: "GENERATION_ADMIN_ONLY",
+      });
+      expect(evaluateGenerationAccess({ ...base, mode: "public", backendModel, profile: { role: "admin", plan_tier: "free" }, grant: null })).toEqual({ allowed: true });
+    }
+  });
 });

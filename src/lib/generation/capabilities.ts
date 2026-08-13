@@ -1,4 +1,5 @@
 import { getGenerationConfig, type GenerationProviderKind } from "./config";
+import { IMAGE_MODEL_CATALOG, listImageModelCatalog, type ImageModelCatalogStatus } from "./model-catalog";
 import { isWorkflowConfigured } from "./workflows";
 
 export type GenerationCapabilityStatus =
@@ -17,11 +18,30 @@ export interface GenerationCapability {
   operation?: string;
   status: GenerationCapabilityStatus;
   workflowConfigured: boolean;
+  realWorkflowConfigured: boolean;
+  catalogStatus?: ImageModelCatalogStatus;
+  sourceUrl?: string;
+  license?: string;
+  minimumVramGb?: number;
+  estimatedCostUsd?: number;
+  estimatedLatencySeconds?: number;
 }
 
-const capabilityCatalog: Array<Omit<GenerationCapability, "status" | "workflowConfigured">> = [
-  { id: "image-flux-schnell", label: "Flux Schnell", kind: "image", model: "flux-schnell", workflowVersion: "image/flux-schnell-v1" },
-  { id: "image-flux-dev", label: "Flux Dev", kind: "image", model: "flux-dev", workflowVersion: "image/flux-dev-v1" },
+type CapabilityDefinition = Omit<GenerationCapability, "status" | "workflowConfigured" | "realWorkflowConfigured">;
+
+const capabilityCatalog: CapabilityDefinition[] = [
+  ...IMAGE_MODEL_CATALOG.map((entry) => ({
+    id: entry.id,
+    label: entry.label,
+    kind: "image" as const,
+    model: entry.backendModel,
+    workflowVersion: entry.workflowVersion,
+    sourceUrl: entry.sourceUrl,
+    license: entry.license,
+    minimumVramGb: entry.minimumVramGb,
+    estimatedCostUsd: entry.estimatedCostUsd,
+    estimatedLatencySeconds: entry.estimatedLatencySeconds,
+  })),
   { id: "character-flux-reference", label: "Flux con referencias", kind: "character", model: "flux-schnell-reference", workflowVersion: "characters/flux-reference-v1" },
   { id: "world-flux", label: "Flux World", kind: "world", model: "flux-schnell-world", workflowVersion: "worlds/flux-world-v1" },
   { id: "audio-f5-tts-es", label: "F5-TTS español", kind: "audio", model: "f5-tts-es", operation: "tts", workflowVersion: "audio/f5-tts-es-v1" },
@@ -38,11 +58,15 @@ const capabilityCatalog: Array<Omit<GenerationCapability, "status" | "workflowCo
 
 export function listGenerationCapabilities(): GenerationCapability[] {
   const config = getGenerationConfig();
+  const imageCatalog = new Map(listImageModelCatalog().map((entry) => [entry.id, entry]));
   return capabilityCatalog.map((capability) => {
     const workflowConfigured = isWorkflowConfigured(capability.workflowVersion);
+    const catalogEntry = capability.kind === "image" ? imageCatalog.get(capability.id) : undefined;
     return {
       ...capability,
       workflowConfigured,
+      realWorkflowConfigured: workflowConfigured,
+      catalogStatus: catalogEntry?.status,
       status: resolveCapabilityStatus(workflowConfigured, config.enabled, config.accessMode),
     };
   });
