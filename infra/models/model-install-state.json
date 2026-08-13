@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-13T21:30:00Z",
+  "generatedAt": "2026-08-13T21:54:00Z",
   "scope": "private-admin-research",
   "models": {
     "flux-schnell": { "state": "gated", "note": "Requiere token HF nuevo y aceptación registrada." },
@@ -10,7 +10,7 @@
     "controlnet-dwpose": { "state": "installed", "note": "Código y pesos instalados; inventario SHA-256 generado." },
     "real-esrgan": { "state": "installed", "note": "Código y dos pesos oficiales instalados; SHA-256 generado." },
     "practical-rife": { "state": "installed", "note": "Código y peso RIFE 4.26 instalados; SHA-256 generado." },
-    "rvc": { "state": "installing", "note": "Código fijado y pesos esenciales en transferencia." },
+    "rvc": { "state": "installed", "note": "Código y pesos esenciales instalados; inventario SHA-256 generado." },
     "wan22-ti2v-5b": { "state": "queued", "note": "Descarga pública preparada." },
     "hunyuan-video-15-83b": { "state": "queued", "note": "T2V 480p, VAE, Qwen2.5-VL, ByT5 y Glyph preparados." },
     "liveportrait-no-insightface": { "state": "partial", "note": "Código instalado; pesos oficiales pendientes de reanudación." },
