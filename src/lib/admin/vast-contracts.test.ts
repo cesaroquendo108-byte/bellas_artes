@@ -4,6 +4,8 @@ import {
   calculateBidPrice,
   calculateProjectedCost,
   classifyLifecycleHeartbeat,
+  getSupportedVastGpuFamily,
+  isSupportedVastGpuFamily,
   validateOfferForRental,
   type VastAdminLimits,
 } from "./vast-contracts";
@@ -33,10 +35,23 @@ describe("contratos administrativos Vast", () => {
   });
 
   it("rechaza ofertas que exceden GPU, VRAM, confiabilidad, precio o máquina del volumen", () => {
-    const offer = { numGpus: 1, gpuRamMb: 24_576, reliability: 0.995, hourlyUsd: 0.3, machineId: 42 };
+    const offer = { gpuName: "RTX 4090", numGpus: 1, gpuRamMb: 24_576, reliability: 0.995, hourlyUsd: 0.3, machineId: 42 };
     expect(validateOfferForRental({ offer, preset: "comfy-clean", limits, fluxMachineId: 99 })).toBeNull();
     expect(validateOfferForRental({ offer: { ...offer, numGpus: 2 }, preset: "comfy-clean", limits, fluxMachineId: null })).toBe("VAST_OFFER_GPU_COUNT");
     expect(validateOfferForRental({ offer: { ...offer, hourlyUsd: 0.61 }, preset: "comfy-clean", limits, fluxMachineId: null })).toBe("VAST_OFFER_PRICE");
     expect(validateOfferForRental({ offer, preset: "flux-cached", limits, fluxMachineId: 99 })).toBe("VAST_OFFER_VOLUME_MACHINE");
+  });
+
+  it("mantiene un allowlist explícito de familias GPU", () => {
+    expect(getSupportedVastGpuFamily("NVIDIA GeForce RTX 3090")).toBe("RTX 3090");
+    expect(getSupportedVastGpuFamily("RTX PRO 4000 Blackwell")).toBe("RTX PRO 4000");
+    expect(isSupportedVastGpuFamily("Tesla P40")).toBe(false);
+    expect(isSupportedVastGpuFamily("Titan RTX")).toBe(false);
+    expect(validateOfferForRental({
+      offer: { gpuName: "Tesla P40", numGpus: 1, gpuRamMb: 24_576, reliability: 0.995, hourlyUsd: 0.1, machineId: 42 },
+      preset: "comfy-clean",
+      limits,
+      fluxMachineId: null,
+    })).toBe("VAST_OFFER_GPU_FAMILY");
   });
 });

@@ -1,6 +1,13 @@
 export const vastAdminPresets = ["comfy-clean", "flux-cached"] as const;
 export const vastAdminMarkets = ["on-demand", "bid"] as const;
 export const vastAdminTtlMinutes = [15, 30, 60, 120] as const;
+export const supportedVastGpuFamilies = [
+  "RTX 3090",
+  "RTX PRO 4000",
+  "RTX 4090",
+  "RTX 5090",
+  "RTX PRO 4500",
+] as const;
 export const vastLeaseStates = [
   "pending",
   "reconciling",
@@ -16,6 +23,7 @@ export const vastLeaseStates = [
 export type VastAdminPreset = (typeof vastAdminPresets)[number];
 export type VastAdminMarket = (typeof vastAdminMarkets)[number];
 export type VastAdminTtlMinutes = (typeof vastAdminTtlMinutes)[number];
+export type SupportedVastGpuFamily = (typeof supportedVastGpuFamilies)[number];
 export type VastLeaseState = (typeof vastLeaseStates)[number];
 export type VastLifecycleHealth = "healthy" | "degraded" | "stale" | "stopped" | "not_configured" | "error";
 
@@ -124,6 +132,21 @@ export type CreateVastLeaseRequest = {
 
 export type VastInstanceAction = "start" | "stop" | "destroy";
 
+export function getSupportedVastGpuFamily(value: string): SupportedVastGpuFamily | null {
+  const normalized = value
+    .toUpperCase()
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^NVIDIA\s+/, "")
+    .replace(/^GEFORCE\s+/, "")
+    .replace(/\s+(BLACKWELL|ADA|LOVELACE|AMPERE)$/, "");
+  return supportedVastGpuFamilies.find((family) => family === normalized) ?? null;
+}
+
+export function isSupportedVastGpuFamily(value: string) {
+  return getSupportedVastGpuFamily(value) !== null;
+}
+
 export function calculateBidPrice(minBidUsd: number) {
   if (!Number.isFinite(minBidUsd) || minBidUsd <= 0) return null;
   return ceilUsd(minBidUsd * 1.1);
@@ -155,12 +178,13 @@ export function classifyLifecycleHeartbeat(input: {
 }
 
 export function validateOfferForRental(input: {
-  offer: Pick<VastOffer, "numGpus" | "gpuRamMb" | "reliability" | "hourlyUsd" | "machineId">;
+  offer: Pick<VastOffer, "gpuName" | "numGpus" | "gpuRamMb" | "reliability" | "hourlyUsd" | "machineId">;
   preset: VastAdminPreset;
   limits: VastAdminLimits;
   fluxMachineId: number | null;
 }) {
   const { offer, limits } = input;
+  if (!isSupportedVastGpuFamily(offer.gpuName)) return "VAST_OFFER_GPU_FAMILY";
   if (offer.numGpus !== 1) return "VAST_OFFER_GPU_COUNT";
   if (offer.gpuRamMb < limits.minGpuRamMb) return "VAST_OFFER_VRAM";
   if (offer.reliability < limits.minReliability) return "VAST_OFFER_RELIABILITY";

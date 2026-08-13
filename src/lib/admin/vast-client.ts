@@ -9,6 +9,7 @@ import {
   type VastAdminTtlMinutes,
   type VastInstance,
   type VastOffer,
+  isSupportedVastGpuFamily,
 } from "@/lib/admin/vast-contracts";
 
 const VAST_API_BASE = "https://console.vast.ai";
@@ -126,6 +127,7 @@ export class VastAdminClient {
     return normalizeCollection(payload.offers)
       .map((offer) => sanitizeOffer(offer, input.market, input.ttlMinutes))
       .filter((offer): offer is VastOffer => Boolean(offer))
+      .filter((offer) => isSupportedVastGpuFamily(offer.gpuName))
       .filter((offer) => !input.offerId || offer.id === input.offerId)
       .filter((offer) => offer.hourlyUsd <= input.limits.maxHourlyUsd)
       .sort((left, right) => left.hourlyUsd - right.hourlyUsd);

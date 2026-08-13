@@ -154,6 +154,13 @@ describe("servicio de alquiler Vast", () => {
     expect(mocks.insertPendingVastLease).not.toHaveBeenCalled();
   });
 
+  it("rechaza una familia GPU bloqueada durante la revalidación final", async () => {
+    mocks.searchOffers.mockResolvedValue([{ ...offer, gpuName: "Tesla P40", hourlyUsd: 0.1 }]);
+    await expect(createVastAdminLease(request, "admin")).rejects.toMatchObject({ code: "VAST_OFFER_CHANGED" });
+    expect(mocks.insertPendingVastLease).not.toHaveBeenCalled();
+    expect(mocks.createInstance).not.toHaveBeenCalled();
+  });
+
   it("persiste primero, programa TTL y después acepta la oferta", async () => {
     const result = await createVastAdminLease(request, "admin");
     expect(result.state).toBe("loading");

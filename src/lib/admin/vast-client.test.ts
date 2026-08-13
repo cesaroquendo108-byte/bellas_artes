@@ -107,6 +107,43 @@ describe("cliente administrativo Vast", () => {
     expect(body).not.toHaveProperty("id");
   });
 
+  it("oculta familias bloqueadas aunque Vast las devuelva con VRAM y precio válidos", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ offers: [
+      {
+        id: 91,
+        machine_id: 42,
+        gpu_name: "RTX 3090",
+        gpu_ram: 24_576,
+        num_gpus: 1,
+        reliability: 0.995,
+        dph_total: 0.2,
+        disk_space: 100,
+      },
+      {
+        id: 92,
+        machine_id: 43,
+        gpu_name: "Tesla P40",
+        gpu_ram: 24_576,
+        num_gpus: 1,
+        reliability: 0.995,
+        dph_total: 0.1,
+        disk_space: 100,
+      },
+      {
+        id: 93,
+        machine_id: 44,
+        gpu_name: "Titan RTX",
+        gpu_ram: 24_576,
+        num_gpus: 1,
+        reliability: 0.995,
+        dph_total: 0.15,
+        disk_space: 100,
+      },
+    ] }), { status: 200 })));
+    const offers = await new VastAdminClient().searchOffers({ preset: "comfy-clean", market: "on-demand", ttlMinutes: 15, limits, fluxMachineId: null });
+    expect(offers.map((offer) => offer.gpuName)).toEqual(["RTX 3090"]);
+  });
+
   it("sólo publica comandos SSH sanitizados y rechaza proxies externos", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ instances: [{
       id: 7,
