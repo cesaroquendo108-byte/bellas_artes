@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Cpu, CreditCard, Gauge, LogOut, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
+import { BrainCircuit, Cpu, CreditCard, Gauge, LogOut, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
 
 import { logout } from "@/app/login/actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -29,7 +29,11 @@ export function AdminSidebar({ email, displayName }: { email: string; displayNam
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
   const adminItems = email.toLowerCase() === "cesaroquendo10@gmail.com"
-    ? [...baseAdminItems, { title: "GPUs", href: "/admin/gpus", icon: Cpu }]
+    ? [
+        ...baseAdminItems,
+        { title: "Modelos", href: "/admin/models", icon: BrainCircuit },
+        { title: "GPUs", href: "/admin/gpus", icon: Cpu },
+      ]
     : baseAdminItems;
   const initials = (displayName || email || "BA")
     .split(/[\s@._-]+/)
