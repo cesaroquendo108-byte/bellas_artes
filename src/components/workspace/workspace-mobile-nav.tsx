@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Liquid } from "liquid-gooey";
 import {
   BookOpen,
   Boxes,
@@ -76,15 +77,28 @@ export function WorkspaceMobileNav({ role }: MobileNavProps) {
       </nav>
 
       <MobileBottomSheet open={createOpen} onOpenChange={setCreateOpen} title="¿Qué quieres crear?" description="Cada estudio conserva tus permisos y el estado real del workflow.">
-        <div className="grid grid-cols-2 gap-3">
+        <Liquid
+          blur={8}
+          contrast={22}
+          fill="#ffffff"
+          filterPadding={20}
+          shadow="0 4px 16px rgba(64, 48, 77, .08)"
+          className="grid grid-cols-2 gap-3"
+        >
           {createItems.map(({ label, href, icon: Icon, detail }) => (
-            <Link key={href} href={href} onClick={() => setCreateOpen(false)} className="rounded-2xl border border-[#e6ded1] bg-white p-4 shadow-sm transition active:scale-[.98] motion-reduce:transform-none motion-reduce:transition-none">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-violet-100 text-violet-700"><Icon className="size-4.5" /></span>
-              <span className="mt-4 block text-sm font-semibold text-[#241f2e]">{label}</span>
-              <span className="mt-1 block text-[10px] leading-4 text-[#817887]">{detail}</span>
-            </Link>
+            <Liquid.Item key={href} morph={{ shape: true, bounce: 0.25, contentBlur: 0 }} className="min-w-0">
+              <Link
+                href={href}
+                onClick={() => setCreateOpen(false)}
+                className="block rounded-2xl border border-[#e6ded1] bg-transparent p-4 shadow-sm outline-none transition hover:border-violet-200 active:scale-[.98] focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fffdf8] motion-reduce:transform-none motion-reduce:transition-none"
+              >
+                <span className="flex size-10 items-center justify-center rounded-xl bg-violet-100 text-violet-700"><Icon className="size-4.5" /></span>
+                <span className="mt-4 block text-sm font-semibold text-[#241f2e]">{label}</span>
+                <span className="mt-1 block text-[10px] leading-4 text-[#817887]">{detail}</span>
+              </Link>
+            </Liquid.Item>
           ))}
-        </div>
+        </Liquid>
       </MobileBottomSheet>
 
       <MobileBottomSheet open={moreOpen} onOpenChange={setMoreOpen} title="Más de tu estudio" description="Organiza tu identidad, tu cuenta y las áreas complementarias.">

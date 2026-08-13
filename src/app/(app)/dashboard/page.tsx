@@ -12,12 +12,12 @@ import {
   Sparkles,
   UsersRound,
   WalletCards,
-  WandSparkles,
 } from "lucide-react";
 
 import { MetricCard } from "@/components/metric-card";
 import { StatusPill } from "@/components/ui/motion-effects";
 import { SectionHeader } from "@/components/ui/workspace";
+import { LiquidCreateActions } from "@/components/workspace/liquid-create-actions";
 import { getAssets } from "@/lib/assets/queries";
 import { requireUser } from "@/lib/auth";
 import { getWalletSummary } from "@/lib/credits/queries";
@@ -72,9 +72,7 @@ export default async function DashboardPage() {
               Empieza una pieza, organiza tus referencias o continúa un proyecto. Las funciones muestran su disponibilidad real antes de consumir créditos.
             </p>
           </div>
-          <Link href="/image" className="shimmer-button w-full px-5 py-3 sm:w-auto">
-            <span className="relative z-10 inline-flex items-center justify-center gap-2"><WandSparkles className="size-4" /> Abrir estudio</span>
-          </Link>
+          <LiquidCreateActions />
         </div>
       </section>
 
