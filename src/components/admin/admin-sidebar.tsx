@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, Gauge, LogOut, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
+import { Cpu, CreditCard, Gauge, LogOut, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
 
 import { logout } from "@/app/login/actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -18,7 +18,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const adminItems = [
+const baseAdminItems = [
   { title: "Dashboard", href: "/admin", icon: Gauge },
   { title: "Usuarios", href: "/admin/users", icon: UsersRound },
   { title: "Pagos", href: "/admin/payments", icon: CreditCard },
@@ -28,6 +28,9 @@ const adminItems = [
 export function AdminSidebar({ email, displayName }: { email: string; displayName: string | null }) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
+  const adminItems = email.toLowerCase() === "cesaroquendo10@gmail.com"
+    ? [...baseAdminItems, { title: "GPUs", href: "/admin/gpus", icon: Cpu }]
+    : baseAdminItems;
   const initials = (displayName || email || "BA")
     .split(/[\s@._-]+/)
     .filter(Boolean)

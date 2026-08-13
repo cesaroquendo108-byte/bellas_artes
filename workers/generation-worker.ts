@@ -9,6 +9,7 @@ import { getDeadLetterQueue, getGenerationQueue, moveToDLQ, type GenerationQueue
 import { claimVastTestBudget, finalizeVastTestBudget } from "@/lib/generation/vast-test-budget";
 import { loadWorkflowManifest, validateWorkflowAssets } from "@/lib/generation/workflow-manifests";
 import { recordServiceHeartbeat } from "@/lib/admin/service-heartbeats";
+import { startVastLifecycleWorker } from "./vast-lifecycle-worker";
 
 type WorkerPayload = { jobId: string };
 const activeConnections = new Set<Redis>();
@@ -359,3 +360,4 @@ function installShutdownHandlers() {
 }
 
 if (process.env.RUN_GENERATION_WORKER === "true") startGenerationWorkers();
+if (process.env.RUN_VAST_LIFECYCLE_WORKER === "true") startVastLifecycleWorker();
