@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-14T00:21:00Z",
+  "generatedAt": "2026-08-14T00:31:00Z",
   "scope": "private-admin-research",
   "models": {
     "flux-schnell": { "state": "gated", "note": "Requiere token HF nuevo y aceptación registrada." },
     "sd35-medium": { "state": "gated", "note": "Requiere token HF nuevo; smoke API previo no instala pesos locales." },
-    "flux2-klein-4b": { "state": "queued", "note": "Descarga pública preparada." },
+    "flux2-klein-4b": { "state": "installing", "note": "Descarga activa y reanudable en /mnt/cesar/BellasArtes_ModelVault." },
     "pixart-sigma": { "state": "queued", "note": "Descarga pública preparada." },
     "controlnet-dwpose": { "state": "installed", "note": "Código y pesos instalados; inventario SHA-256 generado." },
     "real-esrgan": { "state": "installed", "note": "Código y dos pesos oficiales instalados; SHA-256 generado." },
@@ -21,7 +21,7 @@
     "juggernaut-xl": { "state": "partial", "note": "Descarga parcial reanudable desde Civitai." },
     "dynavision-xl": { "state": "queued", "note": "Descarga de investigación preparada." },
     "wai-ani-ponyxl": { "state": "queued", "note": "Descarga aislada de investigación preparada; nunca pública." },
-    "f5-tts-official": { "state": "queued", "note": "Código y pesos no comerciales preparados para investigación privada." },
+    "f5-tts-official": { "state": "installed", "note": "Código y pesos no comerciales instalados; inventario SHA-256 generado para investigación privada." },
     "hunyuan-video-original": { "state": "queued", "note": "Variante FP8 selectiva preparada." },
     "cmu-openpose": { "state": "installed", "note": "Código instalado para investigación; DWPose es el reemplazo operativo." },
     "insightface-models": { "state": "installed", "note": "Código y buffalo_l instalados sólo para investigación; reemplazo comercial pendiente." }
