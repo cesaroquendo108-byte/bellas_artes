@@ -3,11 +3,22 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TOOLS_BIN="${BELLAS_ARTES_MODEL_TOOLS_BIN:-/home/finvecito/.cache/bellas-artes-model-tools/bin}"
-PRIMARY_VAULT="${BELLAS_ARTES_MODEL_VAULT:-/home/finvecito/Documentos/BellasArtes_ModelVault}"
+PRIMARY_VAULT="${BELLAS_ARTES_MODEL_VAULT:-/mnt/cesar/BellasArtes_ModelVault}"
 SECONDARY_VAULT="${BELLAS_ARTES_MODEL_VAULT_SECONDARY:-/mnt/disco_500gb/BellasArtes_ModelVault}"
 
 export PATH="${TOOLS_BIN}:${PATH}"
 cd "${REPO_DIR}"
+
+require_mount() {
+  local mount_path="$1"
+  if ! mountpoint -q -- "${mount_path}"; then
+    echo "El vault requiere el punto de montaje activo: ${mount_path}" >&2
+    exit 1
+  fi
+}
+
+require_mount "/mnt/cesar"
+require_mount "/mnt/disco_500gb"
 
 failures=0
 

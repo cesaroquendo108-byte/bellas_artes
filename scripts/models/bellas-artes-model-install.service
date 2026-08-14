@@ -1,0 +1,20 @@
+[Unit]
+Description=Bellas Artes private model vault installer
+ConditionPathIsMountPoint=/mnt/cesar
+ConditionPathIsMountPoint=/mnt/disco_500gb
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/finvecito/Documentos/bellas_artes_consolidado
+Environment=BELLAS_ARTES_MODEL_VAULT=/mnt/cesar/BellasArtes_ModelVault
+Environment=BELLAS_ARTES_MODEL_VAULT_SECONDARY=/mnt/disco_500gb/BellasArtes_ModelVault
+ExecStart=/home/finvecito/Documentos/bellas_artes_consolidado/scripts/models/install-public-model-waves.sh
+Restart=on-failure
+RestartSec=30
+Nice=10
+IOSchedulingClass=best-effort
+
+[Install]
+WantedBy=default.target

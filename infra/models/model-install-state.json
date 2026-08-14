@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-13T21:54:00Z",
+  "generatedAt": "2026-08-14T00:21:00Z",
   "scope": "private-admin-research",
   "models": {
     "flux-schnell": { "state": "gated", "note": "Requiere token HF nuevo y aceptación registrada." },
@@ -13,7 +13,7 @@
     "rvc": { "state": "installed", "note": "Código y pesos esenciales instalados; inventario SHA-256 generado." },
     "wan22-ti2v-5b": { "state": "queued", "note": "Descarga pública preparada." },
     "hunyuan-video-15-83b": { "state": "queued", "note": "T2V 480p, VAE, Qwen2.5-VL, ByT5 y Glyph preparados." },
-    "liveportrait-no-insightface": { "state": "partial", "note": "Código instalado; pesos oficiales pendientes de reanudación." },
+    "liveportrait-no-insightface": { "state": "installed", "note": "Código y pesos instalados; inventario SHA-256 generado." },
     "z-image": { "state": "queued", "note": "Descarga pública preparada." },
     "qwen-image": { "state": "queued", "note": "Descarga pública preparada; requiere almacenamiento amplio." },
     "flux-dev": { "state": "gated", "note": "Variantes FP8 y completa preparadas para investigación privada." },
@@ -23,7 +23,7 @@
     "wai-ani-ponyxl": { "state": "queued", "note": "Descarga aislada de investigación preparada; nunca pública." },
     "f5-tts-official": { "state": "queued", "note": "Código y pesos no comerciales preparados para investigación privada." },
     "hunyuan-video-original": { "state": "queued", "note": "Variante FP8 selectiva preparada." },
-    "cmu-openpose": { "state": "queued", "note": "Código de investigación preparado; DWPose es el reemplazo operativo." },
-    "insightface-models": { "state": "queued", "note": "Código y buffalo_l sólo para investigación; reemplazo comercial pendiente." }
+    "cmu-openpose": { "state": "installed", "note": "Código instalado para investigación; DWPose es el reemplazo operativo." },
+    "insightface-models": { "state": "installed", "note": "Código y buffalo_l instalados sólo para investigación; reemplazo comercial pendiente." }
   }
 }
