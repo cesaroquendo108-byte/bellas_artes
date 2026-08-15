@@ -23,7 +23,7 @@ finalizar incluso si la aceptación falla.
 ## Laboratorio administrativo RTX 3090
 
 `bootstrap_3090_lab.sh` prepara en una instancia efímera un ComfyUI fijado por
-commit, los pesos públicos de Klein 4B, Z-Image, SDXL Base/Refiner y
+commit, los pesos públicos de Flux Schnell, Klein 4B, Z-Image, SDXL Base/Refiner y
 Real-ESRGAN, y los workflows privados necesarios para probarlos. El cliente
 administrativo descarga el script desde la rama fijada y comprueba su SHA-256
 antes de ejecutarlo.

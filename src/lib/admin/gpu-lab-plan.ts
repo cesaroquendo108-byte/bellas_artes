@@ -29,7 +29,7 @@ export const GPU_LAB_PLAN = [
     title: "FLUX.1 Schnell · baseline",
     modelIds: ["flux-schnell"],
     templateIds: ["flux-schnell-minimal", "flux-schnell-full-t2i"],
-    readiness: "cached_ready",
+    readiness: "bootstrap_ready",
     timeboxMinutes: 15,
     minimumVramGb: 24,
     objective: "Confirmar que GPU, ComfyUI y el checkpoint cacheado producen una imagen reproducible.",
@@ -191,7 +191,7 @@ export const GPU_LAB_PLAN = [
 ] as const satisfies readonly GpuLabCase[];
 
 export function summarizeGpuLabPlan() {
-  const runnable = GPU_LAB_PLAN.filter((item) => item.readiness === "cached_ready" || item.readiness === "bootstrap_ready");
+  const runnable = GPU_LAB_PLAN.filter((item) => item.readiness === "bootstrap_ready");
   return {
     total: GPU_LAB_PLAN.length,
     runnable: runnable.length,

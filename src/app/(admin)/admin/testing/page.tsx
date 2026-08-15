@@ -60,7 +60,7 @@ export default async function AdminTestingPage() {
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Centro de testing</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-            Orden de ejecución para una ventana de 2–3 horas. El bloque automático ocupa 80 minutos repartidos entre el cache de Flux y el laboratorio público; video y modelos gated sólo se intentan después.
+            Orden de ejecución para una ventana de 2–3 horas. El bloque automático ocupa 80 minutos dentro de un único laboratorio público; video y modelos gated sólo se intentan después.
           </p>
         </div>
         <Badge variant="outline" className="w-fit gap-2 border-violet-300 bg-violet-50 text-violet-700">
@@ -89,10 +89,9 @@ export default async function AdminTestingPage() {
       <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-sm leading-6 text-violet-950">
         <p className="font-semibold">Secuencia para abrir y empezar</p>
         <ol className="mt-2 list-decimal space-y-1 pl-5">
-          <li>Si “Flux cacheado” aparece disponible, alquílalo por 30 minutos, ejecuta el caso 1 y destruye esa instancia.</li>
           <li>Elige “Laboratorio 3090 · imagen pública” por 180 minutos y selecciona una RTX 3090 verificada con descarga rápida.</li>
           <li>Espera el bootstrap. Después copia el túnel ComfyUI mostrado en GPUs y abre http://localhost:8188.</li>
-          <li>Ejecuta los casos 2–5 en orden. Los demás sólo si queda tiempo y su bloqueo fue resuelto.</li>
+          <li>Ejecuta los casos 1–5 en orden. Los demás sólo si queda tiempo y su bloqueo fue resuelto.</li>
           <li>Destruye la instancia al terminar; detenerla no cancela el almacenamiento ni sustituye la autodestrucción por TTL.</li>
         </ol>
         <div className="mt-4 flex flex-wrap gap-2">

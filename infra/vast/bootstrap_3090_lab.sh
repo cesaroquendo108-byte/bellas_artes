@@ -40,7 +40,7 @@ payload = {
     "updatedAt": datetime.now(timezone.utc).isoformat(),
     "gpu": {"name": gpu_name, "vramMb": int(gpu_vram_mb or 0)},
     "profile": "public-image-core",
-    "models": ["flux2-klein-4b", "z-image", "sdxl-base-refiner", "real-esrgan"],
+    "models": ["flux-schnell", "flux2-klein-4b", "z-image", "sdxl-base-refiner", "real-esrgan"],
     "comfyPort": 18188,
 }
 Path(path).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -83,6 +83,13 @@ ensure_comfyui() {
 }
 
 install_models() {
+  local flux_schnell="$COMFY_ROOT/models/checkpoints/flux1-schnell-fp8.safetensors"
+  download \
+    "https://huggingface.co/Comfy-Org/flux1-schnell/resolve/0cb207e7e753453ef479ae266caf7c1ab364e363/flux1-schnell-fp8.safetensors?download=true" \
+    "$flux_schnell"
+  [[ "$(stat -c '%s' "$flux_schnell")" == "17236328572" ]]
+  printf '%s  %s\n' "ead426278b49030e9da5df862994f25ce94ab2ee4df38b556ddddb3db093bf72" "$flux_schnell" | sha256sum -c -
+
   download \
     "https://huggingface.co/Comfy-Org/flux2-klein/resolve/main/split_files/diffusion_models/flux-2-klein-4b.safetensors" \
     "$COMFY_ROOT/models/diffusion_models/flux-2-klein-4b.safetensors"
@@ -119,6 +126,7 @@ install_workflows() {
   local workflow_dir="$COMFY_ROOT/user/default/workflows/Bellas Artes"
   mkdir -p "$workflow_dir"
 
+  download "$RAW_BASE/workflows/templates/vendor/comfy-org/templates/flux_schnell.json" "$workflow_dir/00-flux-schnell-baseline.json"
   download "$RAW_BASE/workflows/templates/vendor/comfy-org/templates/image_flux2_klein_text_to_image.json" "$workflow_dir/01-flux2-klein-4b-t2i.json"
   download "$RAW_BASE/workflows/templates/vendor/comfy-org/templates/image_flux2_klein_image_edit_4b_base.json" "$workflow_dir/02-flux2-klein-4b-edit.json"
   download "$RAW_BASE/workflows/templates/vendor/comfy-org/templates/image_z_image.json" "$workflow_dir/03-z-image-t2i.json"
@@ -157,7 +165,7 @@ main() {
   install_workflows
   start_comfyui
 
-  write_status "ready" "ComfyUI está listo con cinco workflows de imagen para la sesión administrativa."
+  write_status "ready" "ComfyUI está listo con seis workflows de imagen para la sesión administrativa."
   printf 'Bellas Artes 3090 lab listo en http://127.0.0.1:18188\n'
 }
 

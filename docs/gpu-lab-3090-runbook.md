@@ -23,19 +23,17 @@ es `/admin/testing`; el alquiler y la destrucción se controlan desde
 ## Secuencia de mañana
 
 1. Entrar como operador y abrir `/admin/testing`.
-2. En `/admin/gpus`, usar **Bellas Artes · Flux cacheado** por 30 minutos si la
-   máquina del volumen está disponible. Ejecutar el caso 1 y destruirla.
-3. Alquilar **Laboratorio 3090 · imagen pública** por 180 minutos. Elegir una
+2. Alquilar **Laboratorio 3090 · imagen pública** por 180 minutos. Elegir una
    RTX 3090 verificada, con al menos 24 GB de VRAM y buena descarga.
-4. Esperar a que termine el bootstrap. El estado está en
+3. Esperar a que termine el bootstrap. El estado está en
    `/workspace/bellas-artes-lab/status.json` y el log en
    `/workspace/bellas-artes-lab/bootstrap.log`.
-5. Copiar el comando **Túnel ComfyUI** mostrado por Bellas Artes y abrir
+4. Copiar el comando **Túnel ComfyUI** mostrado por Bellas Artes y abrir
    `http://localhost:8188`.
-6. En la carpeta de workflows **Bellas Artes**, ejecutar los casos 2–5 en orden.
-7. Probar SD3.5, DWPose o video sólo si su bloqueo fue resuelto previamente y
+5. En la carpeta de workflows **Bellas Artes**, ejecutar los casos 1–5 en orden.
+6. Probar SD3.5, DWPose o video sólo si su bloqueo fue resuelto previamente y
    todavía queda tiempo.
-8. Guardar tiempos, VRAM, coste y outputs privados. Volver a `/admin/gpus` y
+7. Guardar tiempos, VRAM, coste y outputs privados. Volver a `/admin/gpus` y
    destruir la instancia.
 
 ## Qué prepara el bootstrap público
@@ -43,6 +41,7 @@ es `/admin/testing`; el alquiler y la destrucción se controlan desde
 El script `infra/vast/bootstrap_3090_lab.sh` fija una revisión de ComfyUI,
 descarga pesos públicos y deja cinco workflows en el perfil del operador:
 
+- FLUX.1 Schnell FP8, fijado por commit, tamaño y SHA-256.
 - FLUX.2 Klein 4B T2I.
 - FLUX.2 Klein 4B image edit, con su modelo FP8 y decoder pequeño.
 - Z-Image T2I.
@@ -56,8 +55,8 @@ directamente en Internet.
 
 ## Límites de la RTX 3090
 
-La ventana automática suma 80 minutos: 15 para Flux cacheado y 65 para el
-laboratorio público. Qwen-Image base y HunyuanVideo original quedan fuera de una
+La ventana automática suma 80 minutos dentro del laboratorio público.
+Qwen-Image base y HunyuanVideo original quedan fuera de una
 3090 porque el plan validado exige 48 GB o una cuantización todavía no probada.
 Wan 2.2 y HunyuanVideo 1.5 son condicionales: descargar, mapear y generar video
 puede consumir el resto de la sesión. Los modelos de voz, InsightFace y los

@@ -15,7 +15,7 @@ import {
 const VAST_API_BASE = "https://console.vast.ai";
 const VAST_LAB_DISK_GB = 100;
 const VAST_LAB_BOOTSTRAP_URL = "https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/codex/consolidacion-final/infra/vast/bootstrap_3090_lab.sh";
-const VAST_LAB_BOOTSTRAP_SHA256 = "d539c889b2d0f13cb8ddfadb14b0a67a23c6600c8bbcc57f734141e2f11158d6";
+const VAST_LAB_BOOTSTRAP_SHA256 = "80ac869d5d85de980f83d0022f537d81d76bc24552741792d92f5a9866bd86f1";
 
 type VastApiMode = "admin" | "lifecycle";
 

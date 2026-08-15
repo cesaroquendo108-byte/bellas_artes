@@ -452,7 +452,7 @@ function presetStatuses(config: ReturnType<typeof getVastAdminServerConfig>, flu
     {
       id: "comfy-clean" as const,
       name: "Laboratorio 3090 · imagen pública",
-      description: "ComfyUI, 100 GB y bootstrap verificado para Klein 4B, Z-Image, SDXL y Real-ESRGAN.",
+      description: "ComfyUI, 100 GB y bootstrap verificado para Flux Schnell, Klein 4B, Z-Image, SDXL y Real-ESRGAN.",
       available: Boolean(config.templateHashId),
       unavailableReason: config.templateHashId ? null : "Falta configurar la plantilla privada.",
     },
