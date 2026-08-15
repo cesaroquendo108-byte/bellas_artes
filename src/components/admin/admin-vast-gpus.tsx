@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   Clock3,
@@ -35,6 +36,7 @@ import {
   type VastAdminMarket,
   type VastAdminOverview,
   type VastAdminPreset,
+  type VastAdminTtlMinutes,
   type VastInstance,
   type VastInstanceAction,
   type VastOffer,
@@ -47,7 +49,7 @@ export function AdminVastGpus({ initialOverview }: { initialOverview: VastAdminO
   const [overview, setOverview] = useState(initialOverview);
   const [preset, setPreset] = useState<VastAdminPreset>(initialOverview.presets.find((item) => item.available)?.id ?? "comfy-clean");
   const [market, setMarket] = useState<VastAdminMarket>("on-demand");
-  const [ttlMinutes, setTtlMinutes] = useState<15 | 30 | 60 | 120>(15);
+  const [ttlMinutes, setTtlMinutes] = useState<VastAdminTtlMinutes>(15);
   const [offers, setOffers] = useState<VastOffer[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<VastOffer | null>(null);
   const [actionTarget, setActionTarget] = useState<ActionTarget | null>(null);
@@ -173,9 +175,12 @@ export function AdminVastGpus({ initialOverview }: { initialOverview: VastAdminO
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Alquiler de GPU</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">Busca una máquina verificada, fija un TTL y pruébala desde cualquier lugar. Bellas Artes la destruye automáticamente al vencer.</p>
           </div>
-          <Button variant="outline" onClick={() => void refresh()} disabled={busy === "refresh"}>
-            <RefreshCw className={cn(busy === "refresh" && "animate-spin")} />Actualizar
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button render={<Link href="/admin/testing" />} nativeButton={false} variant="outline">Plan de testing</Button>
+            <Button variant="outline" onClick={() => void refresh()} disabled={busy === "refresh"}>
+              <RefreshCw className={cn(busy === "refresh" && "animate-spin")} />Actualizar
+            </Button>
+          </div>
         </div>
         <div className="relative mt-6 flex flex-wrap gap-2">
           <StatusPill state={overview.enabled ? "Alquiler habilitado" : "Alquiler deshabilitado"} tone={overview.enabled ? "success" : "warning"} />
@@ -202,7 +207,7 @@ export function AdminVastGpus({ initialOverview }: { initialOverview: VastAdminO
           <SelectField label="Mercado" value={market} onChange={(value) => { setMarket(value as VastAdminMarket); setOffers([]); }}>
             <option value="on-demand">On-demand</option><option value="bid">Bid · interrumpible</option>
           </SelectField>
-          <SelectField label="Duración máxima" value={String(ttlMinutes)} onChange={(value) => { setTtlMinutes(Number(value) as 15 | 30 | 60 | 120); setOffers([]); }}>
+          <SelectField label="Duración máxima" value={String(ttlMinutes)} onChange={(value) => { setTtlMinutes(Number(value) as VastAdminTtlMinutes); setOffers([]); }}>
             {vastAdminTtlMinutes.map((minutes) => <option key={minutes} value={minutes}>{minutes} minutos</option>)}
           </SelectField>
           <Button onClick={() => void searchOffers()} disabled={!rentable || busy === "search"}>

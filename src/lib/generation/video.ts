@@ -22,6 +22,8 @@ export const videoOperations = [
 export const videoModels = [
   "hunyuan-video-1.5-8.3b",
   "hunyuan-video-13b-pro",
+  "wan22-ti2v-5b",
+  "hunyuan-video-original",
   "liveportrait-motion-v1",
   "video-vfx-v1",
   "video-upscale-v1",

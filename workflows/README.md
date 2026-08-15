@@ -1,5 +1,11 @@
 # Workflows open source
 
+La biblioteca manual de plantillas públicas vive en `workflows/templates/` y
+se muestra en `/admin/templates`. Esos archivos son exports de interfaz para
+abrir en ComfyUI; no se cargan como grafos API del worker. Cada plantilla está
+fijada por commit, conserva su licencia y se verifica por SHA-256 antes de que
+el operador pueda descargarla.
+
 Los pesos de Flux, HunyuanVideo, F5-TTS y RVC no se guardan en Git. Cada
 workflow debe exportarse desde ComfyUI en formato API y guardarse como
 `workflows/<modalidad>/<version>.json` y registrarse en

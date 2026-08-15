@@ -3,7 +3,7 @@ import Redis from "ioredis";
 
 import { recordServiceHeartbeat } from "@/lib/admin/service-heartbeats";
 import { expireVastAdminLease, reconcileVastAdminLeases } from "@/lib/admin/vast-service";
-import { getVastLifecycleQueue, vastLifecycleQueueName } from "@/lib/admin/vast-lifecycle-queue";
+import { getVastLifecycleBackend, getVastLifecycleQueue, vastLifecycleQueueName } from "@/lib/admin/vast-lifecycle-queue";
 
 type LifecyclePayload = { leaseId: string };
 
@@ -12,6 +12,7 @@ let lifecycleConnection: Redis | null = null;
 let heartbeatInterval: NodeJS.Timeout | null = null;
 let reconciliationInterval: NodeJS.Timeout | null = null;
 let handlersInstalled = false;
+let lifecycleStarted = false;
 
 function log(level: "info" | "warn" | "error", message: string, meta?: Record<string, unknown>) {
   const entry = { ts: new Date().toISOString(), level, service: "vast-admin-lifecycle", message, ...redact(meta ?? {}) };
@@ -20,9 +21,7 @@ function log(level: "info" | "warn" | "error", message: string, meta?: Record<st
 }
 
 export function startVastLifecycleWorker() {
-  if (lifecycleWorker) return lifecycleWorker;
-  const redisUrl = process.env.REDIS_URL?.trim();
-  if (!redisUrl) throw new Error("REDIS_URL no está configurado para el ciclo de vida Vast.");
+  if (lifecycleStarted) return lifecycleWorker;
   const enabled = process.env.VAST_ADMIN_LIFECYCLE_ENABLED === "true";
   if (!enabled) {
     void recordServiceHeartbeat({
@@ -33,30 +32,39 @@ export function startVastLifecycleWorker() {
     return null;
   }
   if (!process.env.VAST_LIFECYCLE_API_KEY?.trim()) throw new Error("VAST_LIFECYCLE_API_KEY no está configurada.");
+  const backend = getVastLifecycleBackend();
 
-  lifecycleConnection = new Redis(redisUrl, { maxRetriesPerRequest: null });
-  lifecycleWorker = new Worker<LifecyclePayload>(vastLifecycleQueueName, processLifecycleJob, {
-    connection: lifecycleConnection,
-    prefix: process.env.BULLMQ_PREFIX ?? "bellas-artes",
-    concurrency: 1,
-  });
-  lifecycleWorker.on("completed", (job) => log("info", "Alquiler vencido procesado.", { jobId: job.id, leaseId: job.data.leaseId }));
-  lifecycleWorker.on("failed", (job, error) => log("error", "Falló la autodestrucción de un alquiler.", {
-    jobId: job?.id ?? null,
-    leaseId: job?.data.leaseId ?? null,
-    error: error.message,
-    attemptsMade: job?.attemptsMade ?? 0,
-  }));
-  lifecycleWorker.on("error", (error) => log("error", "Error del worker de ciclo de vida.", { error: error.message }));
+  if (backend === "queue") {
+    const redisUrl = process.env.REDIS_URL?.trim();
+    if (!redisUrl) throw new Error("REDIS_URL no está configurado para el ciclo de vida Vast con backend queue.");
+    lifecycleConnection = new Redis(redisUrl, { maxRetriesPerRequest: null });
+    lifecycleWorker = new Worker<LifecyclePayload>(vastLifecycleQueueName, processLifecycleJob, {
+      connection: lifecycleConnection,
+      prefix: process.env.BULLMQ_PREFIX ?? "bellas-artes",
+      concurrency: 1,
+    });
+    lifecycleWorker.on("completed", (job) => log("info", "Alquiler vencido procesado.", { jobId: job.id, leaseId: job.data.leaseId }));
+    lifecycleWorker.on("failed", (job, error) => log("error", "Falló la autodestrucción de un alquiler.", {
+      jobId: job?.id ?? null,
+      leaseId: job?.data.leaseId ?? null,
+      error: error.message,
+      attemptsMade: job?.attemptsMade ?? 0,
+    }));
+    lifecycleWorker.on("error", (error) => log("error", "Error del worker de ciclo de vida.", { error: error.message }));
+  }
+  lifecycleStarted = true;
 
   const heartbeat = async () => {
     try {
-      const counts = await getVastLifecycleQueue().getJobCounts("waiting", "active", "delayed", "failed");
+      const counts = backend === "queue"
+        ? await getVastLifecycleQueue().getJobCounts("waiting", "active", "delayed", "failed")
+        : null;
       await recordServiceHeartbeat({
         serviceKey: "worker:vast-admin-lifecycle",
         status: "healthy",
         details: {
           lifecycleEnabled: true,
+          backend,
           concurrency: 1,
           waiting: counts?.waiting ?? 0,
           active: counts?.active ?? 0,
@@ -84,9 +92,9 @@ export function startVastLifecycleWorker() {
   void heartbeat();
   void reconcile();
   heartbeatInterval = setInterval(() => void heartbeat(), 30_000);
-  reconciliationInterval = setInterval(() => void reconcile(), 60_000);
+  reconciliationInterval = setInterval(() => void reconcile(), 30_000);
   installShutdownHandlers();
-  log("info", "Worker de ciclo de vida iniciado.", { concurrency: 1 });
+  log("info", "Worker de ciclo de vida iniciado.", { backend, concurrency: 1 });
   return lifecycleWorker;
 }
 

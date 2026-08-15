@@ -22,6 +22,13 @@ export function resolveImageRoute(model: string, params?: Record<string, unknown
     "flux-dev": { backendModel: "flux-dev", workflowVersion: "image/flux-dev-v1" },
     "pixart-sigma": { backendModel: "pixart-sigma", workflowVersion: "image/pixart-sigma-v1" },
     "sd35-medium": { backendModel: "sd35-medium", workflowVersion: "image/sd35-medium-v1" },
+    "flux2-klein-4b": { backendModel: "flux2-klein-4b", workflowVersion: "image/flux2-klein-4b-v1" },
+    "z-image": { backendModel: "z-image", workflowVersion: "image/z-image-v1" },
+    "qwen-image": { backendModel: "qwen-image", workflowVersion: "image/qwen-image-v1" },
+    "flux2-klein-9b": { backendModel: "flux2-klein-9b", workflowVersion: "image/flux2-klein-9b-v1" },
+    "juggernaut-xl": { backendModel: "juggernaut-xl", workflowVersion: "image/juggernaut-xl-v1" },
+    "dynavision-xl": { backendModel: "dynavision-xl", workflowVersion: "image/dynavision-xl-v1" },
+    "wai-ani-ponyxl": { backendModel: "wai-ani-ponyxl", workflowVersion: "image/wai-ani-ponyxl-v1" },
   };
   const route = imageRoutes[model] ?? imageRoutes["flux-schnell"];
   return {
@@ -34,6 +41,26 @@ export function resolveImageRoute(model: string, params?: Record<string, unknown
 }
 
 export function resolveVideoRoute(operation: string, model: string, params?: Record<string, unknown>): GenerationRouteSpec {
+  if (model === "wan22-ti2v-5b") {
+    return {
+      publicModel: model,
+      backendModel: "wan22-ti2v-5b",
+      workflowVersion: `video/wan22-ti2v-5b-${operation}-v1`,
+      operation,
+      providerRoute: configuredRoute(),
+      credits: getGenerationCreditCost("video", params, "wan22-ti2v-5b"),
+    };
+  }
+  if (model === "hunyuan-video-original") {
+    return {
+      publicModel: model,
+      backendModel: "hunyuan-video-original",
+      workflowVersion: `video/hunyuan-original-${operation}-v1`,
+      operation,
+      providerRoute: configuredRoute(),
+      credits: getGenerationCreditCost("video", params, "hunyuan-video-original"),
+    };
+  }
   const premium = model.includes("13b") || model.includes("premium") || model.includes("pro");
   const backendModel = premium ? "hunyuan-video-13b" : "hunyuan-video-8.3b";
   const workflowModel = premium ? "hunyuan-13b" : "hunyuan-8.3b";

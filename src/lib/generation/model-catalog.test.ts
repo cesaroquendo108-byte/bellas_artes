@@ -13,6 +13,13 @@ describe("image model catalog", () => {
       "image-flux-dev",
       "image-pixart-sigma-v1",
       "image-sd35-medium-v1",
+      "image-flux2-klein-4b-v1",
+      "image-z-image-v1",
+      "image-qwen-image-v1",
+      "image-flux2-klein-9b-v1",
+      "image-juggernaut-xl-v1",
+      "image-dynavision-xl-v1",
+      "image-wai-ani-ponyxl-v1",
     ]);
     expect(getImageModelCatalogEntry("image-pixart-sigma-v1")).toMatchObject({
       status: "preparing",
@@ -24,6 +31,11 @@ describe("image model catalog", () => {
       status: "preparing",
       realWorkflowConfigured: false,
       license: "Stability AI Community License",
+    });
+    expect(getImageModelCatalogEntry("image-flux2-klein-4b-v1")).toMatchObject({
+      status: "preparing",
+      realWorkflowConfigured: false,
+      backendModel: "flux2-klein-4b",
     });
   });
 

@@ -31,7 +31,7 @@ import {
   listVastAdminLeases,
   updateVastLease,
 } from "@/lib/admin/vast-lease-store";
-import { scheduleVastLeaseDestruction } from "@/lib/admin/vast-lifecycle-queue";
+import { getVastLifecycleBackend, scheduleVastLeaseDestruction } from "@/lib/admin/vast-lifecycle-queue";
 import { cacheVastOfferRoutes, getCachedVastOfferRoute } from "@/lib/admin/vast-offer-cache";
 
 const ACTIVE_INSTANCE_STATES = new Set(["loading", "running", "stopped", "exited", "offline", "created"]);
@@ -206,16 +206,18 @@ export async function createVastAdminLease(input: CreateVastLeaseRequest, operat
     throw new VastAdminError("VAST_ACTIVE_INSTANCE_EXISTS", "No se pudo reservar el único cupo administrativo de GPU.", 409);
   }
 
-  try {
-    await scheduleVastLeaseDestruction(lease.id, lease.expiresAt);
-  } catch {
-    await updateVastLease(lease.id, {
-      state: "failed",
-      destroyedAt: new Date().toISOString(),
-      errorCode: "VAST_LIFECYCLE_SCHEDULE_FAILED",
-      errorMessage: "No se pudo programar la destrucción; no se solicitó ninguna GPU.",
-    }).catch(() => undefined);
-    throw new VastAdminError("VAST_LIFECYCLE_UNHEALTHY", "No se pudo programar la autodestrucción del alquiler.", 503);
+  if (getVastLifecycleBackend() === "queue") {
+    try {
+      await scheduleVastLeaseDestruction(lease.id, lease.expiresAt);
+    } catch {
+      await updateVastLease(lease.id, {
+        state: "failed",
+        destroyedAt: new Date().toISOString(),
+        errorCode: "VAST_LIFECYCLE_SCHEDULE_FAILED",
+        errorMessage: "No se pudo programar la destrucción; no se solicitó ninguna GPU.",
+      }).catch(() => undefined);
+      throw new VastAdminError("VAST_LIFECYCLE_UNHEALTHY", "No se pudo programar la autodestrucción del alquiler.", 503);
+    }
   }
   await auditVastAdminAction({
     actorId: operatorId,
@@ -229,6 +231,7 @@ export async function createVastAdminLease(input: CreateVastLeaseRequest, operat
     createdInstanceId = await client.createInstance({
       offerId: offer.id,
       label,
+      expiresAt: lease.expiresAt,
       preset: input.preset,
       bidPriceUsd: input.market === "bid" ? offer.bidPriceUsd : null,
       templateHashId: config.templateHashId,
@@ -448,8 +451,8 @@ function presetStatuses(config: ReturnType<typeof getVastAdminServerConfig>, flu
   return [
     {
       id: "comfy-clean" as const,
-      name: "Bellas Artes · ComfyUI limpio",
-      description: "Plantilla privada, SSH y disco temporal de 60 GB.",
+      name: "Laboratorio 3090 · imagen pública",
+      description: "ComfyUI, 100 GB y bootstrap verificado para Klein 4B, Z-Image, SDXL y Real-ESRGAN.",
       available: Boolean(config.templateHashId),
       unavailableReason: config.templateHashId ? null : "Falta configurar la plantilla privada.",
     },

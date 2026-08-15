@@ -118,6 +118,48 @@ const manifests: Record<string, WorkflowManifest> = {
     version: "image/flux-dev-v1",
     limits: { ...fluxSchnellManifest.limits, timeoutSeconds: 900, estimatedBudgetUsd: 0.20, minimumVramGb: 48 },
   },
+  "image/flux2-klein-4b-v1": buildUnconfiguredImageManifest({
+    version: "image/flux2-klein-4b-v1",
+    minimumVramGb: 13,
+    estimatedBudgetUsd: 0.06,
+    timeoutSeconds: 600,
+  }),
+  "image/z-image-v1": buildUnconfiguredImageManifest({
+    version: "image/z-image-v1",
+    minimumVramGb: 12,
+    estimatedBudgetUsd: 0.06,
+    timeoutSeconds: 600,
+  }),
+  "image/qwen-image-v1": buildUnconfiguredImageManifest({
+    version: "image/qwen-image-v1",
+    minimumVramGb: 48,
+    estimatedBudgetUsd: 0.45,
+    timeoutSeconds: 1200,
+  }),
+  "image/flux2-klein-9b-v1": buildUnconfiguredImageManifest({
+    version: "image/flux2-klein-9b-v1",
+    minimumVramGb: 24,
+    estimatedBudgetUsd: 0.12,
+    timeoutSeconds: 900,
+  }),
+  "image/juggernaut-xl-v1": buildUnconfiguredImageManifest({
+    version: "image/juggernaut-xl-v1",
+    minimumVramGb: 12,
+    estimatedBudgetUsd: 0.05,
+    timeoutSeconds: 600,
+  }),
+  "image/dynavision-xl-v1": buildUnconfiguredImageManifest({
+    version: "image/dynavision-xl-v1",
+    minimumVramGb: 12,
+    estimatedBudgetUsd: 0.05,
+    timeoutSeconds: 600,
+  }),
+  "image/wai-ani-ponyxl-v1": buildUnconfiguredImageManifest({
+    version: "image/wai-ani-ponyxl-v1",
+    minimumVramGb: 12,
+    estimatedBudgetUsd: 0.05,
+    timeoutSeconds: 600,
+  }),
   "characters/flux-reference-v1": {
     version: "characters/flux-reference-v1",
     kind: "character",
@@ -187,10 +229,10 @@ const manifests: Record<string, WorkflowManifest> = {
   },
 };
 
-for (const model of ["hunyuan-8.3b", "hunyuan-13b"] as const) {
+for (const model of ["hunyuan-8.3b", "hunyuan-13b", "wan22-ti2v-5b", "hunyuan-1.5-8.3b", "hunyuan-original"] as const) {
   for (const operation of ["t2v", "i2v", "v2v", "action-sync", "effects", "upscale", "lip-sync", "replace-character", "extend"] as const) {
     const version = `video/${model}-${operation}-v1`;
-    const premium = model === "hunyuan-13b";
+    const premium = model === "hunyuan-13b" || model === "hunyuan-original";
     const sourceRequired = operation !== "t2v";
     const sourceMimeTypes = operation === "i2v"
       ? ["image/png", "image/jpeg", "image/webp"]

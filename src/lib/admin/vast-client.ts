@@ -13,6 +13,9 @@ import {
 } from "@/lib/admin/vast-contracts";
 
 const VAST_API_BASE = "https://console.vast.ai";
+const VAST_LAB_DISK_GB = 100;
+const VAST_LAB_BOOTSTRAP_URL = "https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/codex/consolidacion-final/infra/vast/bootstrap_3090_lab.sh";
+const VAST_LAB_BOOTSTRAP_SHA256 = "d539c889b2d0f13cb8ddfadb14b0a67a23c6600c8bbcc57f734141e2f11158d6";
 
 type VastApiMode = "admin" | "lifecycle";
 
@@ -113,7 +116,7 @@ export class VastAdminClient {
       gpu_ram: { gte: input.limits.minGpuRamMb },
       reliability: { gte: input.limits.minReliability },
       direct_port_count: { gte: 1 },
-      disk_space: { gte: 60 },
+      disk_space: { gte: input.preset === "comfy-clean" ? VAST_LAB_DISK_GB : 60 },
     };
     if (input.offerMachineId) body.machine_id = { eq: input.offerMachineId };
     if (input.preset === "flux-cached") {
@@ -143,6 +146,7 @@ export class VastAdminClient {
   async createInstance(input: {
     offerId: number;
     label: string;
+    expiresAt: string;
     preset: VastAdminPreset;
     bidPriceUsd: number | null;
     templateHashId: string;
@@ -152,15 +156,20 @@ export class VastAdminClient {
     const body: Record<string, unknown> = {
       template_hash_id: input.templateHashId,
       label: input.label,
-      disk: 60,
+      disk: input.preset === "comfy-clean" ? VAST_LAB_DISK_GB : 60,
       runtype: "ssh_direct",
       target_state: "running",
       cancel_unavail: true,
     };
     if (input.bidPriceUsd !== null) body.price = input.bidPriceUsd;
+    const watchdog = buildInstanceWatchdogCommand(input.expiresAt);
+    if (input.preset === "comfy-clean") {
+      body.onstart = [watchdog, buildLabOnstartCommand()].join("\n");
+    }
     if (input.preset === "flux-cached") {
       if (!input.fluxVolumeId) throw new VastAdminError("VAST_VOLUME_NOT_CONFIGURED", "El volumen Flux no está configurado.", 422);
       body.volume_info = { create_new: false, volume_id: input.fluxVolumeId, mount_path: input.fluxMountPath };
+      body.onstart = watchdog;
     }
     const payload = await this.request<VastRaw>(`/api/v0/asks/${input.offerId}/`, {
       method: "PUT",
@@ -235,6 +244,36 @@ export class VastAdminClient {
       ? lastError
       : new VastAdminError("VAST_PROVIDER_ERROR", "No se pudo contactar Vast.ai.", 503, true);
   }
+}
+
+function buildLabOnstartCommand() {
+  return [
+    "set -euo pipefail",
+    `curl --fail --location --retry 5 --retry-all-errors --output /tmp/bellas-artes-3090-lab.sh '${VAST_LAB_BOOTSTRAP_URL}'`,
+    `printf '%s  %s\\n' '${VAST_LAB_BOOTSTRAP_SHA256}' /tmp/bellas-artes-3090-lab.sh | sha256sum -c -`,
+    "bash /tmp/bellas-artes-3090-lab.sh",
+  ].join("\n");
+}
+
+function buildInstanceWatchdogCommand(expiresAt: string) {
+  const expiresAtMs = Date.parse(expiresAt);
+  if (!Number.isFinite(expiresAtMs)) throw new VastAdminError("VAST_TTL_INVALID", "El vencimiento del alquiler no es válido.", 422);
+  const script = [
+    "import os, sys, time, urllib.request",
+    "expires_at = int(sys.argv[1])",
+    "time.sleep(max(expires_at - int(time.time()), 0))",
+    "instance_id = os.environ.get('CONTAINER_ID')",
+    "api_key = os.environ.get('CONTAINER_API_KEY')",
+    "if not instance_id or not api_key: raise SystemExit('INSTANCE_WATCHDOG_ENV_MISSING')",
+    "request = urllib.request.Request(f'https://console.vast.ai/api/v0/instances/{instance_id}/', method='DELETE', headers={'Authorization': f'Bearer {api_key}'})",
+    "with urllib.request.urlopen(request, timeout=30) as response: response.read()",
+  ].join("\n");
+  const encoded = Buffer.from(script, "utf8").toString("base64");
+  const expiresAtSeconds = Math.floor(expiresAtMs / 1_000);
+  return [
+    `printf '%s' '${encoded}' | base64 -d > /tmp/bellas-artes-vast-watchdog.py`,
+    `nohup python /tmp/bellas-artes-vast-watchdog.py ${expiresAtSeconds} >/tmp/bellas-artes-vast-watchdog.log 2>&1 &`,
+  ].join("\n");
 }
 
 function sanitizeOffer(raw: VastRaw, market: VastAdminMarket, ttlMinutes: number): VastOffer | null {

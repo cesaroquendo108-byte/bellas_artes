@@ -19,3 +19,17 @@ modelos esté en un filesystem dedicado. Si `/workspace` cae en `/`, `overlay` o
 ventana de cinco jobs, incluido el máximo estimado de US$0.20 por job. No debe cargarse mientras falten rotaciones, auditoría o
 la comprobación del checkpoint, y `GENERATION_ENABLED` vuelve a `false` al
 finalizar incluso si la aceptación falla.
+
+## Laboratorio administrativo RTX 3090
+
+`bootstrap_3090_lab.sh` prepara en una instancia efímera un ComfyUI fijado por
+commit, los pesos públicos de Klein 4B, Z-Image, SDXL Base/Refiner y
+Real-ESRGAN, y los workflows privados necesarios para probarlos. El cliente
+administrativo descarga el script desde la rama fijada y comprueba su SHA-256
+antes de ejecutarlo.
+
+El perfil usa 100 GB de disco, ComfyUI escucha sólo en el puerto interno `18188`
+y el panel ofrece un túnel SSH hacia `localhost:8188`. No se descargan modelos
+gated, custom nodes GPL, pesos de voz ni modelos de investigación. El proceso
+completo y los límites de una RTX 3090 están en
+[`docs/gpu-lab-3090-runbook.md`](../../docs/gpu-lab-3090-runbook.md).

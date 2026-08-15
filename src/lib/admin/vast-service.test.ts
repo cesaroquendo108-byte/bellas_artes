@@ -56,7 +56,10 @@ vi.mock("@/lib/admin/vast-lease-store", () => ({
   getVastLeaseByInstanceId: mocks.getVastLeaseByInstanceId,
   getVastLeaseById: mocks.getVastLeaseById,
 }));
-vi.mock("@/lib/admin/vast-lifecycle-queue", () => ({ scheduleVastLeaseDestruction: mocks.scheduleVastLeaseDestruction }));
+vi.mock("@/lib/admin/vast-lifecycle-queue", () => ({
+  getVastLifecycleBackend: () => process.env.VAST_ADMIN_LIFECYCLE_BACKEND === "queue" ? "queue" : "poller",
+  scheduleVastLeaseDestruction: mocks.scheduleVastLeaseDestruction,
+}));
 vi.mock("@/lib/admin/vast-offer-cache", () => ({
   cacheVastOfferRoutes: mocks.cacheVastOfferRoutes,
   getCachedVastOfferRoute: mocks.getCachedVastOfferRoute,
@@ -120,6 +123,7 @@ describe("servicio de alquiler Vast", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubEnv("VAST_ADMIN_LIFECYCLE_ENABLED", "true");
+    vi.stubEnv("VAST_ADMIN_LIFECYCLE_BACKEND", "queue");
     mocks.getVastLeaseByRequestId.mockResolvedValue(null);
     mocks.getVastLifecycleHeartbeat.mockResolvedValue({ reportedStatus: "healthy", observedAt: new Date().toISOString(), details: {} });
     mocks.getCachedVastOfferRoute.mockResolvedValue({ machineId: offer.machineId, hourlyUsd: offer.hourlyUsd, preset: request.preset, market: request.market });
@@ -167,6 +171,13 @@ describe("servicio de alquiler Vast", () => {
     expect(mocks.insertPendingVastLease).toHaveBeenCalledBefore(mocks.createInstance);
     expect(mocks.scheduleVastLeaseDestruction).toHaveBeenCalledWith(expect.any(String), expect.any(String));
     expect(mocks.createInstance).toHaveBeenCalledWith(expect.objectContaining({ offerId: 91, templateHashId: "template-hash" }));
+  });
+
+  it("usa Supabase como agenda durable cuando el backend es poller", async () => {
+    vi.stubEnv("VAST_ADMIN_LIFECYCLE_BACKEND", "poller");
+    await createVastAdminLease(request, "admin");
+    expect(mocks.scheduleVastLeaseDestruction).not.toHaveBeenCalled();
+    expect(mocks.createInstance).toHaveBeenCalledWith(expect.objectContaining({ expiresAt: expect.any(String) }));
   });
 
   it("no permite actuar sobre una instancia externa", async () => {

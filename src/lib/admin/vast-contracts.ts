@@ -1,6 +1,6 @@
 export const vastAdminPresets = ["comfy-clean", "flux-cached"] as const;
 export const vastAdminMarkets = ["on-demand", "bid"] as const;
-export const vastAdminTtlMinutes = [15, 30, 60, 120] as const;
+export const vastAdminTtlMinutes = [15, 30, 60, 120, 180] as const;
 export const supportedVastGpuFamilies = [
   "RTX 3090",
   "RTX PRO 4000",

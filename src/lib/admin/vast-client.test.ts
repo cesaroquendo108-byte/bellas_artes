@@ -48,7 +48,7 @@ describe("cliente administrativo Vast", () => {
     const body = JSON.parse(String(vi.mocked(fetch).mock.calls[0][1]?.body));
     expect(body).toMatchObject({
       direct_port_count: { gte: 1 },
-      disk_space: { gte: 60 },
+      disk_space: { gte: 100 },
       order: [["dph_total", "asc"]],
     });
     expect(body).not.toHaveProperty("id");
@@ -60,6 +60,7 @@ describe("cliente administrativo Vast", () => {
     await expect(new VastAdminClient().createInstance({
       offerId: 91,
       label: "ba-admin:11111111-1111-4111-8111-111111111111",
+      expiresAt: "2030-01-01T00:00:00.000Z",
       preset: "flux-cached",
       bidPriceUsd: null,
       templateHashId: "template-hash",
@@ -75,7 +76,30 @@ describe("cliente administrativo Vast", () => {
       volume_info: { create_new: false, volume_id: 47343353, mount_path: "/workspace/ComfyUI/models/checkpoints" },
     }));
     expect(body).not.toHaveProperty("env");
-    expect(body).not.toHaveProperty("onstart");
+    expect(body.onstart).toContain("bellas-artes-vast-watchdog.py");
+    expect(body.onstart).toContain("1893456000");
+    expect(body.onstart).not.toContain("scoped-test-key");
+  });
+
+  it("prepara el laboratorio público con 100 GB y bootstrap fijado por hash", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true, new_contract: 1235 }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await new VastAdminClient().createInstance({
+      offerId: 92,
+      label: "ba-admin:22222222-2222-4222-8222-222222222222",
+      expiresAt: "2030-01-01T00:00:00.000Z",
+      preset: "comfy-clean",
+      bidPriceUsd: null,
+      templateHashId: "template-hash",
+      fluxVolumeId: null,
+      fluxMountPath: "/workspace/ComfyUI/models/checkpoints",
+    });
+    const body = JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body));
+    expect(body.disk).toBe(100);
+    expect(body.onstart).toContain("bootstrap_3090_lab.sh");
+    expect(body.onstart).toContain("sha256sum -c -");
+    expect(body.onstart).toContain("bellas-artes-vast-watchdog.py");
+    expect(body).not.toHaveProperty("env");
   });
 
   it("revalida una oferta dentro de un conjunto estable sin confiar en el filtro id de Vast", async () => {

@@ -4,9 +4,14 @@ import { Queue } from "bullmq";
 import Redis from "ioredis";
 
 export const vastLifecycleQueueName = "vast-admin-lifecycle";
+export type VastLifecycleBackend = "poller" | "queue";
 
 let connection: Redis | null = null;
 let queue: Queue<{ leaseId: string }> | null = null;
+
+export function getVastLifecycleBackend(): VastLifecycleBackend {
+  return process.env.VAST_ADMIN_LIFECYCLE_BACKEND === "queue" ? "queue" : "poller";
+}
 
 function getConnection() {
   const url = process.env.REDIS_URL?.trim();

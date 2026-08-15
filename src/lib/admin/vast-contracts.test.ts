@@ -24,6 +24,7 @@ describe("contratos administrativos Vast", () => {
     expect(calculateBidPrice(0.2)).toBe(0.22);
     expect(calculateProjectedCost(0.6, 15)).toBe(0.15);
     expect(calculateProjectedCost(0.6, 120)).toBe(1.2);
+    expect(calculateProjectedCost(0.3, 180)).toBe(0.9);
   });
 
   it("clasifica heartbeats sin permitir alquiler con un worker viejo", () => {

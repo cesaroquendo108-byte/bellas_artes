@@ -54,6 +54,30 @@ const capabilityCatalog: CapabilityDefinition[] = [
     operation,
     workflowVersion: `video/hunyuan-8.3b-${operation}-v1`,
   })),
+  ...(["t2v", "i2v"] as const).map((operation) => ({
+    id: `video-wan22-ti2v-5b-${operation}`,
+    label: `Wan 2.2 TI2V-5B · ${operation}`,
+    kind: "video" as const,
+    model: "wan22-ti2v-5b",
+    operation,
+    workflowVersion: `video/wan22-ti2v-5b-${operation}-v1`,
+  })),
+  ...(["t2v", "i2v"] as const).map((operation) => ({
+    id: `video-hunyuan-1.5-8.3b-${operation}`,
+    label: `HunyuanVideo 1.5 8.3B · ${operation}`,
+    kind: "video" as const,
+    model: "hunyuan-video-1.5-8.3b",
+    operation,
+    workflowVersion: `video/hunyuan-8.3b-${operation}-v1`,
+  })),
+  ...(["t2v", "i2v"] as const).map((operation) => ({
+    id: `video-hunyuan-original-${operation}`,
+    label: `HunyuanVideo original · ${operation}`,
+    kind: "video" as const,
+    model: "hunyuan-video-original",
+    operation,
+    workflowVersion: `video/hunyuan-original-${operation}-v1`,
+  })),
 ];
 
 export function listGenerationCapabilities(): GenerationCapability[] {

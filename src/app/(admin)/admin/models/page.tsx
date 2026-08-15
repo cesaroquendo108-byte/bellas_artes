@@ -18,6 +18,11 @@ import {
   type ModelBenchmarkDecision,
   type ModelBenchmarkEvidence,
 } from "@/lib/admin/model-benchmark";
+import {
+  listModelRuntimeCatalog,
+  summarizeModelRuntime,
+  type ModelRuntimeStatus,
+} from "@/lib/generation/model-runtime-catalog";
 import { requireAdmin } from "@/lib/auth";
 import installState from "../../../../../infra/models/model-install-state.json";
 
@@ -47,6 +52,14 @@ const installLabels = {
   blocked: "Instalación bloqueada",
 } as const;
 
+const runtimeLabels: Record<ModelRuntimeStatus, string> = {
+  workflow_ready: "Workflow real listo",
+  workflow_pending: "Workflow pendiente",
+  component_pending: "Componente integrado",
+  research_only: "Investigación privada",
+  replaced: "Reemplazado / aislado",
+};
+
 type ModelInstallState = {
   state: keyof typeof installLabels;
   note: string;
@@ -64,6 +77,8 @@ export default async function AdminModelsPage() {
       model.id as keyof typeof installState.models
     ] as ModelInstallState,
   }));
+  const runtimeById = new Map(listModelRuntimeCatalog().map((model) => [model.id, model]));
+  const runtimeSummary = summarizeModelRuntime();
   const summary = summarizeModelBenchmark();
 
   return (
@@ -97,6 +112,8 @@ export default async function AdminModelsPage() {
           label="Pesos instalados"
           value={Object.values(installState.models).filter((item) => item.state === "installed").length}
         />
+        <Metric label="Workflows reales" value={runtimeSummary.workflowReady} />
+        <Metric label="Smoke admin listo" value={runtimeSummary.smokeReady} />
       </section>
 
       <Card>
@@ -136,9 +153,34 @@ export default async function AdminModelsPage() {
         </div>
       </div>
 
+      <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-sm leading-6 text-violet-950">
+        <p className="font-semibold">Integración del vault en Bellas Artes</p>
+        <p className="mt-1">
+          {runtimeSummary.installed} de {runtimeSummary.total} paquetes están registrados como instalados. {runtimeSummary.workflowReady} tienen un workflow API real y {runtimeSummary.workflowPending} esperan exportación/validación de ComfyUI. Los auxiliares ({runtimeSummary.components}) se conectan como componentes de otros pipelines; {runtimeSummary.researchOnly} permanecen sólo para investigación y {runtimeSummary.replaced} están aislados por licencia.
+        </p>
+      </div>
+
       <section className="grid gap-4 xl:grid-cols-2">
         {models.map((model) => (
           <Card key={model.id} className="overflow-hidden">
+            {(() => {
+              const runtime = runtimeById.get(model.id);
+              if (!runtime) return null;
+              return (
+                <div className="border-b border-violet-200 bg-violet-50 px-6 py-3 text-xs text-violet-950">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-semibold">{runtimeLabels[runtime.status]}</span>
+                    <span>{runtime.canRunAdminSmoke ? "Listo para smoke admin" : "No ejecutable todavía"} · vault {runtime.vault}</span>
+                  </div>
+                  <p className="mt-1 leading-5">{runtime.useNote}</p>
+                  {runtime.workflowVersions.length > 0 && (
+                    <p className="mt-1 font-mono text-[10px] opacity-75">
+                      {runtime.workflowVersions.join(" · ")}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
             <CardHeader className="space-y-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

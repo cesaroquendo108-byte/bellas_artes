@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/utils/supabase/admin";
 import { getGenerationConfig, type GenerationAccessMode, type GenerationProviderKind } from "./config";
+import { MODEL_RUNTIME_CATALOG } from "./model-runtime-catalog";
 
 type AccessLevel = "beta" | "pro" | "b2b" | "service";
 
@@ -94,7 +95,10 @@ function isPremiumBackend(backendModel: string) {
 }
 
 function isAdminOnlyBackend(backendModel: string) {
-  return backendModel === "pixart-sigma" || backendModel === "sd35-medium";
+  if (backendModel === "flux-schnell" || backendModel === "flux-dev" || backendModel === "hunyuan-video-13b") return false;
+  return backendModel === "pixart-sigma"
+    || backendModel === "sd35-medium"
+    || MODEL_RUNTIME_CATALOG.some((entry) => entry.backendModels.some((model) => model === backendModel));
 }
 
 function hasPremiumEntitlement(profile: GenerationAccessProfile, grant: GenerationAccessGrant | null) {
