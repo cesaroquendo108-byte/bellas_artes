@@ -103,12 +103,9 @@ services:
     pids_limit: 300
     networks:
       - internal
-      - egress
 
 volumes:
   redis-data:
 
 networks:
-  internal:
-    internal: true
-  egress:
+  internal: {}
