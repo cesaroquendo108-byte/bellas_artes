@@ -33,23 +33,23 @@ export function CharacterCanvas() {
   const imageUrl =
     state.localReference?.previewUrl ?? state.savedReference?.signedUrl;
   return (
-    <section className="flex min-h-[520px] min-w-0 flex-col bg-[#080809] p-4 sm:p-6">
+    <section className="flex min-h-[520px] min-w-0 flex-col bg-[#fcfaf5] p-4 text-[#241f2e] sm:p-6">
       <div className="flex items-center gap-2">
-        <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+        <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
           {state.mode}
         </Badge>
-        <span className="text-[10px] text-slate-600">
+        <span className="text-[10px] text-[#8c8393]">
           {state.aspectRatio} · {state.model}
         </span>
         <Badge
           variant="outline"
-          className="ml-auto border-white/10 text-[9px] text-slate-500"
+          className="ml-auto border-[#e6ded1] text-[9px] text-[#817887]"
         >
           Vista previa local
         </Badge>
       </div>
       <div className="flex min-h-80 flex-1 items-center justify-center py-5">
-        <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-white/[0.08] bg-black shadow-2xl shadow-violet-950/20">
+        <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-[#e6ded1] bg-white shadow-[0_12px_30px_rgba(72,53,101,0.08)]">
           <div className="aspect-square sm:aspect-[4/3]">
             {imageUrl ? (
               <div
@@ -66,32 +66,34 @@ export function CharacterCanvas() {
                 <div className="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600">
                   <Sparkles className="size-7" />
                 </div>
-                <h2 className="mt-5 text-lg font-semibold">
+                <h2 className="mt-5 text-lg font-semibold text-[#2b2634]">
                   Canvas de consistencia
                 </h2>
-                <p className="mt-2 max-w-md text-xs leading-5 text-slate-500">
+                <p className="mt-2 max-w-md text-xs leading-5 text-[#817887]">
                   Añade una referencia o describe una identidad. Los resultados
                   reales aparecerán aquí cuando se conecte el proveedor.
                 </p>
               </div>
             )}
           </div>
-          <div className="absolute right-3 bottom-3 flex gap-1 rounded-full border border-white/10 bg-black/70 p-1 backdrop-blur">
+          <div className="absolute right-3 bottom-3 flex gap-1 rounded-full border border-[#e6ded1] bg-white/95 p-1 shadow-sm backdrop-blur">
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
+              className="text-[#574e60] hover:bg-[#f5f0ff] hover:text-[#6d28d9]"
               onClick={() => setZoom((value) => Math.max(0.7, value - 0.1))}
             >
               <Minus />
             </Button>
-            <span className="px-2 py-1.5 text-[9px] text-slate-400">
+            <span className="px-2 py-1.5 text-[9px] text-[#817887]">
               {Math.round(zoom * 100)}%
             </span>
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
+              className="text-[#574e60] hover:bg-[#f5f0ff] hover:text-[#6d28d9]"
               onClick={() => setZoom((value) => Math.min(1.5, value + 0.1))}
             >
               <Plus />
@@ -107,7 +109,7 @@ export function CharacterCanvas() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-white/10 bg-white/[0.03]"
+                className="border-[#e6ded1] bg-white text-[#3a3342] hover:bg-[#f8f4ff]"
               />
             }
           >
@@ -132,7 +134,7 @@ export function CharacterCanvas() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-white/10 bg-white/[0.03]"
+                className="border-[#e6ded1] bg-white text-[#3a3342] hover:bg-[#f8f4ff]"
               />
             }
           >
@@ -155,7 +157,7 @@ export function CharacterCanvas() {
           variant="outline"
           size="sm"
           disabled
-          className="border-white/10"
+          className="border-[#e6ded1] text-[#9a919f]"
         >
           <Maximize2 /> Upscale 4K
         </Button>
@@ -164,17 +166,17 @@ export function CharacterCanvas() {
           variant="outline"
           size="sm"
           disabled
-          className="border-white/10"
+          className="border-[#e6ded1] text-[#9a919f]"
         >
           <Expand /> Remove background
         </Button>
       </div>
-      <div className="mt-4 rounded-2xl border border-white/[0.08] bg-[#121214]/95 p-3 shadow-xl">
+      <div className="mt-4 rounded-2xl border border-[#e6ded1] bg-white p-3 shadow-[0_8px_20px_rgba(72,53,101,0.06)]">
         <textarea
           value={state.prompt}
           onChange={(event) => setField("prompt", event.target.value)}
           placeholder="Describe escena, vestuario, luz y expresión…"
-          className="min-h-16 w-full resize-none bg-transparent text-sm outline-none placeholder:text-slate-600"
+          className="min-h-16 w-full resize-none bg-transparent text-sm text-[#2e2837] outline-none placeholder:text-[#9b919f]"
         />
         <div className="mt-2 flex items-center gap-2">
           <Button
@@ -191,7 +193,7 @@ export function CharacterCanvas() {
           >
             <WandSparkles /> Mejorar
           </Button>
-          <span className="ml-auto text-[10px] text-slate-600">0 créditos</span>
+          <span className="ml-auto text-[10px] text-[#8d8293]">0 créditos</span>
         </div>
       </div>
       {state.feedback && (
@@ -199,8 +201,8 @@ export function CharacterCanvas() {
           role="status"
           className={
             state.feedback.tone === "error"
-              ? "mt-3 rounded-xl border border-rose-400/20 bg-rose-500/10 p-3 text-xs text-rose-200"
-              : "mt-3 rounded-xl border border-violet-400/20 bg-violet-500/10 p-3 text-xs text-violet-200"
+              ? "mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700"
+              : "mt-3 rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs text-violet-700"
           }
         >
           {state.feedback.message}

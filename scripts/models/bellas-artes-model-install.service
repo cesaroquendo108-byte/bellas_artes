@@ -10,6 +10,8 @@ Type=simple
 WorkingDirectory=/home/finvecito/Documentos/bellas_artes_consolidado
 Environment=BELLAS_ARTES_MODEL_VAULT=/mnt/cesar/BellasArtes_ModelVault
 Environment=BELLAS_ARTES_MODEL_VAULT_SECONDARY=/mnt/disco_500gb/BellasArtes_ModelVault
+Environment=HF_HUB_ENABLE_HF_TRANSFER=1
+Environment=HF_XET_HIGH_PERFORMANCE=1
 ExecStart=/home/finvecito/Documentos/bellas_artes_consolidado/scripts/models/install-public-model-waves.sh
 Restart=on-failure
 RestartSec=30

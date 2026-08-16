@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Sparkles } from "lucide-react";
+import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,29 +13,30 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { BellasArtesMark, BellasArtesWordmark } from "@/components/brand/bellas-artes-mark";
 
 const links = [
-  { href: "/inspire", label: "Inspire" },
+  { href: "/inspire", label: "Inspiración" },
   { href: "/blog", label: "Blog" },
-  { href: "/tutorials", label: "Tutorials" },
+  { href: "/tutorials", label: "Tutoriales" },
   { href: "/mcp", label: "MCP" },
 ];
 
 export function PublicMarketingShell({
   children,
+  authenticated = false,
 }: {
   children: React.ReactNode;
+  authenticated?: boolean;
 }) {
   const pathname = usePathname();
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#080809] text-white">
-      <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#080809]/90 backdrop-blur-xl">
+    <div className="ba-public-shell min-h-screen overflow-x-clip bg-[#f2f6fb] text-[#172740]">
+      <header className="ba-public-header sticky top-0 z-50 border-b border-[#dce6f2] bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-7">
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-600 shadow-lg shadow-violet-500/20">
-              <Sparkles className="size-4" />
-            </span>
-            <span>Bellas Artes</span>
+            <BellasArtesMark className="size-8 rounded-lg" />
+            <BellasArtesWordmark />
           </Link>
           <nav className="hidden flex-1 items-center gap-1 md:flex">
             {links.map((item) => (
@@ -45,8 +46,8 @@ export function PublicMarketingShell({
                 className={cn(
                   "rounded-lg px-3 py-2 text-sm transition",
                   pathname.startsWith(item.href)
-                    ? "bg-violet-500/10 text-violet-200"
-                    : "text-slate-500 hover:bg-white/[0.05] hover:text-white",
+                    ? "bg-[#e7f1fb] text-[#084f92]"
+                    : "text-[#5d7088] hover:bg-[#f2f6fb] hover:text-[#172740]",
                 )}
               >
                 {item.label}
@@ -54,19 +55,13 @@ export function PublicMarketingShell({
             ))}
           </nav>
           <div className="ml-auto hidden items-center gap-2 md:flex">
-            <Button
-              render={<Link href="/login" />}
-              nativeButton={false}
-              variant="ghost"
-            >
-              Entrar
-            </Button>
+            {!authenticated && <Button render={<Link href="/login" />} nativeButton={false} variant="ghost" className="text-[#46586f] hover:bg-[#e7f1fb] hover:text-[#172740]">Entrar</Button>}
             <Button
               render={<Link href="/dashboard" />}
               nativeButton={false}
-              className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"
+              className="bg-[#0b72ce] text-white hover:bg-[#084f92]"
             >
-              Abrir estudio
+              {authenticated ? "Volver al estudio" : "Abrir estudio"}
             </Button>
           </div>
           <Sheet>
@@ -84,7 +79,7 @@ export function PublicMarketingShell({
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="border-white/10 bg-[#0d0d10] text-white"
+              className="border-[#dce6f2] bg-white text-[#172740]"
             >
               <SheetHeader>
                 <SheetTitle>Navegación</SheetTitle>
@@ -97,7 +92,7 @@ export function PublicMarketingShell({
                     render={
                       <Link
                         href={item.href}
-                        className="rounded-xl border border-white/[0.07] px-4 py-3 text-sm text-slate-300"
+                        className="rounded-xl border border-[#dce6f2] px-4 py-3 text-sm text-[#46586f]"
                       />
                     }
                   >
@@ -106,27 +101,17 @@ export function PublicMarketingShell({
                 ))}
               </nav>
               <div className="mt-auto grid gap-2 p-4">
-                <SheetClose
-                  nativeButton={false}
-                  render={
-                    <Link
-                      href="/login"
-                      className="rounded-lg border border-white/10 px-4 py-3 text-center text-sm"
-                    />
-                  }
-                >
-                  Entrar
-                </SheetClose>
+                {!authenticated && <SheetClose nativeButton={false} render={<Link href="/login" className="rounded-lg border border-[#dce6f2] px-4 py-3 text-center text-sm text-[#46586f]" />}>Entrar</SheetClose>}
                 <SheetClose
                   nativeButton={false}
                   render={
                     <Link
                       href="/dashboard"
-                      className="rounded-lg bg-violet-600 px-4 py-3 text-center text-sm font-medium"
+                      className="rounded-lg bg-[#0b72ce] px-4 py-3 text-center text-sm font-medium text-white"
                     />
                   }
                 >
-                  Abrir estudio
+                  {authenticated ? "Volver al estudio" : "Abrir estudio"}
                 </SheetClose>
               </div>
             </SheetContent>
@@ -134,17 +119,17 @@ export function PublicMarketingShell({
         </div>
       </header>
       <main>{children}</main>
-      <footer className="border-t border-white/[0.07] bg-[#0a0a0c]">
+      <footer className="ba-public-footer border-t border-white/10 bg-[#16305e]">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-7 md:grid-cols-[1fr_auto]">
           <div>
             <p className="flex items-center gap-2 font-semibold">
-              <Sparkles className="size-4 text-violet-300" /> Bellas Artes
+              <BellasArtesMark inverse className="size-8 rounded-lg" /> <BellasArtesWordmark inverse />
             </p>
-            <p className="mt-2 max-w-md text-xs leading-5 text-slate-600">
-              Suite creativa de imagen, video y narrativa asistida por IA.
+            <p className="mt-2 max-w-md text-xs leading-5 text-white/65">
+              Suite creativa de imagen, video y narrativa nacida en Venezuela.
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-500">
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/70">
             {links.map((item) => (
               <Link
                 key={item.href}

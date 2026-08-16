@@ -154,8 +154,10 @@ export function AudioLibrary({
                 setTab(value);
                 setSelected(new Set());
               }}
-              className={`min-w-fit px-3 py-2 text-xs ${
-                tab === value ? "bg-violet-500/15 text-violet-200" : "text-slate-500"
+              className={`min-w-fit rounded-lg px-3 py-2 text-xs font-medium transition ${
+                tab === value
+                  ? "bg-violet-600 text-white shadow-sm shadow-violet-500/20"
+                  : "text-slate-700 hover:bg-violet-500/10 hover:text-violet-700"
               }`}
             >
               {label}

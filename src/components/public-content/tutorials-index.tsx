@@ -33,18 +33,18 @@ export function TutorialsIndex({
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-7 sm:py-20">
       <header>
-        <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+        <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
           Centro de aprendizaje
         </Badge>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
+        <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[#2b2634] sm:text-6xl">
           Tutorials
         </h1>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-500">
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#817887]">
           Guías paso a paso para generación de imagen, video, edición y
           producción consistente.
         </p>
       </header>
-      <div className="mt-9 flex flex-col gap-4 border-y border-white/[0.07] py-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mt-9 flex flex-col gap-4 border-y border-[#e6ded1] py-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex gap-2 overflow-x-auto">
           {categories.map((item) => (
             <button
@@ -55,7 +55,7 @@ export function TutorialsIndex({
                 "min-w-fit rounded-full border px-4 py-2 text-xs",
                 filter === item
                   ? "border-violet-400 bg-violet-600 text-white"
-                  : "border-white/10 text-slate-500",
+                  : "border-[#e6ded1] text-[#817887] hover:bg-[#f8f4ff]",
               )}
             >
               {item}
@@ -63,7 +63,7 @@ export function TutorialsIndex({
           ))}
         </div>
         <label className="relative w-full lg:w-80">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-600" />
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#8d8293]" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -78,7 +78,7 @@ export function TutorialsIndex({
             <Link
               href={`/tutorials/${tutorial.slug}`}
               key={tutorial.slug}
-              className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111114] transition hover:-translate-y-1 hover:border-violet-400/35"
+              className="group overflow-hidden rounded-2xl border border-[#e6ded1] bg-white transition hover:-translate-y-1 hover:border-violet-300 hover:shadow-[0_10px_24px_rgba(72,53,101,0.08)]"
             >
               <CoverArt tone={tutorial.cover} className="aspect-video">
                 <span className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-violet-600/80 text-white backdrop-blur">
@@ -94,17 +94,17 @@ export function TutorialsIndex({
               </CoverArt>
               <div className="p-4">
                 <div className="flex items-center justify-between">
-                  <Badge className="bg-white/[0.06] text-[9px] text-slate-400">
+                  <Badge className="border border-[#e6ded1] bg-[#f7f4ec] text-[9px] text-[#6f6878]">
                     {tutorial.category}
                   </Badge>
-                  <span className="text-[9px] uppercase text-violet-300">
+                  <span className="text-[9px] uppercase text-[#7c3aed]">
                     {levelLabels[tutorial.level]}
                   </span>
                 </div>
-                <h2 className="mt-3 line-clamp-2 text-sm font-semibold">
+                <h2 className="mt-3 line-clamp-2 text-sm font-semibold text-[#2b2634]">
                   {tutorial.title}
                 </h2>
-                <p className="mt-2 line-clamp-2 text-[11px] leading-5 text-slate-600">
+                <p className="mt-2 line-clamp-2 text-[11px] leading-5 text-[#8d8293]">
                   {tutorial.excerpt}
                 </p>
               </div>
@@ -112,9 +112,9 @@ export function TutorialsIndex({
           ))}
         </div>
       ) : (
-        <div className="mt-8 flex min-h-72 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10">
-          <SearchX className="size-7 text-slate-700" />
-          <p className="mt-3 text-sm text-slate-500">
+        <div className="mt-8 flex min-h-72 flex-col items-center justify-center rounded-2xl border border-dashed border-[#e6ded1]">
+          <SearchX className="size-7 text-[#a097a4]" />
+          <p className="mt-3 text-sm text-[#817887]">
             No encontramos tutoriales.
           </p>
         </div>

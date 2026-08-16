@@ -272,54 +272,54 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Bellas Artes workspace: warm, calm and mobile-first. The public site and
-   administrative backoffice deliberately keep their dark visual language. */
+/* Bellas Artes workspace: authenticated surfaces share the same warm, light
+   canvas as the public creative areas. */
 .workspace-theme {
-  --background: #f7f4ec;
+  --background: #fcfaf5;
   --foreground: #241f2e;
   --card: #fffdf8;
   --card-foreground: #241f2e;
-  --popover: #ffffff;
+  --popover: #fffdf8;
   --popover-foreground: #241f2e;
   --primary: #7c3aed;
   --primary-foreground: #ffffff;
-  --secondary: #eee8f8;
-  --secondary-foreground: #352a43;
-  --muted: #eee9df;
-  --muted-foreground: #756d7c;
-  --accent: #efe8ff;
-  --accent-foreground: #5b21b6;
+  --secondary: #f7f4ec;
+  --secondary-foreground: #3b3344;
+  --muted: #f4efe7;
+  --muted-foreground: #817887;
+  --accent: #f1eaff;
+  --accent-foreground: #6d28d9;
   --border: #e6ded1;
-  --input: #ded4c6;
+  --input: #e6ded1;
   --ring: #8b5cf6;
-  --sidebar: #fcfaf5;
-  --sidebar-foreground: #332c3d;
+  --sidebar: #fffdf8;
+  --sidebar-foreground: #3b3344;
   --sidebar-primary: #7c3aed;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0e9ff;
-  --sidebar-accent-foreground: #5b21b6;
+  --sidebar-accent: #f1eaff;
+  --sidebar-accent-foreground: #6d28d9;
   --sidebar-border: #e6ded1;
   --sidebar-ring: #8b5cf6;
-  --workspace-canvas: #f7f4ec;
+  --workspace-canvas: #f4efe7;
   --workspace-surface: #fffdf8;
   --workspace-surface-strong: #ffffff;
   --workspace-ink: #241f2e;
-  --workspace-muted: #756d7c;
-  --workspace-subtle: #a39aa9;
+  --workspace-muted: #817887;
+  --workspace-subtle: #8d8293;
   --workspace-border: #e6ded1;
   --workspace-primary: #7c3aed;
   min-height: 100svh;
   color: var(--workspace-ink);
   background:
-    radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.08), transparent 29rem),
-    radial-gradient(circle at 92% 18%, rgba(217, 70, 239, 0.045), transparent 25rem),
+    radial-gradient(circle at 12% 0%, rgba(196, 181, 253, 0.18), transparent 29rem),
+    radial-gradient(circle at 92% 18%, rgba(244, 114, 182, 0.1), transparent 25rem),
     var(--workspace-canvas);
 }
 
 .workspace-theme .spotlight-card {
   border-color: var(--workspace-border);
   background: color-mix(in srgb, var(--workspace-surface) 94%, transparent);
-  box-shadow: 0 14px 36px rgba(66, 51, 81, 0.055);
+  box-shadow: 0 14px 36px rgba(72, 53, 101, 0.06);
 }
 
 .workspace-theme .spotlight-card::before {
@@ -329,7 +329,7 @@ body {
 .workspace-theme .spotlight-card:hover,
 .workspace-theme .spotlight-card:focus-within {
   border-color: rgba(124, 58, 237, 0.24);
-  box-shadow: 0 20px 45px rgba(76, 29, 149, 0.09);
+  box-shadow: 0 20px 45px rgba(76, 29, 149, 0.1);
 }
 
 .workspace-page {
@@ -338,10 +338,95 @@ body {
   background: transparent;
 }
 
+.story-page {
+  background: #fcfaf5;
+  color: #241f2e;
+}
+
 .workspace-surface {
   border: 1px solid var(--workspace-border);
   background: var(--workspace-surface);
-  box-shadow: 0 12px 34px rgba(66, 51, 81, 0.055);
+  box-shadow: 0 12px 34px rgba(72, 53, 101, 0.06);
+}
+
+/* Video suite keeps its original dark studio atmosphere inside the light workspace. */
+.workspace-theme .video-hub--dark {
+  color: #f8fafc;
+  background: #080809;
+}
+
+.workspace-theme .video-hub--dark .workspace-surface {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #101012;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+
+.workspace-theme .video-hub--dark .spotlight-card {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #111114;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+}
+
+.workspace-theme .video-hub--dark .spotlight-card:hover,
+.workspace-theme .video-hub--dark .spotlight-card:focus-within {
+  border-color: rgba(167, 139, 250, 0.45);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.38);
+}
+
+.workspace-theme .video-hub--dark [class*="border-white"] {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.workspace-theme .video-hub--dark [class*="bg-white/"] {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.workspace-theme .video-hub--dark .text-slate-400,
+.workspace-theme .video-hub--dark .text-slate-500 {
+  color: #94a3b8;
+}
+
+.workspace-theme .video-hub--dark .text-slate-200,
+.workspace-theme .video-hub--dark .text-slate-300 {
+  color: #cbd5e1;
+}
+
+.workspace-theme .video-hub--dark .text-slate-600 {
+  color: #64748b;
+}
+
+.workspace-theme .video-hub--dark .ba-status--warning {
+  border-color: rgba(251, 191, 36, 0.24);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fde68a;
+}
+
+/* Storyboard editor keeps the warm canvas used by the surrounding workspace.
+   Local component tokens prevent the shared dark input defaults from leaking
+   into this light editing surface. */
+.story-editor {
+  --background: #fcfaf5;
+  --foreground: #241f2e;
+  --card: #ffffff;
+  --card-foreground: #241f2e;
+  --popover: #ffffff;
+  --popover-foreground: #241f2e;
+  --muted-foreground: #817887;
+  --border: #e6ded1;
+  --input: #e6ded1;
+  --ring: #8b5cf6;
+  color: #241f2e;
+}
+
+.story-editor [data-slot="input"],
+.story-editor [data-slot="textarea"],
+.story-editor [data-slot="select-trigger"] {
+  color: #241f2e;
+}
+
+.story-editor [data-slot="input"]::placeholder,
+.story-editor [data-slot="textarea"]::placeholder {
+  color: #a097a4;
 }
 
 .workspace-theme .audio-workspace [class*="border-white"][class*="bg-"] {
@@ -362,18 +447,18 @@ body {
 .ba-status--danger { border-color: rgba(253,164,175,.2); background: rgba(253,164,175,.1); color: #fecdd3; }
 .ba-status--info { border-color: rgba(103,232,249,.2); background: rgba(103,232,249,.1); color: #a5f3fc; }
 
-.workspace-theme .ba-status--neutral { border-color: #ded6ca; background: #f4efe7; color: #625a69; }
-.workspace-theme .ba-status--success { border-color: #b7e4d4; background: #e9f8f1; color: #08785c; }
-.workspace-theme .ba-status--warning { border-color: #efd49a; background: #fff6da; color: #946200; }
-.workspace-theme .ba-status--danger { border-color: #efbdc7; background: #fff0f2; color: #b4233b; }
-.workspace-theme .ba-status--info { border-color: #b7dce8; background: #eaf7fb; color: #08768e; }
+.workspace-theme .ba-status--neutral { border-color: #e6ded1; background: #f7f4ec; color: #6f6878; }
+.workspace-theme .ba-status--success { border-color: #b7e3d0; background: #edf9f2; color: #18704b; }
+.workspace-theme .ba-status--warning { border-color: #f4d7a0; background: #fff8e6; color: #9a5a00; }
+.workspace-theme .ba-status--danger { border-color: #f4b8bd; background: #fff0f1; color: #b4232d; }
+.workspace-theme .ba-status--info { border-color: #b9e7ef; background: #eef8fc; color: #26718d; }
 
 .ba-empty-state { border-color: rgba(255,255,255,.1); background: rgba(255,255,255,.02); }
 .ba-empty-state__icon { border-color: rgba(196,181,253,.15); background: rgba(196,181,253,.1); color: #ddd6fe; }
 .ba-empty-state__title { color: white; }
 .ba-empty-state__description { color: #64748b; }
-.workspace-theme .ba-empty-state { border-color: #dcd2c4; background: rgba(255,253,248,.7); }
-.workspace-theme .ba-empty-state__icon { border-color: #d9caf8; background: #f0e9ff; color: #6d28d9; }
+.workspace-theme .ba-empty-state { border-color: #e6ded1; background: #fffdf8; }
+.workspace-theme .ba-empty-state__icon { border-color: #ddd1ff; background: #f1eaff; color: #7c3aed; }
 .workspace-theme .ba-empty-state__title { color: var(--workspace-ink); }
 .workspace-theme .ba-empty-state__description { color: var(--workspace-muted); }
 
@@ -388,28 +473,55 @@ body {
 .workspace-theme .ba-metric-card__label,
 .workspace-theme .ba-metric-card__detail { color: var(--workspace-muted); }
 .workspace-theme .ba-metric-card__value { color: var(--workspace-ink); }
-.workspace-theme .ba-metric-card__icon--violet { background: #f0e9ff; color: #6d28d9; }
-.workspace-theme .ba-metric-card__icon--fuchsia { background: #fae8ff; color: #a21caf; }
-.workspace-theme .ba-metric-card__icon--cyan { background: #e7f8fc; color: #08768e; }
-.workspace-theme .ba-metric-card__icon--neutral { background: #f0ece5; color: #625a69; }
+.workspace-theme .ba-metric-card__icon--violet { background: #f1eaff; color: #7c3aed; }
+.workspace-theme .ba-metric-card__icon--fuchsia { background: #fbeafa; color: #c026d3; }
+.workspace-theme .ba-metric-card__icon--cyan { background: #eef8fc; color: #26718d; }
+.workspace-theme .ba-metric-card__icon--neutral { background: #f7f4ec; color: #6f6878; }
 
-/* Compatibility layer for legacy dark utility classes inside the authenticated
+/* Compatibility layer for legacy warm utility classes inside the authenticated
    product. New components should prefer semantic workspace classes. */
-.workspace-theme .text-white { color: var(--workspace-ink); }
+.workspace-theme .text-white { color: #f8fafc; }
 .workspace-theme .text-slate-100,
-.workspace-theme .text-slate-200,
-.workspace-theme .text-slate-300 { color: #4c4455; }
-.workspace-theme .text-slate-400 { color: #6f6878; }
-.workspace-theme .text-slate-500 { color: #827986; }
+.workspace-theme .text-slate-200 { color: #3b3344; }
+.workspace-theme .text-slate-300 { color: #574e60; }
+.workspace-theme .text-slate-400,
+.workspace-theme .text-slate-500 { color: #817887; }
 .workspace-theme .text-slate-600,
-.workspace-theme .text-slate-700 { color: #9b929f; }
-.workspace-theme [class*="border-white"] { border-color: rgba(69, 55, 82, 0.13); }
-.workspace-theme [class*="bg-white/"] { background-color: rgba(255, 255, 255, 0.66); }
+.workspace-theme .text-slate-700 { color: #8d8293; }
+.workspace-theme [class*="border-white"] { border-color: var(--workspace-border); }
+.workspace-theme [class*="bg-white/"] { background-color: rgba(255, 255, 255, 0.7); }
+.workspace-theme [class*="border-[#e6ded1]"],
+.workspace-theme [class*="border-[#e2d9cb]"],
+.workspace-theme [class*="border-[#ded4c6]"],
+.workspace-theme [class*="border-[#dcd2c4]"] { border-color: var(--workspace-border); }
+.workspace-theme [class*="bg-[#f7f4ec]"],
+.workspace-theme [class*="bg-[#fffdf8]"],
+.workspace-theme [class*="bg-[#fcfaf5]"],
+.workspace-theme [class*="bg-[#f4efe7]"] { background-color: var(--workspace-surface); }
+.workspace-theme [class*="text-[#241f2e]"],
+.workspace-theme [class*="text-[#3b3344]"] { color: var(--workspace-ink); }
+.workspace-theme [class*="text-[#6f6878]"],
+.workspace-theme [class*="text-[#817887]"],
+.workspace-theme [class*="text-[#827986]"],
+.workspace-theme [class*="text-[#8b828f]"],
+.workspace-theme [class*="text-[#a097a4]"] { color: var(--workspace-muted); }
+.workspace-theme [class*="bg-violet-100"],
+.workspace-theme [class*="bg-violet-50"],
+.workspace-theme [class*="bg-[#f0e9ff]"],
+.workspace-theme [class*="bg-[#fae8ff]"],
+.workspace-theme [class*="bg-[#e7f8fc]"],
+.workspace-theme [class*="bg-[#f0ece5]"] { background-color: #f1eaff; }
+.workspace-theme [class*="text-violet-700"],
+.workspace-theme [class*="text-violet-600"],
+.workspace-theme [class*="text-[#5b21b6]"] { color: #6d28d9; }
+.workspace-theme [class*="hover:bg-white"] { background-color: #f8f4ff; }
+.workspace-theme [class*="hover:bg-red-50"] { background-color: #fff0f1; }
 .workspace-theme [class*="bg-[#080809]"],
 .workspace-theme [class*="bg-[#0a0a0a]"] { background-color: transparent; }
 .workspace-theme [class*="bg-[#101012]"],
 .workspace-theme [class*="bg-[#111114]"],
-.workspace-theme [class*="bg-[#0d0d10]"] { background-color: var(--workspace-surface); }
+.workspace-theme [class*="bg-[#0d0d10]"],
+.workspace-theme [class*="bg-[#121214]"] { background-color: var(--workspace-surface); }
 .workspace-theme [class*="bg-primary"][class~="text-white"],
 .workspace-theme [class*="bg-violet"][class~="text-white"],
 .workspace-theme [class*="from-violet"][class~="text-white"],

@@ -18,12 +18,12 @@ export function MyStoriesDashboard({
   error?: string | null;
 }) {
   return (
-    <div className="workspace-page">
+    <div className="story-page workspace-page">
       <StoryNavigation />
       <div className="px-4 py-8 sm:px-7 lg:px-10">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+            <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
               Biblioteca privada
             </Badge>
             <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">

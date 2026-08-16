@@ -81,7 +81,7 @@ export function DirectorProjectCard({ project }: { project: CreativeProject }) {
   }
   return (
     <>
-      <article className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#121214] transition hover:border-violet-400/40">
+      <article className="group overflow-hidden rounded-2xl border border-[#e6ded1] bg-white transition hover:border-violet-300 hover:shadow-[0_10px_24px_rgba(72,53,101,0.08)]">
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-violet-950 via-[#191923] to-black">
           <div
             className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
@@ -103,12 +103,12 @@ export function DirectorProjectCard({ project }: { project: CreativeProject }) {
             <span className="sr-only">Abrir {project.title}</span>
           </Link>
         </div>
-        <div className="flex items-start gap-3 p-4">
+        <div className="flex items-start gap-3 bg-white p-4">
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-sm font-semibold text-white">
+            <h3 className="truncate text-sm font-semibold text-[#2b2634]">
               {project.title}
             </h3>
-            <p className="mt-1 text-[10px] text-slate-600">
+            <p className="mt-1 text-[10px] text-[#8d8293]">
               Actualizado{" "}
               {new Date(project.updatedAt).toLocaleDateString("es-VE")}
             </p>
@@ -121,6 +121,7 @@ export function DirectorProjectCard({ project }: { project: CreativeProject }) {
                   variant="ghost"
                   size="icon-sm"
                   disabled={busy}
+                  className="text-[#574e60] hover:bg-[#f8f4ff] hover:text-[#6d28d9]"
                 />
               }
             >

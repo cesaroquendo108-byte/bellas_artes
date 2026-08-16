@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,7 +9,6 @@ import {
   ImageIcon,
   MonitorUp,
   ShieldCheck,
-  Sparkles,
   UserRound,
   Video,
   WandSparkles,
@@ -20,7 +18,6 @@ import {
   directorTemplates,
   faqs,
   inspirationCategories,
-  landingAssets,
   models,
   quickStarts,
   suiteCapabilities,
@@ -30,6 +27,8 @@ import {
 import { CapabilityStatusBadge } from "./capability-status";
 import { LandingMobileMenu } from "./landing-mobile-menu";
 import { PromptLauncher } from "./prompt-launcher";
+import { LandingVideo } from "./landing-video";
+import { BellasArtesMark, BellasArtesWordmark } from "@/components/brand/bellas-artes-mark";
 import {
   AnimatedGradientText,
   MotionReveal,
@@ -48,48 +47,46 @@ const icons: Record<LandingCategory, React.ComponentType<{ className?: string }>
 
 function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
   return (
-    <div className="max-w-3xl">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-300">{eyebrow}</p>
-      <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">{title}</h2>
-      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">{copy}</p>
+    <div className="ba-section-heading max-w-3xl">
+      <p className="ba-section-eyebrow text-xs font-semibold uppercase tracking-[0.24em] text-[#084f92]">{eyebrow}</p>
+      <h2 className="ba-section-title mt-3 text-balance text-3xl font-semibold tracking-[-0.03em] text-[#172740] sm:text-4xl lg:text-5xl">{title}</h2>
+      <p className="ba-section-copy mt-4 max-w-2xl text-sm leading-7 text-[#46586f] sm:text-base">{copy}</p>
     </div>
   );
 }
 
 export function LandingPage() {
   return (
-    <main className="landing-v1 min-h-screen overflow-x-clip bg-[#070708] text-white">
-      <div className="border-b border-fuchsia-200/10 bg-gradient-to-r from-violet-950 via-fuchsia-950 to-violet-950 px-4 py-2 text-center text-xs text-fuchsia-100">
-        Estudio creativo IA para Venezuela <span className="mx-2 text-white/30">·</span> Acceso anticipado
+    <main className="landing-v1 min-h-screen overflow-x-clip bg-[#f2f6fb] text-[#172740]">
+      <div className="ba-landing-announcement border-b px-4 py-2 text-center text-xs">
+        Estudio creativo IA para Venezuela <span className="mx-2 text-[#172740]/35">·</span> Acceso anticipado
       </div>
 
-      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#070708]/80 backdrop-blur-2xl">
+      <header className="ba-landing-header sticky top-0 z-50 border-b border-[#dce6f2] bg-white/90 backdrop-blur-2xl">
         <div className="mx-auto flex h-16 max-w-[1480px] items-center gap-5 px-4 sm:px-6 lg:px-10">
           <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight" aria-label="Bellas Artes, inicio">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 shadow-lg shadow-fuchsia-500/20">
-              <Sparkles className="size-4" />
-            </span>
-            <span>Bellas Artes</span>
+            <BellasArtesMark className="size-9 rounded-xl" />
+            <BellasArtesWordmark />
           </Link>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Navegación pública">
-            <Link href="/inspire" className="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.05] hover:text-white">Inspiración</Link>
-            <Link href="/tutorials" className="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.05] hover:text-white">Tutoriales</Link>
-            <Link href="/blog" className="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.05] hover:text-white">Blog</Link>
-            <Link href="/mcp" className="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.05] hover:text-white">MCP</Link>
+            <Link href="/inspire" className="rounded-lg px-3 py-2 text-sm text-[#5d7088] transition hover:bg-[#e7f1fb] hover:text-[#084f92]">Inspiración</Link>
+            <Link href="/tutorials" className="rounded-lg px-3 py-2 text-sm text-[#5d7088] transition hover:bg-[#e7f1fb] hover:text-[#084f92]">Tutoriales</Link>
+            <Link href="/blog" className="rounded-lg px-3 py-2 text-sm text-[#5d7088] transition hover:bg-[#e7f1fb] hover:text-[#084f92]">Blog</Link>
+            <Link href="/mcp" className="rounded-lg px-3 py-2 text-sm text-[#5d7088] transition hover:bg-[#e7f1fb] hover:text-[#084f92]">MCP</Link>
           </nav>
           <div className="ml-auto hidden items-center gap-2 sm:flex">
-            <Link href="/login" className="rounded-xl px-4 py-2 text-sm text-zinc-300 transition hover:bg-white/[0.06] hover:text-white">Entrar</Link>
-            <Link href="/login?next=/dashboard" className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-zinc-200">Abrir mi estudio</Link>
+            <Link href="/login" className="rounded-xl px-4 py-2 text-sm text-[#46586f] transition hover:bg-[#e7f1fb] hover:text-[#084f92]">Entrar</Link>
+            <Link href="/login?next=/dashboard" className="rounded-xl bg-[#0b72ce] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#084f92]">Abrir mi estudio</Link>
           </div>
           <LandingMobileMenu />
         </div>
       </header>
 
-      <section className="landing-mesh relative isolate">
-        <div className="mx-auto grid max-w-[1480px] items-center gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:px-10 lg:py-28">
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/15 bg-fuchsia-400/[0.07] px-3 py-1.5 text-xs text-fuchsia-100">
-              <span className="size-1.5 rounded-full bg-fuchsia-300 shadow-[0_0_12px_#f0abfc]" />
+      <section className="ba-landing-hero landing-mesh relative isolate">
+        <div className="mx-auto grid min-w-0 max-w-[1480px] items-center gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:px-10 lg:py-28">
+          <div className="relative z-10 min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ffd34d]/40 bg-[#ffd34d]/15 px-3 py-1.5 text-xs text-white">
+              <span className="size-1.5 rounded-full bg-[#ffd34d] shadow-[0_0_12px_#ffd34d]" />
               Tu estudio, una historia a la vez
             </div>
             <h1 className="mt-7 max-w-4xl text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-7xl xl:text-[84px]">
@@ -104,12 +101,11 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="relative min-h-[410px] sm:min-h-[520px]" aria-label="Vista previa del estudio creativo">
-            <div className="absolute inset-4 rotate-2 rounded-[32px] bg-gradient-to-br from-violet-500/20 to-cyan-400/10 blur-2xl" />
+          <div className="relative min-w-0 min-h-[410px] sm:min-h-[520px]" aria-label="Vista previa del estudio creativo">
             <div className="absolute inset-x-0 top-0 overflow-hidden rounded-[28px] border border-white/10 bg-[#111114] p-2 shadow-2xl shadow-black/60 sm:left-10">
               <div className="flex items-center gap-1.5 px-2 py-2"><span className="size-2 rounded-full bg-pink-400" /><span className="size-2 rounded-full bg-amber-300" /><span className="size-2 rounded-full bg-emerald-300" /><span className="ml-3 text-[10px] text-zinc-600">Director · Cortometraje</span></div>
               <div className="relative aspect-[16/9] overflow-hidden rounded-[20px] bg-zinc-900">
-                <Image src={landingAssets["hero-director"]} alt="Escena fantástica de una historia visual" fill priority sizes="(max-width: 1024px) 92vw, 620px" className="object-cover" />
+                <LandingVideo videoKey="hero-worlds" eager className="absolute inset-0" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-violet-950/10" />
                 <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-3">
                   <div><p className="text-[10px] uppercase tracking-[.2em] text-fuchsia-200">Escena 01</p><p className="mt-1 text-sm font-medium">Una historia comienza entre sombras</p></div>
@@ -117,20 +113,13 @@ export function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="absolute bottom-0 left-0 w-[58%] overflow-hidden rounded-[22px] border border-white/10 bg-[#111114]/95 p-2 shadow-2xl backdrop-blur-xl">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl"><Image src={landingAssets["capability-character"]} alt="Panel visual para personajes consistentes" fill sizes="300px" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" /><p className="absolute bottom-3 left-3 text-xs font-medium">Identidad consistente</p></div>
-            </div>
-            <div className="absolute right-0 bottom-8 w-[45%] rounded-[22px] border border-white/10 bg-black/70 p-4 shadow-2xl backdrop-blur-xl">
-              <p className="text-[10px] uppercase tracking-[.18em] text-cyan-200">Biblioteca privada</p>
-              <div className="mt-3 grid grid-cols-3 gap-2">{["bg-violet-500/35", "bg-fuchsia-500/30", "bg-cyan-500/25"].map((tone) => <span key={tone} className={`aspect-square rounded-lg ${tone}`} />)}</div>
-            </div>
           </div>
 
-          <MotionReveal className="lg:col-span-2" level="expressive"><PromptLauncher /></MotionReveal>
+          <MotionReveal className="min-w-0 lg:col-span-2" level="expressive"><PromptLauncher /></MotionReveal>
         </div>
       </section>
 
-      <section className="border-y border-white/[0.06] bg-white/[0.018] py-12">
+      <section className="ba-landing-section ba-landing-section--soft border-y border-[#dce6f2] py-12">
         <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
           <p className="mb-5 text-center text-xs font-medium uppercase tracking-[.22em] text-zinc-600">Empieza por la parte de tu idea que ya tienes clara</p>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
@@ -138,7 +127,7 @@ export function LandingPage() {
               const Icon = icons[item.category];
               return <SpotlightCard key={item.id} className="rounded-2xl" contentClassName="p-4">
                 <Link href={item.href} className="block size-full">
-                  <div className="flex items-start justify-between gap-2"><span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/25 to-fuchsia-500/15 text-fuchsia-200"><Icon className="size-4" /></span><ChevronRight className="size-4 text-zinc-700 transition group-hover:translate-x-0.5 group-hover:text-white" /></div>
+                  <div className="flex items-start justify-between gap-2"><span className="flex size-10 items-center justify-center rounded-xl bg-[#e7f1fb] text-[#084f92]"><Icon className="size-4" /></span><ChevronRight className="size-4 text-[#7a8aa0] transition group-hover:translate-x-0.5 group-hover:text-[#084f92]" /></div>
                   <h3 className="mt-5 font-medium">{item.title}</h3><p className="mt-2 text-xs leading-5 text-zinc-500">{item.description}</p><CapabilityStatusBadge status={item.status} className="mt-4" />
                 </Link>
               </SpotlightCard>;
@@ -147,12 +136,12 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
+      <section className="ba-landing-section ba-landing-section--white mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <SectionHeading eyebrow="Vibe Direct" title="Elige el tono. Director organiza la historia." copy="Plantillas reales para empezar con una estructura, sin prometer una generación automática desde la portada." />
         <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
-          {directorTemplates.map((template, index) => <SpotlightCard key={template.id} className={`rounded-2xl ${index === 0 ? "col-span-2 row-span-2 min-h-80 md:min-h-0 xl:col-span-2" : "min-h-48"}`}>
+          {directorTemplates.map((template, index) => <SpotlightCard key={template.id} className={`ba-media-card rounded-2xl ${index === 0 ? "col-span-2 row-span-2 min-h-80 md:min-h-0 xl:col-span-2" : "min-h-48"}`}>
             <Link href={template.href} className="absolute inset-0 block">
-              {template.imageKey && <Image src={landingAssets[template.imageKey]} alt={`Referencia visual para ${template.title}`} fill sizes={index === 0 ? "(max-width: 768px) 92vw, 420px" : "240px"} className="object-cover transition duration-500 group-hover:scale-105" />}
+              <LandingVideo videoKey={template.videoKey} className="absolute inset-0 transition duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-4"><CapabilityStatusBadge status={template.status} /><h3 className="mt-3 text-sm font-semibold">{template.title}</h3><p className="mt-1 hidden text-xs leading-5 text-zinc-400 sm:block">{template.description}</p></div>
             </Link>
@@ -160,15 +149,15 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="border-y border-white/[0.06] bg-[#0b0b0d]">
+      <section className="ba-landing-section ba-landing-section--navy border-y border-white/10 bg-[#16305e]">
         <div className="mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
           <SectionHeading eyebrow="Suite Bellas Artes" title="Una identidad creativa, muchas superficies." copy="Cada módulo comparte biblioteca, permisos y lenguaje visual. Cuando el backend aún no está listo, la interfaz lo dice con claridad." />
           <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {suiteCapabilities.map((capability) => {
               const Icon = icons[capability.category];
-              return <SpotlightCard key={capability.id} className="min-h-72 rounded-[24px]" contentClassName="p-6">
+              return <SpotlightCard key={capability.id} className="ba-media-card min-h-72 rounded-[24px]" contentClassName="p-6">
                 <Link href={capability.href} className="group relative block size-full">
-                {capability.imageKey && <Image src={landingAssets[capability.imageKey]} alt={`Vista de ${capability.title}`} fill sizes="(max-width: 768px) 92vw, 520px" className="object-cover opacity-55 transition duration-500 group-hover:scale-105 group-hover:opacity-70" />}
+                <LandingVideo videoKey={capability.videoKey} className="absolute inset-0 opacity-55 transition duration-500 group-hover:scale-105 group-hover:opacity-70" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/75 to-transparent" />
                 <div className="relative flex h-full flex-col"><div className="flex items-start justify-between"><span className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-black/40 backdrop-blur"><Icon className="size-5" /></span><CapabilityStatusBadge status={capability.status} /></div><div className="mt-auto pt-24"><h3 className="text-xl font-semibold">{capability.title}</h3><p className="mt-2 max-w-sm text-sm leading-6 text-zinc-400">{capability.description}</p><span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-fuchsia-200">Abrir superficie <ArrowRight className="size-3.5 transition group-hover:translate-x-1" /></span></div></div>
                 </Link>
@@ -178,26 +167,26 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
+      <section className="ba-landing-section ba-landing-section--white mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <SectionHeading eyebrow="Modelos y estado" title="Sabes qué motor está listo antes de crear." copy="Sin nombres decorativos ni proveedores presentados como activos. Estos son los motores que forman parte del roadmap real." />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {models.map((model, index) => <SpotlightCard key={model.id} className="rounded-2xl" contentClassName="p-5">
-            <div className={`absolute inset-x-0 top-0 h-1 ${index === 0 ? "bg-gradient-to-r from-violet-400 to-fuchsia-400" : "bg-white/5"}`} />
+            <div className={`absolute inset-x-0 top-0 h-1 ${index === 0 ? "bg-[#0b72ce]" : "bg-[#e7f1fb]"}`} />
             <p className="text-[10px] uppercase tracking-[.2em] text-zinc-600">{model.category}</p><h3 className="mt-4 text-lg font-semibold">{model.title}</h3><p className="mt-3 min-h-20 text-xs leading-5 text-zinc-500">{model.copy}</p><CapabilityStatusBadge status={model.status} className="mt-4" />
           </SpotlightCard>)}
         </div>
       </section>
 
-      <section className="border-y border-white/[0.06] bg-white/[0.018]">
+      <section className="ba-landing-section ba-landing-section--soft border-y border-[#dce6f2]">
         <div className="mx-auto max-w-[1480px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><SectionHeading eyebrow="Inspiración" title="Ideas para crear desde aquí." copy="Categorías conectadas al feed real de la comunidad Bellas Artes." /><Link href="/inspire" className="inline-flex items-center gap-2 text-sm text-fuchsia-200">Ver toda la inspiración <ArrowRight className="size-4" /></Link></div>
-          <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">{inspirationCategories.map((item) => <Link key={item.title} href={`/inspire?category=${item.category}${item.focus ? `&focus=${item.focus}` : ""}`} className="group relative min-h-64 overflow-hidden rounded-2xl border border-white/[0.08]"><Image src={landingAssets[item.imageKey]} alt={`Inspiración de ${item.title}`} fill sizes="(max-width: 768px) 46vw, 240px" className="object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" /><div className="absolute inset-x-0 bottom-0 p-4"><h3 className="text-sm font-semibold">{item.title}</h3><p className="mt-1 text-[11px] leading-4 text-zinc-400">{item.description}</p></div></Link>)}</div>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><SectionHeading eyebrow="Inspiración" title="Ideas para crear desde aquí." copy="Categorías conectadas al feed real de la comunidad Bellas Artes." /><Link href="/inspire" className="inline-flex items-center gap-2 text-sm font-semibold text-[#084f92]">Ver toda la inspiración <ArrowRight className="size-4" /></Link></div>
+          <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">{inspirationCategories.map((item) => <Link key={item.title} href={`/inspire?category=${item.category}${item.focus ? `&focus=${item.focus}` : ""}`} className="ba-media-card group relative min-h-64 overflow-hidden rounded-2xl border border-white/[0.08]"><LandingVideo videoKey={item.videoKey} className="absolute inset-0 transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" /><div className="absolute inset-x-0 bottom-0 p-4"><h3 className="text-sm font-semibold">{item.title}</h3><p className="mt-1 text-[11px] leading-4 text-zinc-300">{item.description}</p></div></Link>)}</div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1480px] gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-10 lg:py-28">
-        <div><SectionHeading eyebrow="Preguntas frecuentes" title="Transparencia antes de generar." copy="Privacidad, créditos, disponibilidad y beta explicados sin letra pequeña." /><div className="mt-8 space-y-3 text-sm text-zinc-400">{["Assets privados con URL firmada", "Billing shadow antes del cobro público", "Estados reales por herramienta"].map((item) => <p key={item} className="flex items-center gap-2"><Check className="size-4 text-emerald-300" />{item}</p>)}</div></div>
-        <div className="space-y-3">{faqs.map((faq) => <details key={faq.question} className="group rounded-2xl border border-white/[0.08] bg-[#101012] p-5 open:border-violet-300/20"><summary className="cursor-pointer list-none pr-8 text-sm font-medium text-white marker:hidden">{faq.question}<span className="float-right text-zinc-600 transition group-open:rotate-45">+</span></summary><p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-500">{faq.answer}</p></details>)}</div>
+      <section className="ba-landing-section ba-landing-section--white mx-auto grid max-w-[1480px] gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-10 lg:py-28">
+        <div><SectionHeading eyebrow="Preguntas frecuentes" title="Transparencia antes de generar." copy="Privacidad, créditos, disponibilidad y beta explicados sin letra pequeña." /><div className="mt-8 space-y-3 text-sm text-[#46586f]">{["Assets privados con URL firmada", "Billing shadow antes del cobro público", "Estados reales por herramienta"].map((item) => <p key={item} className="flex items-center gap-2"><Check className="size-4 text-emerald-600" />{item}</p>)}</div></div>
+        <div className="space-y-3">{faqs.map((faq) => <details key={faq.question} className="ba-landing-faq group rounded-2xl border p-5 open:border-[#0b72ce]"><summary className="cursor-pointer list-none pr-8 text-sm font-medium text-[#172740] marker:hidden">{faq.question}<span className="float-right text-[#7a8aa0] transition group-open:rotate-45">+</span></summary><p className="mt-4 max-w-3xl text-sm leading-6 text-[#5d7088]">{faq.answer}</p></details>)}</div>
       </section>
 
       <section className="px-4 pb-20 sm:px-6 lg:px-10">
@@ -206,9 +195,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.06] px-4 py-10 sm:px-6 lg:px-10">
+      <footer className="ba-landing-footer border-t border-white/10 bg-[#16305e] px-4 py-10 text-white sm:px-6 lg:px-10">
         <div className="mx-auto grid max-w-[1480px] gap-8 md:grid-cols-[1fr_auto_auto]">
-          <div><div className="flex items-center gap-2 font-semibold"><Sparkles className="size-4 text-fuchsia-300" /> Bellas Artes</div><p className="mt-3 max-w-sm text-xs leading-5 text-zinc-600">Suite creativa IA construida desde Venezuela para historias, marcas y equipos que quieren crear con control.</p></div>
+          <div><div className="flex items-center gap-2 font-semibold"><BellasArtesMark inverse className="size-8 rounded-lg" /> <BellasArtesWordmark inverse /></div><p className="mt-3 max-w-sm text-xs leading-5 text-white/65">Suite creativa IA construida desde Venezuela para historias, marcas y equipos que quieren crear con control.</p></div>
           <div><p className="text-xs font-semibold text-zinc-300">Explorar</p><div className="mt-3 grid gap-2 text-xs text-zinc-600"><Link href="/inspire">Inspiración</Link><Link href="/tutorials">Tutoriales</Link><Link href="/blog">Blog</Link><Link href="/mcp">MCP</Link></div></div>
           <div><p className="text-xs font-semibold text-zinc-300">Confianza</p><div className="mt-3 grid gap-2 text-xs text-zinc-600"><Link href="/privacy">Privacidad</Link><Link href="/terms">Términos</Link><Link href="/login">Entrar</Link></div></div>
         </div>

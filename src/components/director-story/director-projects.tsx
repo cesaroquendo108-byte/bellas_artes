@@ -47,7 +47,7 @@ export function DirectorProjects({
     <div className="workspace-page px-0 py-2 sm:py-4">
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+          <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
             Director
           </Badge>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -66,7 +66,7 @@ export function DirectorProjects({
           <Plus /> Crear nuevo proyecto
         </Button>
       </header>
-      <div className="mt-8 flex flex-col gap-4 border-y border-white/[0.07] py-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mt-8 flex flex-col gap-4 border-y border-[#e6ded1] py-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex max-w-full gap-2 overflow-x-auto">
           {filters.map((item) => (
             <button
@@ -77,7 +77,7 @@ export function DirectorProjects({
                 "min-w-fit rounded-full border px-4 py-2 text-xs",
                 filter === item.value
                   ? "border-violet-400 bg-violet-600 text-white"
-                  : "border-white/10 text-slate-500",
+                  : "border-[#e6ded1] text-[#817887] hover:bg-[#f8f4ff]",
               )}
             >
               {item.label}
@@ -85,7 +85,7 @@ export function DirectorProjects({
           ))}
         </div>
         <label className="relative block w-full lg:w-72">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-600" />
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#8d8293]" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}

@@ -13,48 +13,67 @@ type CachedOfferRoute = {
   market: VastAdminMarket;
 };
 
+const inMemoryOfferCache = new Map<number, { route: CachedOfferRoute; expiresAt: number }>();
+
 export async function cacheVastOfferRoutes(
   offers: VastOffer[],
   preset: VastAdminPreset,
   market: VastAdminMarket,
 ) {
   if (!offers.length) return;
-  const redis = createRedis();
+  const now = Date.now();
+  for (const offer of offers) {
+    inMemoryOfferCache.set(offer.id, {
+      route: { machineId: offer.machineId, hourlyUsd: offer.hourlyUsd, preset, market },
+      expiresAt: now + OFFER_CACHE_TTL_SECONDS * 1000,
+    });
+  }
   try {
-    const pipeline = redis.pipeline();
-    for (const offer of offers) {
-      pipeline.set(
-        keyForOffer(offer.id),
-        JSON.stringify({ machineId: offer.machineId, hourlyUsd: offer.hourlyUsd, preset, market } satisfies CachedOfferRoute),
-        "EX",
-        OFFER_CACHE_TTL_SECONDS,
-      );
+    const redis = createRedis();
+    try {
+      const pipeline = redis.pipeline();
+      for (const offer of offers) {
+        pipeline.set(
+          keyForOffer(offer.id),
+          JSON.stringify({ machineId: offer.machineId, hourlyUsd: offer.hourlyUsd, preset, market } satisfies CachedOfferRoute),
+          "EX",
+          OFFER_CACHE_TTL_SECONDS,
+        );
+      }
+      await pipeline.exec();
+    } finally {
+      redis.disconnect();
     }
-    const results = await pipeline.exec();
-    if (!results || results.some(([error]) => Boolean(error))) {
-      throw new Error("No se pudieron cachear las rutas de ofertas Vast.");
-    }
-  } finally {
-    redis.disconnect();
+  } catch {
+    // Fallback in-memory cache is already populated
   }
 }
 
 export async function getCachedVastOfferRoute(offerId: number): Promise<CachedOfferRoute | null> {
-  const redis = createRedis();
   try {
-    const value = await redis.get(keyForOffer(offerId));
-    if (!value) return null;
-    const parsed = JSON.parse(value) as Partial<CachedOfferRoute>;
-    if (!Number.isInteger(parsed.machineId) || (parsed.machineId ?? 0) <= 0) return null;
-    if (typeof parsed.hourlyUsd !== "number" || !Number.isFinite(parsed.hourlyUsd) || parsed.hourlyUsd <= 0) return null;
-    if (parsed.preset !== "comfy-clean" && parsed.preset !== "flux-cached") return null;
-    if (parsed.market !== "on-demand" && parsed.market !== "bid") return null;
-    return parsed as CachedOfferRoute;
+    const redis = createRedis();
+    try {
+      const value = await redis.get(keyForOffer(offerId));
+      if (value) {
+        const parsed = JSON.parse(value) as Partial<CachedOfferRoute>;
+        if (Number.isInteger(parsed.machineId) && (parsed.machineId ?? 0) > 0
+          && typeof parsed.hourlyUsd === "number" && Number.isFinite(parsed.hourlyUsd) && parsed.hourlyUsd > 0
+          && (parsed.preset === "comfy-clean" || parsed.preset === "flux-cached")
+          && (parsed.market === "on-demand" || parsed.market === "bid")) {
+          return parsed as CachedOfferRoute;
+        }
+      }
+    } finally {
+      redis.disconnect();
+    }
   } catch {
-    return null;
-  } finally {
-    redis.disconnect();
+    // Check in-memory fallback on Redis error
   }
+  const fallback = inMemoryOfferCache.get(offerId);
+  if (fallback && fallback.expiresAt > Date.now()) {
+    return fallback.route;
+  }
+  return null;
 }
 
 function createRedis() {

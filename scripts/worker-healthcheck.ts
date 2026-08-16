@@ -19,7 +19,7 @@ async function main() {
     await assertSupabaseServiceRole();
     console.log(JSON.stringify({ ok: true, redis: "pong", supabase: "reachable" }));
   } finally {
-    redis.disconnect();
+    await redis.quit().catch(() => redis.disconnect());
   }
 }
 

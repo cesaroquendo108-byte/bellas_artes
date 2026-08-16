@@ -53,10 +53,10 @@ export function StoryQuickStarts() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
           <div className="relative flex h-full flex-col">
             <Icon className="size-5 text-white/80" />
-            <ArrowUpRight className="ml-auto size-4 text-white/50 transition group-hover:translate-x-1 group-hover:-translate-y-1" />
+            <ArrowUpRight className="ml-auto size-4 !text-[#e2dbea] transition group-hover:translate-x-1 group-hover:-translate-y-1" />
             <div className="mt-auto">
-              <h3 className="font-semibold text-white">{item.title}</h3>
-              <p className="mt-1 text-[10px] leading-4 text-white/55">
+              <h3 className="font-semibold !text-white">{item.title}</h3>
+              <p className="mt-1 text-[10px] leading-4 !text-[#ded8e7]">
                 {item.description}
               </p>
             </div>

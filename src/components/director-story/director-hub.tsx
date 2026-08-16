@@ -73,7 +73,7 @@ export function DirectorHub({
       <header className="workspace-surface relative overflow-hidden rounded-[30px] p-7 sm:p-10">
         <div className="absolute -top-20 right-0 size-80 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="relative max-w-3xl">
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+          <Badge className="border-violet-500 bg-violet-600 text-white shadow-sm shadow-violet-500/20">
             Director IA
           </Badge>
           <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
@@ -119,10 +119,10 @@ export function DirectorHub({
       <section className="mt-10">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-violet-300">
+            <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-violet-700">
               Inicio rápido
             </p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-slate-700">
               Elige una estructura narrativa para comenzar.
             </p>
           </div>
@@ -141,8 +141,8 @@ export function DirectorHub({
               <div className="relative flex h-full flex-col">
                 <Icon className="size-5 text-white/70" />
                 <div className="mt-auto">
-                  <p className="font-medium text-white">{title}</p>
-                  <span className="mt-1 flex items-center text-[10px] text-white/45">
+                  <p className="font-medium !text-white drop-shadow-sm">{title}</p>
+                  <span className="mt-1 flex items-center text-[10px] text-white/75 drop-shadow-sm">
                     Comenzar{" "}
                     <ArrowRight className="ml-1 size-3 transition group-hover:translate-x-1" />
                   </span>
@@ -156,7 +156,7 @@ export function DirectorHub({
         <div className="mb-5 flex items-end justify-between">
           <div>
             <h2 className="text-xl font-semibold">Proyectos de director</h2>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-slate-700">
               Tus proyectos reales y ejemplos editoriales claramente
               identificados.
             </p>
@@ -198,8 +198,8 @@ export function DirectorHub({
                   </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="text-sm font-semibold">{example.title}</h3>
-                  <p className="mt-1 text-[10px] text-slate-600">
+                  <h3 className="text-sm font-semibold !text-white">{example.title}</h3>
+                  <p className="mt-1 text-[10px] text-white/70">
                     Plantilla editorial · no es un proyecto del usuario
                   </p>
                 </div>

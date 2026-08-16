@@ -21,8 +21,14 @@ export function getOAuthRedirectBaseUrl() {
 
     // Localhost is valid only for local development. A stale Vercel variable
     // must never send a production OAuth flow away from the public app.
-    if (process.env.NODE_ENV !== "production" || !isLocalDevelopmentUrl(normalizedUrl)) {
-      return normalizedUrl;
+    try {
+      const parsed = new URL(normalizedUrl);
+      const isProductionHttps = process.env.NODE_ENV !== "production" || parsed.protocol === "https:";
+      if (isProductionHttps && (process.env.NODE_ENV !== "production" || !isLocalDevelopmentUrl(normalizedUrl))) {
+        return normalizedUrl;
+      }
+    } catch {
+      // Ignore malformed or redacted values and use the canonical fallback.
     }
   }
 

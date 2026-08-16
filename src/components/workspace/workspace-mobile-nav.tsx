@@ -60,7 +60,7 @@ export function WorkspaceMobileNav({ role }: MobileNavProps) {
 
   return (
     <>
-      <nav aria-label="Navegación principal móvil" className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e2d9cb] bg-[#fffdf8]/95 px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_34px_rgba(64,48,77,.08)] backdrop-blur-xl md:hidden">
+      <nav aria-label="Navegación principal móvil" className="ba-mobile-nav fixed inset-x-0 bottom-0 z-50 border-t border-[#dce6f2] bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_34px_rgba(22,48,94,.09)] backdrop-blur-xl md:hidden">
         <div className="mx-auto grid h-[4.5rem] max-w-lg grid-cols-5 items-center">
           <MobileLink {...directItems[0]} />
           <button type="button" onClick={() => setCreateOpen(true)} className={navClass(creating)} aria-current={creating ? "page" : undefined}>

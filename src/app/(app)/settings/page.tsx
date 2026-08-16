@@ -54,7 +54,6 @@ export default async function SettingsPage({
           {[
             ["Correo", profile.email],
             ["Plan", profile.planTier.toUpperCase()],
-            ["Retención", profile.planTier === "free" ? "15 días" : "Permanente"],
             ["Rol", profile.role === "admin" ? "Administrador" : "Usuario"],
           ].map(([key, value]) => (
             <div key={key} className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_1fr]">

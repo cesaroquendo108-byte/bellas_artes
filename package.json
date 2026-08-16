@@ -15,9 +15,9 @@
     "db:reset": "supabase db reset",
     "db:status": "supabase status",
     "db:new-migration": "supabase migration new",
-    "worker": "NODE_OPTIONS=--conditions=react-server tsx workers/generation-worker.ts",
-    "worker:vast-lifecycle": "NODE_OPTIONS=--conditions=react-server tsx workers/vast-lifecycle-worker.ts",
-    "worker:health": "tsx scripts/worker-healthcheck.ts",
+    "worker": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local workers/generation-worker.ts",
+    "worker:vast-lifecycle": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local workers/vast-lifecycle-worker.ts",
+    "worker:health": "tsx --env-file=.env.local scripts/worker-healthcheck.ts",
     "test:vast:flux": "NODE_OPTIONS=--conditions=react-server tsx scripts/run-vast-flux-acceptance.ts",
     "mcp": "NODE_OPTIONS=--conditions=react-server tsx mcp/server.ts"
   },

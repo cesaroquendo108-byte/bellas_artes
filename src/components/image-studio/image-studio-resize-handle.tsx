@@ -30,7 +30,7 @@ export function ImageStudioResizeHandle({
       aria-valuemax={MAX_WIDTH}
       aria-valuenow={Math.round(width)}
       tabIndex={0}
-      className="group relative hidden cursor-col-resize touch-none items-center justify-center border-x border-white/[0.04] bg-[#0d0d0f] outline-none hover:bg-violet-500/10 focus-visible:bg-violet-500/10 lg:flex"
+      className="group relative hidden cursor-col-resize touch-none items-center justify-center border-0 bg-transparent outline-none after:absolute after:inset-y-0 after:left-1/2 after:w-px after:-translate-x-1/2 after:bg-transparent after:transition-colors hover:after:bg-violet-400/70 focus-visible:after:bg-violet-400/70 lg:flex"
       onPointerDown={(event) => {
         dragState.current = { startX: event.clientX, startWidth: width };
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -60,7 +60,7 @@ export function ImageStudioResizeHandle({
         );
       }}
     >
-      <GripVertical className="size-4 text-white/20 transition-colors group-hover:text-violet-300 group-focus-visible:text-violet-300" />
+      <GripVertical className="relative z-10 size-4 text-transparent transition-colors group-hover:text-violet-300 group-focus-visible:text-violet-300" />
     </div>
   );
 }

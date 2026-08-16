@@ -31,7 +31,7 @@ export default async function ImageStudioPage({ searchParams }: { searchParams: 
   }
 
   return (
-    <div>
+    <div className="workspace-page">
       <ImageStudio
         initialAssets={initialAssets}
         galleryError={galleryError}

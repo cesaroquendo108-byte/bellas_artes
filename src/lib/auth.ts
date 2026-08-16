@@ -30,6 +30,18 @@ export const requireUser = cache(async function requireUser() {
   };
 });
 
+export const getOptionalUser = cache(async function getOptionalUser() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user;
+  } catch {
+    return null;
+  }
+});
+
 export async function requireAdmin() {
   const session = await requireUser();
   if (session.profile.role !== "admin") redirect("/dashboard");

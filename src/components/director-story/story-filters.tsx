@@ -32,7 +32,7 @@ export function StoryFilters({
             "min-w-fit rounded-full border px-4 py-2 text-xs transition",
             value === filter.value
               ? "border-violet-400 bg-violet-600 text-white"
-              : "border-white/[0.08] bg-white/[0.035] text-slate-500 hover:bg-white/[0.07] hover:text-white",
+              : "border-[#e6ded1] bg-white text-[#817887] hover:bg-[#f8f4ff] hover:text-[#3a3342]",
           )}
         >
           {filter.label}

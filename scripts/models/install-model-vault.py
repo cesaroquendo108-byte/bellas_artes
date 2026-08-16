@@ -62,6 +62,13 @@ def install_huggingface(package: dict[str, Any], destination: Path) -> None:
     target = destination / "weights" / safe_name(package["repo"])
     target.mkdir(parents=True, exist_ok=True)
     token = os.environ.get("HF_TOKEN")
+
+    try:
+        from huggingface_hub import hf_hub_download
+        has_hf_hub = True
+    except ImportError:
+        has_hf_hub = False
+
     api_url = (
         f"https://huggingface.co/api/models/{quote(package['repo'], safe='/')}"
         f"/tree/{package['revision']}?recursive=true&limit=1000"
@@ -81,6 +88,20 @@ def install_huggingface(package: dict[str, Any], destination: Path) -> None:
     for relative_path in files:
         output = target / relative_path
         output.parent.mkdir(parents=True, exist_ok=True)
+
+        if has_hf_hub:
+            try:
+                hf_hub_download(
+                    repo_id=package["repo"],
+                    filename=relative_path,
+                    revision=package["revision"],
+                    local_dir=str(target),
+                    token=token,
+                )
+                continue
+            except Exception as e:
+                print(f"hf_hub_download falló para {relative_path}, usando fallback con curl: {e}", file=sys.stderr)
+
         url = (
             f"https://huggingface.co/{quote(package['repo'], safe='/')}"
             f"/resolve/{package['revision']}/{quote(relative_path, safe='/')}?download=true"

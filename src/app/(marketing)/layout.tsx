@@ -1,2 +1,7 @@
 import { PublicMarketingShell } from "@/components/social"
-export default function MarketingLayout({ children }: { children: React.ReactNode }) { return <PublicMarketingShell>{children}</PublicMarketingShell> }
+import { getOptionalUser } from "@/lib/auth"
+
+export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
+  const user = await getOptionalUser()
+  return <PublicMarketingShell authenticated={Boolean(user)}>{children}</PublicMarketingShell>
+}

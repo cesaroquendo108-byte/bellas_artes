@@ -19,19 +19,19 @@ const mobileRoutes = {
   "/settings": "src/app/(app)/settings/page.tsx",
 };
 
-describe("Bellas Artes warm workspace redesign", () => {
+describe("Bellas Artes Farmacia Azul workspace redesign", () => {
   it("keeps every primary mobile destination backed by a real page", () => {
     for (const [href, file] of Object.entries(mobileRoutes)) {
       expect(existsSync(path.join(root, file)), `${href} has no page`).toBe(true);
     }
   });
 
-  it("installs the warm theme and mobile navigation only inside private routes", () => {
+  it("installs the blue editorial theme and mobile navigation only inside private routes", () => {
     const privateLayout = read("src/app/(app)/layout.tsx");
     const rootLayout = read("src/app/layout.tsx");
     expect(privateLayout).toContain('className="workspace-theme"');
     expect(privateLayout).toContain("WorkspaceMobileNav");
-    expect(rootLayout).toContain('className="dark"');
+    expect(rootLayout).toContain('className="ba-azul"');
     expect(rootLayout).not.toContain("WorkspaceMobileNav");
   });
 

@@ -86,15 +86,18 @@ describe("Supabase session middleware", () => {
     expect(response.headers.get("location")).toBe("https://example.test/brand-kits")
   })
 
-  it("no hace un round trip de sesión en una página pública configurada", async () => {
+  it("renueva la sesión al visitar una página pública configurada", async () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co")
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", validAnonKey)
+    getUser.mockResolvedValue({ data: { user: { id: "user" } } })
+    createServerClient.mockReturnValue({ auth: { getUser } })
 
     const response = await updateSession(new NextRequest("https://example.test/blog"))
 
     expect(response.status).toBe(200)
     expect(response.headers.get("x-middleware-next")).toBe("1")
-    expect(createServerClient).not.toHaveBeenCalled()
+    expect(createServerClient).toHaveBeenCalledOnce()
+    expect(getUser).toHaveBeenCalledOnce()
   })
 
   it("conserva los query params de un destino local", async () => {

@@ -23,11 +23,11 @@ export function StoryHub({
   error?: string | null;
 }) {
   return (
-    <div className="workspace-page">
+    <div className="story-page workspace-page">
       <StoryNavigation />
       <div className="px-4 py-8 sm:px-7 lg:px-10">
         <header>
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+          <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
             Historias
           </Badge>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">
@@ -44,25 +44,25 @@ export function StoryHub({
         <section className="mt-6 grid gap-3 md:grid-cols-2">
           <Link
             href="/story/create"
-            className="group relative overflow-hidden rounded-2xl border border-violet-400/20 bg-gradient-to-r from-violet-950 to-[#15151a] p-6"
+            className="group relative overflow-hidden rounded-2xl border border-[#ddd1ff] bg-gradient-to-br from-[#eee7ff] to-white p-6 transition hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(72,53,101,0.08)]"
           >
-            <LayoutPanelTop className="size-6 text-violet-300" />
-            <h2 className="mt-5 text-xl font-semibold">Crear storyboard</h2>
-            <p className="mt-2 text-xs text-slate-500">
+            <LayoutPanelTop className="size-6 text-[#7c3aed]" />
+            <h2 className="mt-5 text-xl font-semibold text-[#2b2634]">Crear storyboard</h2>
+            <p className="mt-2 text-xs text-[#817887]">
               Divide tu narrativa en escenas y planos persistentes.
             </p>
-            <ArrowRight className="absolute right-6 bottom-6 transition group-hover:translate-x-2" />
+            <ArrowRight className="absolute right-6 bottom-6 text-[#7c3aed] transition group-hover:translate-x-2" />
           </Link>
           <Link
             href="/story/create?view=timeline"
-            className="group relative overflow-hidden rounded-2xl border border-fuchsia-400/20 bg-gradient-to-r from-fuchsia-950 to-[#15151a] p-6"
+            className="group relative overflow-hidden rounded-2xl border border-[#f4c8ed] bg-gradient-to-br from-[#fbeafa] to-white p-6 transition hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(72,53,101,0.08)]"
           >
-            <Clapperboard className="size-6 text-fuchsia-300" />
-            <h2 className="mt-5 text-xl font-semibold">Abrir editor</h2>
-            <p className="mt-2 text-xs text-slate-500">
+            <Clapperboard className="size-6 text-[#c026d3]" />
+            <h2 className="mt-5 text-xl font-semibold text-[#2b2634]">Abrir editor</h2>
+            <p className="mt-2 text-xs text-[#817887]">
               Organiza duración, ritmo, cámara y transiciones.
             </p>
-            <ArrowRight className="absolute right-6 bottom-6 transition group-hover:translate-x-2" />
+            <ArrowRight className="absolute right-6 bottom-6 text-[#c026d3] transition group-hover:translate-x-2" />
           </Link>
         </section>
         <section className="mt-14 pb-12">
@@ -94,12 +94,12 @@ export function StoryHub({
               ))}
             </div>
           ) : (
-            <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center">
-              <SearchX className="size-8 text-slate-700" />
-              <p className="mt-4 text-sm text-slate-400">
+            <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-[#e6ded1] text-center">
+              <SearchX className="size-8 text-[#a097a4]" />
+              <p className="mt-4 text-sm text-[#817887]">
                 La comunidad todavía no ha publicado historias
               </p>
-              <p className="mt-1 text-xs text-slate-600">
+              <p className="mt-1 text-xs text-[#8d8293]">
                 No mostramos historias ficticias como contenido real.
               </p>
               <Button

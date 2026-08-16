@@ -29,9 +29,9 @@ export function StoryboardShotCard({
   const { dispatch, assets } = useStoryProject();
   const selected = assets.filter((asset) => shot.assetIds.includes(asset.id));
   return (
-    <article className="rounded-xl border border-white/[0.08] bg-[#111114] p-3">
+    <article className="rounded-xl border border-[#e6ded1] bg-[#fffdf8] p-3">
       <div className="flex items-center gap-2">
-        <span className="flex size-7 items-center justify-center rounded-lg bg-violet-500/10 text-[10px] font-semibold text-violet-300">
+        <span className="flex size-7 items-center justify-center rounded-lg bg-violet-50 text-[10px] font-semibold text-violet-700">
           {index + 1}
         </span>
         <Input
@@ -115,7 +115,7 @@ export function StoryboardShotCard({
       </div>
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_170px]">
         <div className="space-y-2">
-          <Label className="text-[10px] text-slate-500">
+          <Label className="text-[10px] text-[#6f6878]">
           Descripción y dirección
           </Label>
           <Textarea
@@ -135,7 +135,7 @@ export function StoryboardShotCard({
         </div>
         <div className="space-y-3">
           <div>
-            <Label className="text-[10px] text-slate-500">Duración</Label>
+            <Label className="text-[10px] text-[#6f6878]">Duración</Label>
             <Input
               type="number"
               min={0.5}
@@ -154,7 +154,7 @@ export function StoryboardShotCard({
             />
           </div>
           <div>
-            <Label className="text-[10px] text-slate-500">Cámara</Label>
+            <Label className="text-[10px] text-[#6f6878]">Cámara</Label>
             <Input
               value={shot.camera ?? ""}
               onChange={(event) =>
@@ -170,7 +170,7 @@ export function StoryboardShotCard({
             />
           </div>
           <div>
-            <Label className="text-[10px] text-slate-500">Transición</Label>
+            <Label className="text-[10px] text-[#6f6878]">Transición</Label>
             <Input
               value={shot.transition ?? ""}
               onChange={(event) =>
@@ -188,14 +188,14 @@ export function StoryboardShotCard({
         </div>
       </div>
       <div className="mt-3">
-        <Label className="text-[10px] text-slate-500">
+        <Label className="text-[10px] text-[#6f6878]">
           Recursos vinculados
         </Label>
         <div className="mt-2 flex flex-wrap gap-2">
           {selected.map((asset) => (
             <span
               key={asset.id}
-              className="flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] text-slate-400"
+              className="flex items-center gap-1 rounded-full border border-[#e6ded1] bg-white px-2 py-1 text-[9px] text-[#6f6878]"
             >
               {asset.name}
               <button

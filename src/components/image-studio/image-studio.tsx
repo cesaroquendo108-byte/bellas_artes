@@ -335,9 +335,9 @@ export function ImageStudio({
 
       <div
         className="hidden h-full lg:grid"
-        style={{ gridTemplateColumns: `${panelWidth}px 10px minmax(0, 1fr)` }}
+        style={{ gridTemplateColumns: `${panelWidth}px 4px minmax(0, 1fr)` }}
       >
-        <aside className="h-full min-w-0 overflow-hidden border-r border-[#e6ded1] bg-[#fffdf8]">
+        <aside className="h-full min-w-0 overflow-hidden border-0 bg-[#fffdf8]">
           {controls}
         </aside>
         <ImageStudioResizeHandle

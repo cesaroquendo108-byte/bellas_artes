@@ -49,12 +49,12 @@ export function VideoHub() {
   const editTools = (Object.keys(VIDEO_TOOL_META) as VideoOperation[]).filter((operation) => VIDEO_TOOL_META[operation].category === "edit")
 
   return (
-    <div className="workspace-page px-0 py-2 sm:py-4">
+    <div className="workspace-page video-hub--dark px-0 py-2 sm:py-4">
       <section className="workspace-surface relative overflow-hidden rounded-[30px] px-6 py-9 sm:px-10 sm:py-12">
         <div className="absolute -top-32 right-[-8%] size-80 rounded-full bg-violet-600/25 blur-3xl" />
         <div className="absolute -bottom-40 left-[30%] size-72 rounded-full bg-fuchsia-600/15 blur-3xl" />
         <div className="relative max-w-3xl">
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200"><Sparkles className="size-3" /> Suite de video</Badge>
+          <Badge className="border-violet-500 bg-violet-600 text-white shadow-sm shadow-violet-500/20"><Sparkles className="size-3" /> Suite de video</Badge>
           <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">Del primer frame al corte final.</h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">Crea, transforma y mejora video desde un conjunto de estudios especializados, con un flujo visual consistente y preparado para conectar modelos reales.</p>
           <div className="mt-7 flex flex-wrap gap-3">

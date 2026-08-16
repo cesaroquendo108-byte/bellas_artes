@@ -1,23 +1,10 @@
 .landing-v1 {
-  --landing-pink: #f472d0;
-  --landing-violet: #8b5cf6;
-  --landing-cyan: #67e8f9;
+  --landing-pink: #ffd34d;
+  --landing-violet: #0b72ce;
+  --landing-cyan: #6bb6f2;
   background:
-    radial-gradient(circle at 50% -10%, rgba(139, 92, 246, 0.13), transparent 30rem),
-    #070708;
-}
-
-.landing-mesh::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(ellipse 72% 78% at 50% 38%, black 8%, transparent 78%);
+    radial-gradient(circle at 50% -10%, rgba(47, 134, 214, 0.13), transparent 30rem),
+    #f2f6fb;
 }
 
 .landing-mesh::after {
@@ -30,28 +17,28 @@
   content: "";
   transform: translateX(-50%);
   border-radius: 9999px;
-  background: radial-gradient(ellipse, rgba(236, 72, 153, 0.14), rgba(34, 211, 238, 0.05) 48%, transparent 72%);
+  background: radial-gradient(ellipse, rgba(255, 211, 77, 0.16), rgba(107, 182, 242, 0.08) 48%, transparent 72%);
   filter: blur(24px);
 }
 
 .landing-gradient-text {
   color: transparent;
-  background: linear-gradient(105deg, #fff 0%, #f5a8df 30%, #b69cff 61%, #87e8f9 100%);
+  background: linear-gradient(105deg, #fff 0%, #d9eeff 42%, #ffd34d 100%);
   background-clip: text;
   -webkit-background-clip: text;
 }
 
 .landing-cta {
   background:
-    radial-gradient(circle at 18% 0%, rgba(236, 72, 153, 0.24), transparent 34%),
-    radial-gradient(circle at 82% 100%, rgba(34, 211, 238, 0.14), transparent 34%),
-    linear-gradient(145deg, rgba(139, 92, 246, 0.12), rgba(11, 11, 14, 0.96));
+    radial-gradient(circle at 18% 0%, rgba(255, 211, 77, 0.22), transparent 34%),
+    radial-gradient(circle at 82% 100%, rgba(107, 182, 242, 0.18), transparent 34%),
+    linear-gradient(145deg, #16305e, #0b72ce);
 }
 
 .landing-v1 a:focus-visible,
 .landing-v1 button:focus-visible,
 .landing-v1 summary:focus-visible {
-  outline: 2px solid rgba(244, 114, 208, 0.85);
+  outline: 2px solid rgba(11, 114, 206, 0.9);
   outline-offset: 3px;
 }
 

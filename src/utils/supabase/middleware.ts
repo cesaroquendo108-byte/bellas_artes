@@ -86,11 +86,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.next({ request });
   }
 
-  // Public pages and API routes authenticate themselves when needed. Avoid a
-  // Supabase round trip on every marketing navigation; protected routes and
-  // /login still refresh the SSR session here.
-  const needsSession = isPrivate || request.nextUrl.pathname.startsWith("/login");
-  if (!needsSession) return NextResponse.next({ request });
+  // Refresh the SSR session on every configured route. Public pages do not
+  // redirect anonymous visitors, but refreshing here keeps an authenticated
+  // user signed in while moving between the private studio and public
+  // inspiration, tutorials, or blog surfaces.
 
   let supabaseResponse = NextResponse.next({
     request,

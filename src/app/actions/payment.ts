@@ -3,7 +3,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, requireUser } from "@/lib/auth";
-import { getPaymentRate } from "@/lib/bcvRate";
+import { calculateBolivarAmount, getPaymentRate } from "@/lib/bcvRate";
 import {
   getCreditPackage,
   isCreditPackageId,
@@ -70,11 +70,11 @@ export async function submitPayment(
   } catch {
     return {
       ok: false,
-      message: "No pudimos consultar la tasa BCV. Intenta nuevamente en unos minutos.",
+      message: "No pudimos actualizar el precio. Intenta nuevamente en unos minutos.",
     };
   }
 
-  const expectedAmount = Math.round(pkg.priceUsd * rate * 100) / 100;
+  const expectedAmount = calculateBolivarAmount(pkg.priceUsd, rate);
   const extension = receipt.type.split("/")[1]?.replace("jpeg", "jpg") ?? "bin";
   const key = `payment-proofs/${profile.id}/${randomUUID()}.${extension}`;
 
@@ -136,7 +136,7 @@ export async function submitPayment(
     return {
       ok: true,
       status,
-      message: "Comprobante recibido. Lo revisaremos antes de acreditar los créditos.",
+      message: "Comprobante recibido. Te avisaremos cuando los créditos estén disponibles.",
     };
   } catch {
     await deletePrivateObject(key).catch(() => undefined);

@@ -38,4 +38,11 @@ describe("getOAuthRedirectBaseUrl", () => {
 
     expect(getOAuthRedirectBaseUrl()).toBe("https://bellasartes-xi.vercel.app");
   });
+
+  it("ignores malformed site URLs in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "[SENSITIVE]");
+
+    expect(getOAuthRedirectBaseUrl()).toBe("https://bellasartes-xi.vercel.app");
+  });
 });

@@ -82,16 +82,16 @@ export function InspireFeed({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-7 sm:py-14">
-      <header className="relative overflow-hidden rounded-3xl border border-violet-400/20 bg-[#111114] p-7 sm:p-11">
+      <header className="relative overflow-hidden rounded-3xl border border-[#e6ded1] bg-[#fffdf8] p-7 text-[#241f2e] shadow-[0_12px_30px_rgba(72,53,101,0.06)] sm:p-11">
         <div className="absolute -top-24 right-0 size-80 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="relative max-w-3xl">
-          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
+          <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
             <Sparkles /> Inspire
           </Badge>
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[#2b2634] sm:text-6xl">
             Ideas reales, listas para dirigir.
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-[#817887]">
             Explora imágenes y videos publicados por la comunidad y abre su
             contexto creativo en el estudio correspondiente.
           </p>
@@ -108,7 +108,7 @@ export function InspireFeed({
         <InspireStickyNav />
       </div>
       {error && (
-        <div className="mt-6 rounded-xl border border-amber-400/20 bg-amber-500/[0.08] p-4 text-xs text-amber-200">
+        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
           {error}
         </div>
       )}
@@ -122,7 +122,7 @@ export function InspireFeed({
       {selectedCategory && (
         <div
           ref={sentinel}
-          className="flex min-h-12 items-center justify-center text-xs text-slate-600"
+          className="flex min-h-12 items-center justify-center text-xs text-[#8d8293]"
         >
           {loading
             ? "Cargando más…"
@@ -131,7 +131,7 @@ export function InspireFeed({
               : posts.length
                 ? "Has llegado al final"
                 : null}
-          {loadError && <span className="text-rose-300">{loadError}</span>}
+          {loadError && <span className="text-rose-600">{loadError}</span>}
         </div>
       )}
     </div>

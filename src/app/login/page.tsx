@@ -1,7 +1,8 @@
 import { login, signup, loginWithGoogle } from "./actions";
 import { Navbar } from "@/components/layout/Navbar";
-import { Sparkles, Mail, Lock } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import type { Metadata } from "next";
+import { BellasArtesMark, BellasArtesWordmark } from "@/components/brand/bellas-artes-mark";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -21,39 +22,37 @@ export default async function LoginPage({
   const configMissing = params.config === "missing";
   
   return (
-    <main className="min-h-screen bg-black flex flex-col">
+    <main className="ba-login-page min-h-screen bg-[#f2f6fb] flex flex-col">
       <Navbar />
       
       <div className="flex-1 flex flex-col justify-center items-center px-4 pt-16">
         
-        <div className="w-full max-w-md bg-background-neutral-soft border border-normal-border p-8 rounded-2xl shadow-oa relative overflow-hidden">
+        <div className="ba-login-card w-full max-w-md border border-[#dce6f2] bg-white p-8 rounded-[24px] relative overflow-hidden">
           {/* Subtle background glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none transform translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#e7f1fb] rounded-full blur-3xl pointer-events-none transform translate-x-1/2 -translate-y-1/2" />
           
           <div className="relative">
             <div className="flex justify-center mb-6">
-              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary" />
-              </div>
+              <BellasArtesMark className="size-14 rounded-2xl" />
             </div>
             
-            <h2 className="text-2xl font-bold text-white text-center mb-2">Entrar a Bellas Artes</h2>
-            <p className="text-text-icon-neutral-secondary text-center text-sm mb-8">
+            <h2 className="text-2xl font-bold text-[#172740] text-center mb-2">Entrar a <BellasArtesWordmark /></h2>
+            <p className="text-[#5d7088] text-center text-sm mb-8">
               Tu estudio de generación IA en Venezuela.
             </p>
 
             <form className="flex flex-col gap-4">
               <input type="hidden" name="next" value={params.next ?? ""} />
               <div>
-                <label className="text-sm font-medium text-text-icon-neutral-secondary mb-1 block" htmlFor="email">
+                <label className="text-sm font-medium text-[#46586f] mb-1 block" htmlFor="email">
                   Correo Electrónico
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-text-icon-neutral-secondary" />
+                    <Mail className="h-5 w-5 text-[#7a8aa0]" />
                   </div>
                   <input
-                    className="w-full bg-background-neutral-soft border border-normal-border rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition"
+                    className="w-full bg-[#f7fafd] border border-[#c6d5e7] rounded-xl py-3 pl-10 pr-4 text-[#172740] focus:outline-none focus:border-[#0b72ce] transition"
                     id="email"
                     name="email"
                     type="email"
@@ -64,15 +63,15 @@ export default async function LoginPage({
               </div>
 
               <div>
-                <label className="text-sm font-medium text-text-icon-neutral-secondary mb-1 block" htmlFor="password">
+                <label className="text-sm font-medium text-[#46586f] mb-1 block" htmlFor="password">
                   Contraseña
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-text-icon-neutral-secondary" />
+                    <Lock className="h-5 w-5 text-[#7a8aa0]" />
                   </div>
                   <input
-                    className="w-full bg-background-neutral-soft border border-normal-border rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition"
+                    className="w-full bg-[#f7fafd] border border-[#c6d5e7] rounded-xl py-3 pl-10 pr-4 text-[#172740] focus:outline-none focus:border-[#0b72ce] transition"
                     id="password"
                     name="password"
                     type="password"
@@ -119,22 +118,22 @@ export default async function LoginPage({
                 </button>
                 
                 <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-normal-border"></div>
-                  <span className="flex-shrink-0 mx-4 text-text-icon-neutral-secondary text-sm">o con tu correo</span>
-                  <div className="flex-grow border-t border-normal-border"></div>
+                  <div className="flex-grow border-t border-[#dce6f2]"></div>
+                  <span className="flex-shrink-0 mx-4 text-[#7a8aa0] text-sm">o con tu correo</span>
+                  <div className="flex-grow border-t border-[#dce6f2]"></div>
                 </div>
 
                 <button
                   formAction={login}
                   disabled={configMissing}
-                  className="w-full bg-primary hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-primary/20"
+                  className="ba-login-primary w-full disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-blue-200/60"
                 >
                   Iniciar Sesión
                 </button>
                 <button
                   formAction={signup}
                   disabled={configMissing}
-                  className="w-full bg-transparent border border-normal-border hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition"
+                  className="ba-login-secondary w-full border disabled:cursor-not-allowed disabled:opacity-50 font-bold py-3 px-4 rounded-xl transition"
                 >
                   Registrarme
                 </button>
@@ -143,7 +142,7 @@ export default async function LoginPage({
           </div>
         </div>
         
-        <p className="text-text-icon-neutral-secondary text-xs mt-8 text-center max-w-sm">
+        <p className="text-[#657890] text-xs mt-8 text-center max-w-sm">
           Al iniciar sesión, aceptas nuestros Términos de Servicio y Política de Privacidad. Pagos locales seguros.
         </p>
 

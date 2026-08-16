@@ -11,12 +11,12 @@ export function StoryboardCanvas() {
   const { state, dispatch } = useStoryProject();
   if (!state.document.scenes.length)
     return (
-      <div className="flex min-h-[55vh] flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center">
+      <div className="flex min-h-[55vh] flex-col items-center justify-center rounded-2xl border border-dashed border-[#dcd2c4] bg-white text-center">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-violet-500/10">
-          <LayoutPanelTop className="size-7 text-violet-300" />
+          <LayoutPanelTop className="size-7 text-violet-700" />
         </div>
         <h2 className="mt-5 text-lg font-semibold">Tu storyboard está vacío</h2>
-        <p className="mt-2 max-w-md text-xs leading-5 text-slate-600">
+        <p className="mt-2 max-w-md text-xs leading-5 text-[#817887]">
           Crea una escena para comenzar a organizar planos, descripciones y recursos
           reales.
         </p>
@@ -48,7 +48,7 @@ export function StoryboardCanvas() {
       <Button
         type="button"
         variant="outline"
-        className="w-full border-dashed border-white/10 text-slate-400"
+        className="w-full border-dashed border-[#dcd2c4] text-[#6f6878]"
         onClick={() =>
           dispatch({
             type: "add_scene",
