@@ -24,9 +24,9 @@ finalizar incluso si la aceptación falla.
 
 `bootstrap_3090_lab.sh` prepara en una instancia efímera un ComfyUI fijado por
 commit, los pesos públicos de Flux Schnell, Klein 4B, Z-Image, SDXL Base/Refiner y
-Real-ESRGAN, y los workflows privados necesarios para probarlos. El cliente
-administrativo descarga el script desde la rama fijada y comprueba su SHA-256
-antes de ejecutarlo.
+Real-ESRGAN, y los workflows privados necesarios para probarlos. La fuente de
+workflows se fija por `BA_REPO_REF` y el cliente administrativo comprueba el
+SHA-256 del bootstrap antes de ejecutarlo.
 
 El perfil usa 100 GB de disco, ComfyUI escucha sólo en el puerto interno `18188`
 y el panel ofrece un túnel SSH hacia `localhost:8188`. No se descargan modelos

@@ -5,7 +5,8 @@ umask 077
 
 LAB_ROOT="${BA_LAB_ROOT:-/workspace/bellas-artes-lab}"
 COMFY_ROOT="${COMFYUI_ROOT:-$LAB_ROOT/ComfyUI}"
-RAW_BASE="${BA_REPO_RAW_BASE:-https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/codex/consolidacion-final}"
+BA_REPO_REF="${BA_REPO_REF:-077ec399eee2735d47a76e757a4d5451774410de}"
+RAW_BASE="${BA_REPO_RAW_BASE:-https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/${BA_REPO_REF}}"
 COMFY_COMMIT="a7365071e47175fb06572d0a56d1bf4116c2f581"
 LOG_PATH="$LAB_ROOT/bootstrap.log"
 STATUS_PATH="$LAB_ROOT/status.json"

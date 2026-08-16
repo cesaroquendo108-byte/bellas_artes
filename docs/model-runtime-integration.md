@@ -28,6 +28,27 @@ El estado de instalación `installed` sólo significa que el paquete fue
 descargado y pasó la validación SHA-256 del vault. No implica que el modelo
 esté habilitado para usuarios ni que su licencia permita hosting comercial.
 
+## Olas de implementación
+
+La matriz ejecutable vive en `src/lib/admin/model-test-plan.ts` y cubre los 22
+paquetes sin convertir el catálogo en activación automática:
+
+- `image-3090`: imagen abierta en una RTX 3090 de 24 GB, con presupuesto máximo
+  de US$5 por ola.
+- `image-large-vram`: Qwen-Image y otros modelos que requieren 48 GB o una
+  cuantización validada.
+- `control-and-postprocess`: DWPose, LivePortrait, Real-ESRGAN y RIFE; se
+  validan dentro de un workflow padre.
+- `audio`: RVC y F5-TTS en una cola aislada, con consentimiento y licencia.
+- `video-large-vram`: Wan y Hunyuan en sesiones independientes de 48–80 GB.
+- `research-policy`: pesos que sólo pueden estudiarse en laboratorio privado.
+- `replaced`: dependencias que no deben ejecutarse.
+
+La primera sesión sólo puede ejecutar entradas con `canRunAdminSmoke=true`.
+Cada modelo aprobado necesita dos smoke tests y tres pruebas de aceptación,
+además de output privado, coste, VRAM, tiempo, ownership y rollback. Un modelo
+instalado o un template descargable no cambia por sí solo ese estado.
+
 ## Cómo activar un modelo para un smoke administrativo
 
 1. Arrancar un único endpoint GPU Vast con el vault montado y la variante de

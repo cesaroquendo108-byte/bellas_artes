@@ -5,6 +5,12 @@ la generación pública, cobrar créditos ni exponer secretos. El punto de entra
 es `/admin/testing`; el alquiler y la destrucción se controlan desde
 `/admin/gpus`.
 
+El bootstrap descarga los templates desde una revisión inmutable del mismo
+repositorio (`BA_REPO_REF`) y el alquiler verifica SHA-256 del script antes de
+ejecutarlo. Si se cambia el bootstrap, hay que actualizar primero el hash
+publicado en la configuración administrativa y sólo después abrir una nueva
+sesión.
+
 ## Estado seguro
 
 - `GENERATION_ENABLED=false`.

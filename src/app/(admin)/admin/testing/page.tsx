@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GPU_LAB_PLAN, summarizeGpuLabPlan, type GpuLabReadiness } from "@/lib/admin/gpu-lab-plan";
+import { summarizeModelTestPlan } from "@/lib/admin/model-test-plan";
 import { getVastAdminServerConfig, isVastAdminOperator } from "@/lib/admin/vast-client";
 import { getGenerationConfig } from "@/lib/generation/config";
 import { COMFY_TEMPLATE_CATALOG } from "@/lib/generation/comfy-template-catalog";
@@ -48,6 +49,7 @@ export default async function AdminTestingPage() {
 
   const generation = getGenerationConfig();
   const summary = summarizeGpuLabPlan();
+  const modelSummary = summarizeModelTestPlan();
   const templatesById = new Map(COMFY_TEMPLATE_CATALOG.map((template) => [template.id, template]));
   const installed = Object.values(installState.models).filter((entry) => entry.state === "installed").length;
 
@@ -102,6 +104,35 @@ export default async function AdminTestingPage() {
       </div>
 
       <section className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base"><FlaskConical className="size-4 text-violet-600" /> Cobertura de los 22 modelos</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <Metric label="Instalados" value={modelSummary.installed} />
+              <Metric label="Smoke ejecutable" value={modelSummary.executable} />
+              <Metric label="Workflow pendiente" value={modelSummary.pending} />
+              <Metric label="Investigación" value={modelSummary.researchOnly} />
+              <Metric label="Componentes" value={modelSummary.components} />
+            </div>
+            <div className="grid gap-3 lg:grid-cols-2">
+              {modelSummary.waves.map((wave) => (
+                <div key={wave.id} className="rounded-xl border border-border bg-muted/30 p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-foreground">{wave.order}. {wave.label}</p>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">{wave.description}</p>
+                    </div>
+                    <Badge variant="outline">{wave.models} modelos</Badge>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">GPU: {wave.gpu} · Presupuesto: US${wave.budgetUsd.toFixed(2)} · Listos: {wave.ready}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {GPU_LAB_PLAN.map((testCase) => (
           <Card key={testCase.id} className="overflow-hidden">
             <CardHeader className="space-y-3">
