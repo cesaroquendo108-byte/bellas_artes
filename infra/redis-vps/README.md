@@ -4,7 +4,7 @@ Este stack reemplaza exclusivamente Upstash. La aplicación y el dominio contin�
 
 ## Topología
 
-- `redis`: cola BullMQ y cachés, persistidos en el volumen `redis-data`.
+- `redis`: cola BullMQ y cachés, persistidos en el volumen `redis-data`. Solo enlaza `6379` al bridge local del host como `172.17.0.1:16379`.
 - `gateway`: recibe solicitudes firmadas de Vercel en el puerto 8787 del host Docker.
 - `worker`: consume Redis directamente por la red interna. Conserva `GENERATION_ENABLED=false` hasta una activación independiente.
 - Caddy: termina TLS para `bellas-artes-queue.157.173.104.214.nip.io`.
@@ -25,4 +25,4 @@ Los secretos viven en `/etc/bellas-artes` y no se guardan en Git. El despliegue 
 4. Verificar que `https://bellas-artes-queue.157.173.104.214.nip.io/health` responde `200`.
 5. Enviar una solicitud firmada de prueba y confirmar que una repetición del mismo nonce responde `409`.
 
-No se debe publicar `6379/tcp` ni copiar `REDIS_URL` a Vercel. Vercel solo recibe `QUEUE_GATEWAY_URL` y `QUEUE_GATEWAY_HMAC_KEY`.
+No se debe publicar Redis en `0.0.0.0`, `::` ni copiar `REDIS_URL` a Vercel. Vercel solo recibe `QUEUE_GATEWAY_URL` y `QUEUE_GATEWAY_HMAC_KEY`.

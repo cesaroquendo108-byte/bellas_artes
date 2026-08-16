@@ -34,11 +34,12 @@ services:
     mem_limit: 512m
     cpus: 0.50
     pids_limit: 100
+    network_mode: bridge
+    ports:
+      - "172.17.0.1:16379:6379"
     volumes:
       - redis-data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
-    networks:
-      - internal
 
   gateway:
     <<: *service-defaults
@@ -51,7 +52,7 @@ services:
     environment:
       NODE_ENV: production
       NODE_OPTIONS: --conditions=react-server
-      REDIS_URL: redis://default:${REDIS_PASSWORD:?REDIS_PASSWORD es obligatorio}@redis:6379
+      REDIS_URL: redis://default:${REDIS_PASSWORD:?REDIS_PASSWORD es obligatorio}@172.17.0.1:16379
       BULLMQ_PREFIX: bellas-artes
       QUEUE_GATEWAY_PORT: "8787"
     env_file:
@@ -68,11 +69,9 @@ services:
     mem_limit: 512m
     cpus: 0.50
     pids_limit: 150
+    network_mode: bridge
     ports:
       - "172.17.0.1:8787:8787"
-    networks:
-      - internal
-      - host_bridge
 
   worker:
     <<: *service-defaults
@@ -85,7 +84,7 @@ services:
     environment:
       NODE_ENV: production
       NODE_OPTIONS: --conditions=react-server
-      REDIS_URL: redis://default:${REDIS_PASSWORD:?REDIS_PASSWORD es obligatorio}@redis:6379
+      REDIS_URL: redis://default:${REDIS_PASSWORD:?REDIS_PASSWORD es obligatorio}@172.17.0.1:16379
       BULLMQ_PREFIX: bellas-artes
       RUN_GENERATION_WORKER: "true"
     env_file:
@@ -102,16 +101,7 @@ services:
     mem_limit: 1536m
     cpus: 1.50
     pids_limit: 300
-    networks:
-      - internal
-      - host_bridge
+    network_mode: bridge
 
 volumes:
   redis-data:
-
-networks:
-  internal:
-    internal: true
-  host_bridge:
-    external: true
-    name: bridge
