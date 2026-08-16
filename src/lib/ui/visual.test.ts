@@ -26,10 +26,10 @@ describe("visual UI contracts", () => {
     expect(Object.values(uiStatusToneClasses).every((value) => value.includes("border"))).toBe(true);
   });
 
-  it("keeps the authenticated workspace palette aligned with Farmacia Azul", () => {
-    expect(workspacePalette.canvas).toBe("#F2F6FB");
-    expect(workspacePalette.primary).toBe("#0B72CE");
-    expect(workspacePalette.surface).toBe("#FFFFFF");
+  it("keeps the authenticated workspace palette independent from the dark landing", () => {
+    expect(workspacePalette.canvas).toBe("#F7F4EC");
+    expect(workspacePalette.primary).toBe("#7C3AED");
+    expect(workspacePalette.surface).not.toBe("#0A0A0A");
   });
 
   it("defines honest generation states and controlled visual directions", () => {
@@ -42,10 +42,10 @@ describe("visual UI contracts", () => {
       "queued",
     ]);
     expect(Object.keys(visualDirectionPalettes).sort()).toEqual([
-      "cine-caribe",
-      "farmacia-azul",
-      "noche-navy",
-      "sol-editorial",
+      "caribe-electrico",
+      "cine-violeta",
+      "nocturno",
+      "tierra-de-estudio",
     ]);
     expect(Object.values(visualDirectionPalettes).every((palette) => palette.contrast.startsWith("#"))).toBe(true);
   });

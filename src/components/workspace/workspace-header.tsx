@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Sparkles } from "lucide-react";
 
 import { AnimatedMetric, StatusPill } from "@/components/ui/motion-effects";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { BellasArtesMark } from "@/components/brand/bellas-artes-mark";
 
 const routeLabels: Array<[string, string]> = [
   ["/dashboard", "Inicio"],
@@ -39,22 +39,24 @@ export function WorkspaceHeader({
   const label = currentLabel(pathname);
 
   return (
-    <header className="ba-workspace-header sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-[#dce6f2] bg-white/90 px-3 backdrop-blur-xl sm:px-6">
-      <SidebarTrigger className="size-9 rounded-xl text-[#5d7088] hover:bg-[#e7f1fb] hover:text-[#084f92]" />
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-[#e6ded1] bg-[#f7f4ec]/88 px-3 backdrop-blur-xl sm:px-6">
+      <SidebarTrigger className="size-9 rounded-xl text-[#6f6878] hover:bg-white hover:text-[#5b21b6]" />
       <div className="flex min-w-0 items-center gap-2.5">
-        <BellasArtesMark className="size-8 rounded-xl md:hidden" />
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 md:hidden">
+          <Sparkles className="size-4" />
+        </span>
         <div className="min-w-0">
-          <p className="hidden truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0b72ce] min-[420px]:block">Bellas Artes</p>
-          <p className="truncate text-sm font-semibold text-[#172740]">{label}</p>
+          <p className="hidden truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-violet-700 min-[420px]:block">Bellas Artes</p>
+          <p className="truncate text-sm font-semibold text-[#241f2e]">{label}</p>
         </div>
       </div>
       <div className="flex-1" />
       <StatusPill state="Acceso anticipado" tone="info" className="hidden lg:inline-flex" />
-      <div className="rounded-full border border-[#b9d8f3] bg-white/90 px-3 py-1.5 text-xs text-[#5d7088] shadow-sm">
+      <div className="rounded-full border border-violet-200 bg-white/80 px-3 py-1.5 text-xs text-[#6f6878] shadow-sm">
         {unlimited ? (
-          <span className="font-semibold text-[#084f92]">Ilimitados</span>
+          <span className="font-semibold text-violet-700">Ilimitados</span>
         ) : (
-          <><span className="font-semibold text-[#084f92]"><AnimatedMetric value={balance} /></span><span className="hidden sm:inline"> créditos</span></>
+          <><span className="font-semibold text-violet-700"><AnimatedMetric value={balance} /></span><span className="hidden sm:inline"> créditos</span></>
         )}
       </div>
     </header>

@@ -24,8 +24,8 @@ export function DirectorInspirations({
   return (
     <section className="mt-14 pb-12">
       <div className="mb-5">
-        <h2 className="text-xl font-semibold text-[#2b2634]">Inspiraciones</h2>
-        <p className="mt-1 text-xs text-[#8d8293]">
+        <h2 className="text-xl font-semibold text-white">Inspiraciones</h2>
+        <p className="mt-1 text-xs text-slate-600">
           Historias publicadas por la comunidad.
         </p>
       </div>
@@ -39,12 +39,12 @@ export function DirectorInspirations({
           ))}
         </div>
       ) : (
-        <div className="mt-5 flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-[#e6ded1] text-center">
-          <SearchX className="size-7 text-[#a097a4]" />
-          <p className="mt-3 text-sm text-[#817887]">
+        <div className="mt-5 flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center">
+          <SearchX className="size-7 text-slate-700" />
+          <p className="mt-3 text-sm text-slate-400">
             Todavía no hay inspiraciones publicadas
           </p>
-          <p className="mt-1 text-xs text-[#8d8293]">
+          <p className="mt-1 text-xs text-slate-600">
             Sólo aparecerán proyectos comunitarios reales.
           </p>
         </div>

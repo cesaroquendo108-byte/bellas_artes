@@ -35,8 +35,8 @@ describe("customer billing language", () => {
     expect(settingsPage).not.toContain("[\"Retención\"");
   });
 
-  it("uses the shared Bellas Artes workspace theme in administration", () => {
-    expect(adminLayout).toContain("workspace-theme");
-    expect(adminLayout).toContain("bg-background");
+  it("keeps administration on the dark Bellas Artes backoffice theme", () => {
+    expect(adminLayout).not.toContain("workspace-theme");
+    expect(adminLayout).toContain('bg-[#080808]');
   });
 });

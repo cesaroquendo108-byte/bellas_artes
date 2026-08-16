@@ -59,7 +59,7 @@ export function StoryVideoCard({ project }: { project: CreativeProject }) {
               <Play className="ml-0.5 size-5 fill-current" />
             </span>
           </div>
-          <h3 className="mt-3 line-clamp-2 text-sm font-medium text-[#3b3344] transition group-hover:text-[#6d28d9]">
+          <h3 className="mt-3 line-clamp-2 text-sm font-medium text-slate-300 transition group-hover:text-white">
             {project.title}
           </h3>
         </DialogTrigger>

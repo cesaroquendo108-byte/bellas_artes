@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "./alacena-theme.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getOAuthRedirectBaseUrl } from "@/lib/auth-redirect";
 
@@ -24,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="ba-azul">
-      <body className={`${inter.className} min-h-screen bg-[#f2f6fb] text-[#172740] antialiased`}>
+    <html lang="es" className="dark">
+      <body className={`${inter.className} min-h-screen bg-[#0a0a0a] text-white antialiased selection:bg-primary/30 selection:text-white`}>
         <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>

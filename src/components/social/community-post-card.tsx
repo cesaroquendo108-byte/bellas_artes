@@ -63,10 +63,10 @@ export function CommunityPostCard({ post }: { post: CommunityPost }) {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <h3 className="truncate text-sm font-medium text-[#3b3344]">
+              <h3 className="truncate text-sm font-medium text-slate-200">
                 {post.title}
               </h3>
-              <p className="truncate text-[10px] text-[#8d8293]">
+              <p className="truncate text-[10px] text-slate-600">
                 {post.authorName}
               </p>
             </div>
@@ -80,7 +80,7 @@ export function CommunityPostCard({ post }: { post: CommunityPost }) {
             {post.authorName} · {post.category}
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-4 overflow-hidden rounded-xl border border-[#e6ded1] bg-[#f7f4ec]">
+        <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-black">
           {post.signedUrl && post.assetType === "image" ? (
             <img
               src={post.signedUrl}
@@ -95,7 +95,7 @@ export function CommunityPostCard({ post }: { post: CommunityPost }) {
               className="max-h-[60dvh] w-full"
             />
           ) : (
-            <div className="flex aspect-video items-center justify-center text-xs text-[#8d8293]">
+            <div className="flex aspect-video items-center justify-center text-xs text-slate-600">
               Media no disponible
             </div>
           )}

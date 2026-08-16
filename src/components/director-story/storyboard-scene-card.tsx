@@ -22,9 +22,9 @@ export function StoryboardSceneCard({
 }) {
   const { dispatch } = useStoryProject();
   return (
-    <section className="rounded-2xl border border-[#e6ded1] bg-white p-3 shadow-sm sm:p-4">
+    <section className="rounded-2xl border border-white/[0.08] bg-[#0d0d10] p-3 sm:p-4">
       <header className="flex flex-wrap items-center gap-2">
-        <Badge className="border-violet-200 bg-violet-50 text-violet-700">
+        <Badge className="bg-violet-500/10 text-violet-300">
           Escena {index + 1}
         </Badge>
         <Input
@@ -39,7 +39,7 @@ export function StoryboardSceneCard({
           }
           className="h-8 min-w-40 flex-1 border-0 bg-transparent px-1 text-sm font-semibold"
         />
-        <span className="text-[10px] text-[#817887]">
+        <span className="text-[10px] text-slate-600">
           {scene.durationSeconds.toFixed(1)}s
         </span>
         <Button
@@ -102,7 +102,7 @@ export function StoryboardSceneCard({
           type="button"
           variant="outline"
           size="sm"
-          className="w-full border-dashed border-[#dcd2c4] text-[#6f6878]"
+          className="w-full border-dashed border-white/10 text-slate-400"
           onClick={() =>
             dispatch({
               type: "add_shot",

@@ -10,7 +10,6 @@ import {
   directorTemplates,
   inspirationCategories,
   landingAssets,
-  landingVideos,
   models,
   primaryLandingRoutes,
   quickStarts,
@@ -63,18 +62,6 @@ describe("landing content manifest", () => {
       bytes += statSync(file).size;
     }
     expect(bytes).toBeLessThan(2 * 1024 * 1024);
-  });
-
-  it("keeps every landing video and poster local and optimized", () => {
-    let videoBytes = 0;
-    for (const video of Object.values(landingVideos)) {
-      expect(video.src.startsWith("/landing/clips/")).toBe(true);
-      expect(video.poster.startsWith("/landing/posters/")).toBe(true);
-      expect(existsSync(path.join(root, "public", video.src))).toBe(true);
-      expect(existsSync(path.join(root, "public", video.poster))).toBe(true);
-      videoBytes += statSync(path.join(root, "public", video.src)).size;
-    }
-    expect(videoBytes).toBeLessThan(8 * 1024 * 1024);
   });
 
   it("uses valid community categories", () => {

@@ -91,11 +91,8 @@ export function WorldHub({
         <div className="absolute -top-24 right-0 size-72 rounded-full bg-blue-600/20 blur-3xl" />
         <div className="relative max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">Mundos</Badge>
-            <CapabilityStatusBadge
-              status="beta"
-              className="border-[#b9dded] bg-[#eef8fc] text-[#26718d]"
-            />
+            <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">Mundos</Badge>
+            <CapabilityStatusBadge status="beta" />
           </div>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
             Escenarios con memoria visual.

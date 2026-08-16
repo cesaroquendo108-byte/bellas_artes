@@ -71,11 +71,11 @@ export function CommunityStories({
     return () => observer.disconnect();
   }, [cursor, loadMore]);
   return (
-    <div className="story-page workspace-page">
+    <div className="workspace-page">
       <StoryNavigation />
       <div className="px-4 py-8 sm:px-7 lg:px-10">
         <header>
-          <Badge className="border border-[#ddd1ff] bg-[#f1eaff] text-[#7c3aed]">
+          <Badge className="border border-violet-400/20 bg-violet-500/10 text-violet-200">
             Historias publicadas
           </Badge>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -100,12 +100,12 @@ export function CommunityStories({
             ))}
           </div>
         ) : (
-          <div className="mt-6 flex min-h-[55vh] flex-col items-center justify-center rounded-2xl border border-dashed border-[#e6ded1] text-center">
-            <SearchX className="size-8 text-[#a097a4]" />
-            <h2 className="mt-4 text-base font-medium text-[#3b3344]">
+          <div className="mt-6 flex min-h-[55vh] flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 text-center">
+            <SearchX className="size-8 text-slate-700" />
+            <h2 className="mt-4 text-base font-medium text-slate-300">
               No hay historias publicadas en esta categoría
             </h2>
-            <p className="mt-2 text-xs text-[#8d8293]">
+            <p className="mt-2 text-xs text-slate-600">
               La galería sólo contiene proyectos comunitarios reales.
             </p>
           </div>

@@ -14,7 +14,7 @@ const items = [
 export function StoryNavigation() {
   const pathname = usePathname();
   return (
-    <nav className="flex max-w-full gap-1 overflow-x-auto border-b border-[#e6ded1] bg-white px-4 sm:px-7 lg:px-10">
+    <nav className="flex max-w-full gap-1 overflow-x-auto border-b border-white/[0.08] bg-[#0b0b0d] px-4 sm:px-7 lg:px-10">
       {items.map((item) => (
         <Link
           key={item.href}
@@ -22,8 +22,8 @@ export function StoryNavigation() {
           className={cn(
             "min-w-fit border-b-2 px-3 py-4 text-xs transition",
             pathname === item.href
-              ? "border-violet-600 font-medium text-[#6d28d9]"
-              : "border-transparent text-[#817887] hover:bg-[#f8f4ff] hover:text-[#3a3342]",
+              ? "border-violet-500 text-white"
+              : "border-transparent text-slate-500 hover:text-slate-200",
           )}
         >
           {item.label}

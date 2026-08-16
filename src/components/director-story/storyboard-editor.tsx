@@ -184,9 +184,9 @@ function EditorWorkspace() {
             : Cloud;
   const SaveIcon = saveIcon;
   return (
-    <div className="story-editor min-h-[calc(100dvh-1rem)] bg-[#fcfaf5] text-[#241f2e]">
-      <header className="sticky top-0 z-30 border-b border-[#e6ded1] bg-[#fffdf8]/95 shadow-sm backdrop-blur-xl">
-        <div className="flex items-center gap-3 px-3 py-4 sm:px-5">
+    <div className="min-h-[calc(100dvh-1rem)] bg-[#080809] text-white">
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0b0b0d]/95 backdrop-blur-xl">
+        <div className="flex items-center gap-3 px-3 py-3 sm:px-5">
           <Button
             render={
               <Link
@@ -212,17 +212,17 @@ function EditorWorkspace() {
                   value: event.target.value,
                 })
               }
-            className="h-8 border-0 bg-transparent px-0 text-base font-semibold text-[#241f2e] placeholder:text-[#a097a4]"
+              className="h-7 border-0 bg-transparent px-0 text-sm font-semibold"
             />
-            <p className="hidden text-[10px] text-[#817887] sm:block">
+            <p className="hidden text-[9px] text-slate-600 sm:block">
               {state.kind === "director" ? "Proyecto de director" : "Proyecto de historia"}{" "}
               · {state.projectId ? "Supabase" : "Nuevo borrador"}
             </p>
           </div>
           <span
             className={cn(
-              "flex items-center gap-1 text-[10px]",
-              state.saveState === "error" ? "text-rose-600" : "text-[#6f6878]",
+              "flex items-center gap-1 text-[9px]",
+              state.saveState === "error" ? "text-rose-300" : "text-slate-500",
             )}
           >
             <SaveIcon
@@ -243,12 +243,12 @@ function EditorWorkspace() {
           </span>
           <Badge
             variant="outline"
-            className="border-violet-200 bg-violet-50 text-violet-700"
+            className="border-violet-400/20 text-violet-300"
           >
             Beta
           </Badge>
         </div>
-        <div className="flex gap-1 overflow-x-auto border-t border-[#eee7dc] px-3 py-3 sm:px-5">
+        <div className="flex gap-1 overflow-x-auto px-3 pb-3 sm:px-5">
           {(
             [
               {
@@ -267,27 +267,27 @@ function EditorWorkspace() {
                 dispatch({ type: "set_field", field: "view", value })
               }
               className={cn(
-                "flex min-w-fit items-center gap-1 rounded-lg px-3 py-2 text-xs font-medium transition",
+                "flex min-w-fit items-center gap-1 rounded-lg px-3 py-2 text-[10px]",
                 state.view === value
                   ? "bg-violet-600 text-white"
-                  : "text-[#6f6878] hover:bg-violet-50 hover:text-violet-700",
+                  : "text-slate-500 hover:bg-white/[0.05]",
               )}
             >
               <Icon className="size-3" />
               {label}
             </button>
           ))}
-          <span className="ml-auto flex min-w-fit items-center gap-1 px-2 text-[10px] text-[#817887]">
+          <span className="ml-auto flex min-w-fit items-center gap-1 px-2 text-[9px] text-slate-600">
             <Timer className="size-3" />
             {total.toFixed(1)}s · {state.document.scenes.length} escenas
           </span>
         </div>
       </header>
       <div className="grid min-h-0 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="border-r border-[#e6ded1] bg-[#fffdf8] p-4 lg:min-h-[calc(100dvh-110px)]">
+        <aside className="border-r border-white/[0.07] bg-[#0d0d10] p-4 lg:min-h-[calc(100dvh-110px)]">
           <div className="space-y-4">
             <div>
-              <Label className="text-xs font-medium text-[#6f6878]">
+              <Label className="text-[10px] text-slate-500">
                 Tipo de historia
               </Label>
               <Select
@@ -310,7 +310,7 @@ function EditorWorkspace() {
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-medium text-[#6f6878]">Descripción</Label>
+              <Label className="text-[10px] text-slate-500">Descripción</Label>
               <Textarea
                 value={state.description}
                 onChange={(event) =>
@@ -325,7 +325,7 @@ function EditorWorkspace() {
               />
             </div>
             <div>
-              <Label className="text-xs font-medium text-[#6f6878]">Portada</Label>
+              <Label className="text-[10px] text-slate-500">Portada</Label>
               <Select
                 value={state.coverAssetId}
                 onValueChange={(value) =>
@@ -349,9 +349,9 @@ function EditorWorkspace() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="rounded-xl border border-[#e6ded1] bg-white p-3 text-[10px]">
+            <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 text-[10px]">
               <div className="flex justify-between">
-                <span className="text-[#6f6878]">Escenas incompletas</span>
+                <span className="text-slate-500">Escenas incompletas</span>
                 <span
                   className={incomplete ? "text-amber-300" : "text-emerald-300"}
                 >
@@ -359,8 +359,8 @@ function EditorWorkspace() {
                 </span>
               </div>
               <div className="mt-2 flex justify-between">
-                <span className="text-[#6f6878]">Recursos disponibles</span>
-                <span className="text-[#3b3344]">{assets.length}</span>
+                <span className="text-slate-500">Recursos disponibles</span>
+                <span className="text-slate-300">{assets.length}</span>
               </div>
             </div>
             <Button
@@ -370,7 +370,7 @@ function EditorWorkspace() {
             >
               <Sparkles /> Generar historia
             </Button>
-            <p className="text-[10px] leading-4 text-[#817887]">
+            <p className="text-[9px] leading-4 text-slate-600">
               Próximamente: la generación se conectará a los estudios de Imagen,
               Video y Audio.
             </p>
@@ -383,8 +383,8 @@ function EditorWorkspace() {
               className={cn(
                 "mb-4 rounded-xl border p-3 text-xs",
                 state.saveState === "error"
-                  ? "border-rose-200 bg-rose-50 text-rose-700"
-                  : "border-violet-200 bg-violet-50 text-violet-700",
+                  ? "border-rose-400/20 bg-rose-500/10 text-rose-200"
+                  : "border-violet-400/20 bg-violet-500/10 text-violet-200",
               )}
             >
               {state.message}
@@ -393,26 +393,26 @@ function EditorWorkspace() {
           {state.view === "storyboard" && <StoryboardCanvas />}
           {state.view === "timeline" && <StoryboardTimeline />}
           {state.view === "preview" && (
-            <div className="min-h-[55vh] rounded-2xl border border-[#e6ded1] bg-white p-5 shadow-sm">
+            <div className="min-h-[55vh] rounded-2xl border border-white/[0.08] bg-black p-5">
               <div className="mx-auto max-w-3xl">
-                <Badge className="border-violet-200 bg-violet-50 text-violet-700">
+                <Badge className="bg-violet-500/10 text-violet-300">
                   Vista previa estructural
                 </Badge>
                 <h2 className="mt-4 text-2xl font-semibold">{state.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-[#6f6878]">
+                <p className="mt-2 text-sm leading-6 text-slate-500">
                   {state.description || "Sin descripción."}
                 </p>
                 <div className="mt-8 space-y-4">
                   {state.document.scenes.map((scene, index) => (
                     <div
                       key={scene.id}
-                      className="rounded-xl border border-[#e6ded1] bg-[#fffdf8] p-4"
+                      className="rounded-xl border border-white/[0.08] p-4"
                     >
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold">
                           {index + 1}. {scene.title}
                         </h3>
-                        <span className="text-[10px] text-[#817887]">
+                        <span className="text-[10px] text-slate-600">
                           {scene.durationSeconds.toFixed(1)}s
                         </span>
                       </div>
@@ -420,12 +420,12 @@ function EditorWorkspace() {
                         {scene.shots.map((shot) => (
                           <div
                             key={shot.id}
-                            className="rounded-lg border border-[#eee7dc] bg-white p-3"
+                            className="rounded-lg bg-white/[0.035] p-3"
                           >
-                            <p className="text-[10px] font-medium text-violet-700">
+                            <p className="text-[10px] font-medium text-violet-200">
                               {shot.title}
                             </p>
-                            <p className="mt-1 line-clamp-3 text-[9px] leading-4 text-[#817887]">
+                            <p className="mt-1 line-clamp-3 text-[9px] leading-4 text-slate-600">
                               {shot.prompt || "Descripción pendiente"}
                             </p>
                           </div>
@@ -434,7 +434,7 @@ function EditorWorkspace() {
                     </div>
                   ))}
                   {!state.document.scenes.length && (
-                    <p className="py-20 text-center text-xs text-[#817887]">
+                    <p className="py-20 text-center text-xs text-slate-600">
                       No hay escenas que previsualizar.
                     </p>
                   )}

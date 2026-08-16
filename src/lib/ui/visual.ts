@@ -24,7 +24,7 @@ export type GenerationSurfaceStatus =
   | "canceled"
   | "not_configured";
 
-export type VisualDirection = "farmacia-azul" | "cine-caribe" | "noche-navy" | "sol-editorial";
+export type VisualDirection = "nocturno" | "cine-violeta" | "caribe-electrico" | "tierra-de-estudio";
 
 export const surfaceStateLabels: Record<SurfaceState, string> = {
   idle: "Listo",
@@ -63,16 +63,16 @@ export const generationStatusTones: Record<GenerationSurfaceStatus, UiStatusTone
 };
 
 export const workspacePalette = {
-  canvas: "#F2F6FB",
-  surface: "#FFFFFF",
+  canvas: "#F7F4EC",
+  surface: "#FFFDF8",
   surfaceStrong: "#FFFFFF",
-  ink: "#172740",
-  muted: "#5D7088",
-  border: "#DCE6F2",
-  primary: "#0B72CE",
-  primarySoft: "#E7F1FB",
-  fuchsia: "#2F86D6",
-  cyan: "#08768E",
+  ink: "#241F2E",
+  muted: "#6F6878",
+  border: "#E6DED1",
+  primary: "#7C3AED",
+  primarySoft: "#F0E9FF",
+  fuchsia: "#D946EF",
+  cyan: "#0891B2",
 } as const;
 
 export const visualDirectionPalettes: Record<VisualDirection, {
@@ -81,8 +81,8 @@ export const visualDirectionPalettes: Record<VisualDirection, {
   accentSoft: string;
   contrast: string;
 }> = {
-  "farmacia-azul": { canvas: "#F2F6FB", accent: "#0B72CE", accentSoft: "#E7F1FB", contrast: "#172740" },
-  "cine-caribe": { canvas: "#071A32", accent: "#2F86D6", accentSoft: "#123C69", contrast: "#F7FBFF" },
-  "noche-navy": { canvas: "#0B213D", accent: "#6BB6F2", accentSoft: "#16305E", contrast: "#FFFFFF" },
-  "sol-editorial": { canvas: "#FFF8DA", accent: "#FFD34D", accentSoft: "#FFF1A8", contrast: "#172740" },
+  nocturno: { canvas: "#0A0A0A", accent: "#8B5CF6", accentSoft: "#2E1065", contrast: "#F5F3FF" },
+  "cine-violeta": { canvas: "#120D1F", accent: "#C084FC", accentSoft: "#3B176B", contrast: "#FAF5FF" },
+  "caribe-electrico": { canvas: "#071A22", accent: "#22D3EE", accentSoft: "#083344", contrast: "#ECFEFF" },
+  "tierra-de-estudio": { canvas: "#251B17", accent: "#F59E0B", accentSoft: "#542B05", contrast: "#FFFBEB" },
 };

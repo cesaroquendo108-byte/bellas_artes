@@ -20,6 +20,7 @@ import {
   ReceiptText,
   Settings,
   ShieldCheck,
+  Sparkles,
   UsersRound,
   Video,
   Volume2,
@@ -36,7 +37,6 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { BellasArtesMark, BellasArtesWordmark } from "@/components/brand/bellas-artes-mark";
 
 type AppSidebarProps = {
   email: string;
@@ -91,47 +91,49 @@ export function AppSidebar({ email, displayName, role }: AppSidebarProps) {
     .join("");
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="ba-app-sidebar border-r border-[#dce6f2] bg-white text-[#46586f]">
+    <Sidebar variant="inset" collapsible="icon" className="border-r border-[#e6ded1] bg-[#fcfaf5] text-[#4c4455]">
       <SidebarHeader className="p-3">
         <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-1 py-2">
-          <BellasArtesMark className="size-10 rounded-2xl" />
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white shadow-lg shadow-violet-200/70">
+            <Sparkles className="size-4" />
+          </span>
           <span className="group-data-[collapsible=icon]:hidden">
-            <BellasArtesWordmark />
-            <span className="block text-[11px] text-[#7a8aa0]">Estudio creativo IA</span>
+            <span className="block text-base font-semibold tracking-tight text-[#241f2e]">Bellas Artes</span>
+            <span className="block text-[11px] text-[#827986]">Estudio creativo IA</span>
           </span>
         </Link>
       </SidebarHeader>
       <SidebarContent className="px-2 py-3">
         <SidebarSection label="Crear" items={studioItems} pathname={pathname} />
-        <SidebarSeparator className="my-3 bg-[#dce6f2]" />
+        <SidebarSeparator className="my-3 bg-[#e6ded1]" />
         <SidebarSection label="Organizar" items={organizeItems} pathname={pathname} />
-        <SidebarSeparator className="my-3 bg-[#dce6f2]" />
+        <SidebarSeparator className="my-3 bg-[#e6ded1]" />
         <SidebarSection label="Descubrir" items={discoverItems} pathname={pathname} />
-        <SidebarSeparator className="my-3 bg-[#dce6f2]" />
+        <SidebarSeparator className="my-3 bg-[#e6ded1]" />
         <SidebarSection label="Cuenta" items={accountItems} pathname={pathname} />
         {adminItems.length > 0 && (
           <>
-            <SidebarSeparator className="my-3 bg-[#dce6f2]" />
+            <SidebarSeparator className="my-3 bg-[#e6ded1]" />
             <SidebarSection label="Administración" items={adminItems} pathname={pathname} />
           </>
         )}
       </SidebarContent>
       <SidebarFooter className="p-3">
-        <div className="rounded-2xl border border-[#dce6f2] bg-[#f7fafd] p-2 shadow-sm">
+        <div className="rounded-2xl border border-[#e6ded1] bg-white/80 p-2 shadow-sm">
           <div className="flex items-center gap-2">
             <Avatar className="size-8 rounded-md">
-              <AvatarFallback className="rounded-md bg-[#e7f1fb] text-xs font-semibold text-[#084f92]">
+              <AvatarFallback className="rounded-md bg-violet-100 text-xs font-semibold text-violet-700">
                 {initials || "BA"}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-[#172740]">{displayName || "Mi cuenta"}</p>
-              <p className="truncate text-xs text-[#7a8aa0]">{email}</p>
+              <p className="truncate text-sm font-medium text-[#241f2e]">{displayName || "Mi cuenta"}</p>
+              <p className="truncate text-xs text-[#827986]">{email}</p>
             </div>
             <form action={logout}>
               <button
                 type="submit"
-                className="rounded-xl p-2 text-[#7a8aa0] transition hover:bg-red-50 hover:text-red-600"
+                className="rounded-xl p-2 text-[#827986] transition hover:bg-red-50 hover:text-red-600"
                 aria-label="Cerrar sesión"
                 title="Cerrar sesión"
               >
@@ -163,7 +165,7 @@ function SidebarSection({
 }) {
   return (
     <div>
-      <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-[.16em] text-[#7a8aa0] group-data-[collapsible=icon]:hidden">
+      <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-[.16em] text-[#a097a4] group-data-[collapsible=icon]:hidden">
         {label}
       </p>
       <SidebarMenu>
@@ -179,7 +181,7 @@ function SidebarSection({
                 isActive={active}
                 tooltip={item.disabled ? `${item.title} · Próximamente` : item.title}
                 disabled={item.disabled}
-                className="h-10 rounded-xl text-[#5d7088] hover:bg-[#f2f6fb] hover:text-[#084f92] data-[active=true]:bg-[#e7f1fb] data-[active=true]:font-semibold data-[active=true]:text-[#084f92] disabled:cursor-not-allowed disabled:opacity-45"
+                className="h-10 rounded-xl text-[#6f6878] hover:bg-white hover:text-[#4c1d95] data-[active=true]:bg-violet-100 data-[active=true]:font-semibold data-[active=true]:text-violet-700 disabled:cursor-not-allowed disabled:opacity-45"
               >
                 <item.icon className="size-4" />
                 <span>{item.title}</span>

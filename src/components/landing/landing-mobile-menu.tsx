@@ -33,7 +33,7 @@ export function LandingMobileMenu() {
         aria-controls="landing-mobile-navigation"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="flex size-10 items-center justify-center rounded-xl border border-[#dce6f2] text-[#46586f] transition hover:bg-[#e7f1fb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0b72ce]"
+        className="flex size-10 items-center justify-center rounded-xl border border-white/10 text-zinc-300 transition hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-300"
       >
         <MorphIcon
           icon={open ? X : Menu}
@@ -47,14 +47,14 @@ export function LandingMobileMenu() {
       {open ? (
         <div
           id="landing-mobile-navigation"
-          className="absolute right-0 top-[calc(100%+8px)] w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-[#dce6f2] bg-white p-3 text-[#172740] shadow-2xl"
+          className="absolute right-0 top-[calc(100%+8px)] w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-white/10 bg-[#111114] p-3 shadow-2xl"
         >
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={closeMenu}
-              className="block rounded-xl px-4 py-3 text-sm text-[#46586f] transition hover:bg-[#e7f1fb] hover:text-[#084f92]"
+              className="block rounded-xl px-4 py-3 text-sm text-zinc-300 transition hover:bg-white/[0.06] hover:text-white"
             >
               {item.label}
             </Link>
@@ -62,7 +62,7 @@ export function LandingMobileMenu() {
           <Link
             href="/login?next=/dashboard"
             onClick={closeMenu}
-            className="mt-2 block rounded-xl bg-[#0b72ce] px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#084f92]"
+            className="mt-2 block rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-zinc-200"
           >
             Abrir mi estudio
           </Link>
