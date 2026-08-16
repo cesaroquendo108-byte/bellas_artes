@@ -72,6 +72,7 @@ services:
       - "172.17.0.1:8787:8787"
     networks:
       - internal
+      - host_bridge
 
   worker:
     <<: *service-defaults
@@ -103,9 +104,14 @@ services:
     pids_limit: 300
     networks:
       - internal
+      - host_bridge
 
 volumes:
   redis-data:
 
 networks:
-  internal: {}
+  internal:
+    internal: true
+  host_bridge:
+    external: true
+    name: bridge
