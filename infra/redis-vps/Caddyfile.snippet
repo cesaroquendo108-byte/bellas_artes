@@ -1,0 +1,15 @@
+bellas-artes-queue.157.173.104.214.nip.io {
+	reverse_proxy 172.17.0.1:8787
+
+	header {
+		-Server
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

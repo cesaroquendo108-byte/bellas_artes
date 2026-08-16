@@ -1,5 +1,7 @@
 import { Queue } from "bullmq";
 import Redis from "ioredis";
+import { isQueueGatewayConfigured, postQueueGateway } from "@/lib/redis-gateway/client";
+import { queueGatewayPaths, type EnqueueGenerationRequest } from "@/lib/redis-gateway/contracts";
 import { getGenerationConfig } from "./config";
 import type { GenerationQueueKind } from "./queue-contracts";
 
@@ -59,11 +61,12 @@ export async function moveToDLQ(input: {
   }, { jobId: input.jobId });
 }
 
-export async function enqueueGenerationJob(input: {
-  kind: GenerationQueueKind;
-  jobId: string;
-  priority?: number;
-}) {
+export async function enqueueGenerationJobDirect(input: EnqueueGenerationRequest) {
   const queue = getGenerationQueue(input.kind);
   return queue.add(input.kind, { jobId: input.jobId }, { jobId: input.jobId, priority: input.priority ?? 10 });
+}
+
+export async function enqueueGenerationJob(input: EnqueueGenerationRequest) {
+  if (!isQueueGatewayConfigured()) return enqueueGenerationJobDirect(input);
+  return postQueueGateway<EnqueueGenerationRequest, { id: string | null }>(queueGatewayPaths.enqueueGeneration, input);
 }

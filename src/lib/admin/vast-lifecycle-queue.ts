@@ -2,6 +2,8 @@ import "server-only";
 
 import { Queue } from "bullmq";
 import Redis from "ioredis";
+import { isQueueGatewayConfigured, postQueueGateway } from "@/lib/redis-gateway/client";
+import { queueGatewayPaths, type ScheduleVastLifecycleRequest } from "@/lib/redis-gateway/contracts";
 
 export const vastLifecycleQueueName = "vast-admin-lifecycle";
 export type VastLifecycleBackend = "poller" | "queue";
@@ -34,10 +36,18 @@ export function getVastLifecycleQueue() {
   return queue;
 }
 
-export async function scheduleVastLeaseDestruction(leaseId: string, expiresAt: string) {
+export async function scheduleVastLeaseDestructionDirect(leaseId: string, expiresAt: string) {
   const delay = Math.max(Date.parse(expiresAt) - Date.now(), 0);
   return getVastLifecycleQueue().add("destroy-lease", { leaseId }, {
     jobId: `destroy-${leaseId}`,
     delay,
   });
+}
+
+export async function scheduleVastLeaseDestruction(leaseId: string, expiresAt: string) {
+  if (!isQueueGatewayConfigured()) return scheduleVastLeaseDestructionDirect(leaseId, expiresAt);
+  return postQueueGateway<ScheduleVastLifecycleRequest, { id: string | null }>(
+    queueGatewayPaths.scheduleVastLifecycle,
+    { leaseId, expiresAt },
+  );
 }

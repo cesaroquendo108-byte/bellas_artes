@@ -1,11 +1,16 @@
 import Redis from "ioredis";
+import { isQueueGatewayConfigured, postQueueGateway, QueueGatewayError } from "@/lib/redis-gateway/client";
+import {
+  queueGatewayPaths,
+  type ConsumeGenerationRateLimitRequest,
+} from "@/lib/redis-gateway/contracts";
 
 export class GenerationRateLimitError extends Error {
   readonly code = "GENERATION_RATE_LIMITED";
   readonly status = 429;
 }
 
-export async function consumeGenerationRateLimit(input: { userId: string; kind: string }) {
+export async function consumeGenerationRateLimitDirect(input: ConsumeGenerationRateLimitRequest) {
   if (process.env.GENERATION_RATE_LIMIT_ENABLED !== "true") return;
   const url = process.env.REDIS_URL?.trim();
   if (!url) throw new Error("GENERATION_RATE_LIMIT_REDIS_NOT_CONFIGURED");
@@ -20,5 +25,21 @@ export async function consumeGenerationRateLimit(input: { userId: string; kind: 
     if (count > limit) throw new GenerationRateLimitError("Has alcanzado el límite temporal de generaciones.");
   } finally {
     await redis.quit().catch(() => redis.disconnect());
+  }
+}
+
+export async function consumeGenerationRateLimit(input: ConsumeGenerationRateLimitRequest) {
+  if (!isQueueGatewayConfigured()) return consumeGenerationRateLimitDirect(input);
+  if (process.env.GENERATION_RATE_LIMIT_ENABLED !== "true") return;
+  try {
+    await postQueueGateway<ConsumeGenerationRateLimitRequest, { consumed: true }>(
+      queueGatewayPaths.consumeGenerationRateLimit,
+      input,
+    );
+  } catch (error) {
+    if (error instanceof QueueGatewayError && error.status === 429) {
+      throw new GenerationRateLimitError(error.message);
+    }
+    throw error;
   }
 }

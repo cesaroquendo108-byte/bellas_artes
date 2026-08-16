@@ -18,6 +18,9 @@
     "worker": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local workers/generation-worker.ts",
     "worker:vast-lifecycle": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local workers/vast-lifecycle-worker.ts",
     "worker:health": "tsx --env-file=.env.local scripts/worker-healthcheck.ts",
+    "gateway": "NODE_OPTIONS=--conditions=react-server tsx gateway/redis-gateway.ts",
+    "gateway:health": "node -e \"fetch('http://127.0.0.1:'+(process.env.QUEUE_GATEWAY_PORT||8787)+'/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))\"",
+    "jobs:reconcile-stale": "tsx --env-file=.env.local scripts/reconcile-stale-generation-jobs.ts",
     "test:vast:flux": "NODE_OPTIONS=--conditions=react-server tsx scripts/run-vast-flux-acceptance.ts",
     "mcp": "NODE_OPTIONS=--conditions=react-server tsx mcp/server.ts"
   },
