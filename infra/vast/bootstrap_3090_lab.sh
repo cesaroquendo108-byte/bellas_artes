@@ -27,7 +27,7 @@ write_status() {
     gpu_vram_mb="$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -n 1 | tr -d '\r ')"
   fi
 
-  python - "$STATUS_PATH" "$state" "$message" "$gpu_name" "$gpu_vram_mb" <<'PY'
+  python3 - "$STATUS_PATH" "$state" "$message" "$gpu_name" "$gpu_vram_mb" <<'PY'
 import json
 import sys
 from datetime import datetime, timezone
@@ -80,7 +80,7 @@ ensure_comfyui() {
 
   git -C "$COMFY_ROOT" fetch --depth 1 origin "$COMFY_COMMIT"
   git -C "$COMFY_ROOT" checkout --detach "$COMFY_COMMIT"
-  python -m pip install --disable-pip-version-check --no-input -r "$COMFY_ROOT/requirements.txt"
+  python3 -m pip install --disable-pip-version-check --no-input -r "$COMFY_ROOT/requirements.txt"
 }
 
 install_models() {
@@ -140,7 +140,7 @@ start_comfyui() {
     return
   fi
 
-  nohup python "$COMFY_ROOT/main.py" \
+  nohup python3 "$COMFY_ROOT/main.py" \
     --listen 0.0.0.0 \
     --port 18188 \
     --disable-auto-launch \
