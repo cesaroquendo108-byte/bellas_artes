@@ -102,6 +102,24 @@ describe("cliente administrativo Vast", () => {
     expect(body).not.toHaveProperty("env");
   });
 
+  it("apunta al commit inmutable del bootstrap compatible con python3", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true, new_contract: 1236 }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await new VastAdminClient().createInstance({
+      offerId: 93,
+      label: "ba-admin:33333333-3333-4333-8333-333333333333",
+      expiresAt: "2030-01-01T00:00:00.000Z",
+      preset: "comfy-clean",
+      bidPriceUsd: null,
+      templateHashId: "template-hash",
+      fluxVolumeId: null,
+      fluxMountPath: "/workspace/ComfyUI/models/checkpoints",
+    });
+    const body = JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body));
+    expect(body.onstart).toContain("1a4117ee118229c8389d438e42706a177ec9b01c");
+    expect(body.onstart).toContain("5d19273adae1e948eb02f0206ff575ce665720f7150b67b33445e869d74680d8");
+  });
+
   it("revalida una oferta dentro de un conjunto estable sin confiar en el filtro id de Vast", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ offers: [{
       id: 91,

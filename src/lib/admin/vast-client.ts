@@ -15,7 +15,7 @@ import {
 const VAST_API_BASE = "https://console.vast.ai";
 const VAST_LAB_DISK_GB = 100;
 const VAST_LAB_BOOTSTRAP_URL = process.env.VAST_LAB_BOOTSTRAP_URL?.trim()
-  || "https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/1a4117ee3bab2b1a67170a25aeeb3c0430159c75/infra/vast/bootstrap_3090_lab.sh";
+  || "https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/1a4117ee118229c8389d438e42706a177ec9b01c/infra/vast/bootstrap_3090_lab.sh";
 const VAST_LAB_BOOTSTRAP_SHA256 = process.env.VAST_LAB_BOOTSTRAP_SHA256?.trim()
   || "5d19273adae1e948eb02f0206ff575ce665720f7150b67b33445e869d74680d8";
 
