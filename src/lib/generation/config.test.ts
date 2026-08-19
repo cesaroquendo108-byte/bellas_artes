@@ -77,6 +77,25 @@ describe("generation safety defaults", () => {
     expect(getVastComfyBaseUrl("audio")).toBe("https://vast.example/audio");
   });
 
+  it("activa un runtime nativo sólo con contrato, HTTPS y clave server-side", () => {
+    vi.stubEnv("GENERATION_ENABLED", "true");
+    vi.stubEnv("GENERATION_PROVIDER", "vast");
+    vi.stubEnv("NATIVE_IMAGE_RUNTIME_BASE_URL", "https://native.example/");
+    vi.stubEnv("NATIVE_RUNTIME_API_KEY", "native-test-key");
+    expect(isGenerationRouteConfigured({
+      providerRoute: "vast",
+      workflowVersion: "image/pixart-sigma-v1",
+      backendModel: "pixart-sigma",
+    })).toBe(true);
+
+    vi.stubEnv("NATIVE_RUNTIME_API_KEY", "");
+    expect(isGenerationRouteConfigured({
+      providerRoute: "vast",
+      workflowVersion: "image/pixart-sigma-v1",
+      backendModel: "pixart-sigma",
+    })).toBe(false);
+  });
+
   it("bloquea activaciones con controles Serverless inseguros", () => {
     vi.stubEnv("GENERATION_ENABLED", "true");
     vi.stubEnv("GENERATION_PROVIDER", "vast");

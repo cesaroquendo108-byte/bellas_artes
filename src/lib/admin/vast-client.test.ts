@@ -77,6 +77,7 @@ describe("cliente administrativo Vast", () => {
     }));
     expect(body).not.toHaveProperty("env");
     expect(body.onstart).toContain("bellas-artes-vast-watchdog.py");
+    expect(body.onstart).toContain("nohup python3");
     expect(body.onstart).toContain("1893456000");
     expect(body.onstart).not.toContain("scoped-test-key");
   });
@@ -102,7 +103,7 @@ describe("cliente administrativo Vast", () => {
     expect(body).not.toHaveProperty("env");
   });
 
-  it("apunta al commit inmutable del bootstrap compatible con python3", async () => {
+  it("apunta al commit inmutable del bootstrap con pesos verificados", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true, new_contract: 1236 }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
     await new VastAdminClient().createInstance({
@@ -116,8 +117,8 @@ describe("cliente administrativo Vast", () => {
       fluxMountPath: "/workspace/ComfyUI/models/checkpoints",
     });
     const body = JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body));
-    expect(body.onstart).toContain("1a4117ee118229c8389d438e42706a177ec9b01c");
-    expect(body.onstart).toContain("5d19273adae1e948eb02f0206ff575ce665720f7150b67b33445e869d74680d8");
+    expect(body.onstart).toContain("dfca38d71a7495edf2e632063b9cb13ee42552ab");
+    expect(body.onstart).toContain("51df4045cd8d1ab47d3561ecc304df53ec7adcb6d7aa9895b90c0ca73404d96a");
   });
 
   it("revalida una oferta dentro de un conjunto estable sin confiar en el filtro id de Vast", async () => {
@@ -211,6 +212,6 @@ describe("cliente administrativo Vast", () => {
     vi.stubEnv("VAST_ADMIN_MAX_ACTIVE_INSTANCES", "9");
     vi.stubEnv("VAST_ADMIN_MAX_HOURLY_USD", "99");
     vi.stubEnv("VAST_ADMIN_MAX_RENTAL_USD", "99");
-    expect(getVastAdminServerConfig().limits).toMatchObject({ maxActiveInstances: 1, maxHourlyUsd: 0.6, maxRentalUsd: 1.2 });
+    expect(getVastAdminServerConfig().limits).toMatchObject({ maxActiveInstances: 1, maxHourlyUsd: 5, maxRentalUsd: 25 });
   });
 });

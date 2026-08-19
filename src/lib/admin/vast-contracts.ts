@@ -7,6 +7,18 @@ export const supportedVastGpuFamilies = [
   "RTX 4090",
   "RTX 5090",
   "RTX PRO 4500",
+  "RTX A5000",
+  "A10",
+  "A40",
+  "RTX A6000",
+  "RTX 6000 ADA",
+  "L40",
+  "L40S",
+  "A100 PCIE",
+  "A100 SXM4",
+  "H100 PCIE",
+  "H100 SXM",
+  "H200",
 ] as const;
 export const vastLeaseStates = [
   "pending",
@@ -139,7 +151,11 @@ export function getSupportedVastGpuFamily(value: string): SupportedVastGpuFamily
     .trim()
     .replace(/^NVIDIA\s+/, "")
     .replace(/^GEFORCE\s+/, "")
-    .replace(/\s+(BLACKWELL|ADA|LOVELACE|AMPERE)$/, "");
+    .replace(/\s+(BLACKWELL|LOVELACE|AMPERE)$/, "")
+    .replace(/\s+80GB$/, "")
+    .replace(/\s+PCIE$/, " PCIE")
+    .replace(/\s+SXM5$/, " SXM")
+    .replace(/\s+SXM$/, " SXM");
   return supportedVastGpuFamilies.find((family) => family === normalized) ?? null;
 }
 

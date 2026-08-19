@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from pathlib import PurePosixPath
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,16 @@ def sha256_file(path: Path) -> str:
         while chunk := handle.read(8 * 1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def matches_include(path: str, patterns: list[str]) -> bool:
+    """Match Hugging Face paths while allowing globstar to span zero folders."""
+    candidate = PurePosixPath(path)
+    for pattern in patterns:
+        expanded = {pattern, pattern.replace("/**/*", "/*"), pattern.replace("/**/", "/")}
+        if any(candidate.match(item) or fnmatch.fnmatchcase(path, item) for item in expanded):
+            return True
+    return False
 
 
 def inventory(path: Path) -> list[dict[str, Any]]:
@@ -81,7 +92,7 @@ def install_huggingface(package: dict[str, Any], destination: Path) -> None:
         entry["path"]
         for entry in entries
         if entry.get("type") == "file"
-        and (not patterns or any(fnmatch.fnmatch(entry["path"], pattern) for pattern in patterns))
+        and (not patterns or matches_include(entry["path"], patterns))
     ]
     if not files:
         raise RuntimeError(f"Ningún archivo coincide con los patrones de {package['repo']}")
@@ -196,6 +207,17 @@ def install_model(model: dict[str, Any], root: Path) -> dict[str, Any]:
     return record
 
 
+def existing_model_bytes(root: Path, model_id: str) -> int:
+    model_root = root / model_id
+    if not model_root.exists():
+        return 0
+    return sum(
+        path.stat().st_size
+        for path in model_root.rglob("*")
+        if path.is_file() and ".git" not in path.parts and ".cache" not in path.parts
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
@@ -215,18 +237,22 @@ def main() -> int:
         parser.error("Selecciona --all o al menos un --model válido.")
 
     estimated_gb = sum(float(model["estimatedInstallGb"]) for model in selected)
+    existing_gb = sum(existing_model_bytes(args.root, model["id"]) for model in selected) / 1_000_000_000
+    remaining_gb = max(estimated_gb - existing_gb, 0)
     free_gb = shutil.disk_usage(args.root.parent if not args.root.exists() else args.root).free / 1_000_000_000
     summary = {
         "models": [model["id"] for model in selected],
         "estimatedGb": estimated_gb,
+        "existingGb": round(existing_gb, 2),
+        "remainingEstimatedGb": round(remaining_gb, 2),
         "freeGb": round(free_gb, 2),
         "hfTokenPresent": bool(os.environ.get("HF_TOKEN")),
     }
     print(json.dumps(summary, indent=2))
     if args.plan:
         return 0
-    if free_gb < estimated_gb * 1.1:
-        raise SystemExit(f"Espacio insuficiente: se requieren ~{estimated_gb * 1.1:.1f} GB con margen.")
+    if free_gb < remaining_gb * 1.1:
+        raise SystemExit(f"Espacio insuficiente: se requieren ~{remaining_gb * 1.1:.1f} GB adicionales con margen.")
 
     args.root.mkdir(parents=True, exist_ok=True)
     results = [install_model(model, args.root) for model in selected]

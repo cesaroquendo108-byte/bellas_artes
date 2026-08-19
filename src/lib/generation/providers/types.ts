@@ -32,6 +32,7 @@ export interface ProviderExecution {
 export interface GenerationProvider {
   readonly name: ProviderJob["provider"];
   health(): Promise<boolean>;
+  queueDepth(): Promise<number>;
   submit(input: ProviderSubmitInput): Promise<ProviderJob>;
   getStatus(job: ProviderJob): Promise<ProviderStatus>;
   getResult(job: ProviderJob): Promise<ProviderResult>;

@@ -1,4 +1,6 @@
 import { isWorkflowConfigured } from "./workflows";
+import { hasWorkflowManifest } from "./workflow-manifests";
+import { getModelRuntimeEntryForBackendModel } from "./model-runtime-catalog";
 
 export type ProviderRoute = "vast" | "fake";
 export type GenerationProviderKind = "image" | "video" | "audio" | "character" | "world";
@@ -19,6 +21,14 @@ const vastServerlessEndpointVariables: Record<GenerationProviderKind, string> = 
   audio: "VAST_AUDIO_SERVERLESS_ENDPOINT",
   character: "VAST_CHARACTER_SERVERLESS_ENDPOINT",
   world: "VAST_WORLD_SERVERLESS_ENDPOINT",
+};
+
+const nativeRuntimeVariables: Record<GenerationProviderKind, string> = {
+  image: "NATIVE_IMAGE_RUNTIME_BASE_URL",
+  video: "NATIVE_VIDEO_RUNTIME_BASE_URL",
+  audio: "NATIVE_AUDIO_RUNTIME_BASE_URL",
+  character: "NATIVE_CHARACTER_RUNTIME_BASE_URL",
+  world: "NATIVE_WORLD_RUNTIME_BASE_URL",
 };
 
 function truthy(value: string | undefined) {
@@ -42,7 +52,11 @@ export function getGenerationConfig() {
         process.env.VAST_SERVERLESS_ENDPOINT?.trim()
         || process.env.VAST_LIVEPORTRAIT_SERVERLESS_ENDPOINT?.trim()
         || Object.values(vastServerlessEndpointVariables).some((key) => process.env[key]?.trim())
-      )),
+      ))
+      || (process.env.NATIVE_RUNTIME_API_KEY?.trim() && (
+        process.env.NATIVE_RUNTIME_BASE_URL?.trim()
+        || Object.values(nativeRuntimeVariables).some((key) => process.env[key]?.trim())
+      ))
   );
   const serverlessMinLoad = Number(process.env.VAST_SERVERLESS_MIN_LOAD ?? 0);
   const serverlessColdWorkers = Number(process.env.VAST_SERVERLESS_COLD_WORKERS ?? 0);
@@ -104,17 +118,46 @@ export function isGenerationConfigured() {
   return config.enabled && (config.route === "fake" || (config.route === "vast" && config.hasVast && config.vastServerless.safe));
 }
 
-export function isGenerationRouteConfigured(input: { providerRoute: ProviderRoute; workflowVersion: string }) {
+export function isGenerationRouteConfigured(input: { providerRoute: ProviderRoute; workflowVersion: string; backendModel?: string }) {
   const config = getGenerationConfig();
   if (!config.enabled) return false;
   if (!isGenerationSafetyConfigured()) return false;
   if (input.providerRoute === "fake") return process.env.NODE_ENV === "test";
   const workflowKind = input.workflowVersion.split("/", 1)[0];
   const kind = workflowKind === "characters" ? "character" : workflowKind === "worlds" ? "world" : workflowKind;
+  const engine = input.backendModel
+    ? getModelRuntimeEntryForBackendModel(input.backendModel)?.engine
+    : "comfyui-api";
+  if (engine === "native-api") {
+    const nativeUrl = isGenerationProviderKind(kind) ? getNativeRuntimeBaseUrl(kind) : null;
+    return isGenerationProviderKind(kind)
+      && hasWorkflowManifest(input.workflowVersion)
+      && Boolean(nativeUrl && getNativeRuntimeApiKey() && isSafeNativeRuntimeUrl(nativeUrl));
+  }
+  if (engine !== "comfyui-api") return false;
   return config.vastServerless.safe
     && isGenerationProviderKind(kind)
     && Boolean(getVastComfyBaseUrl(kind) || getVastServerlessEndpointName(kind, input.workflowVersion))
     && isWorkflowConfigured(input.workflowVersion);
+}
+
+export function getNativeRuntimeBaseUrl(kind?: GenerationProviderKind) {
+  const specific = kind ? process.env[nativeRuntimeVariables[kind]]?.trim() : undefined;
+  return specific || process.env.NATIVE_RUNTIME_BASE_URL?.trim() || null;
+}
+
+export function getNativeRuntimeApiKey() {
+  return process.env.NATIVE_RUNTIME_API_KEY?.trim() || null;
+}
+
+function isSafeNativeRuntimeUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:"
+      || (process.env.NODE_ENV !== "production" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname));
+  } catch {
+    return false;
+  }
 }
 
 /** Beta safety gates fail closed when they are explicitly required. */

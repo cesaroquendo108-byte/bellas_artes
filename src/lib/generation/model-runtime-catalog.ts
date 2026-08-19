@@ -1,10 +1,14 @@
 import installState from "../../../infra/models/model-install-state.json";
+import runtimeRequirements from "../../../infra/models/model-runtime-requirements.json";
 
 import { ADMIN_MODEL_BENCHMARK, type ModelBenchmarkCategory } from "@/lib/admin/model-benchmark";
 import { isWorkflowConfigured } from "./workflows";
 
 export type ModelRuntimeRole = "generator" | "component" | "postprocess" | "dependency";
 export type ModelRuntimePolicy = "admin_smoke" | "admin_research" | "component_only" | "replaced";
+export type ModelExecutionEngine = "comfyui-api" | "native-api" | "component" | "none";
+export type ModelHardwareProfile = "gpu16" | "gpu24" | "gpu48" | "gpu80" | "none";
+export type ModelCommercialPolicy = "eligible" | "gated" | "territory_gated" | "consent_gated" | "research_only" | "replaced";
 export type ModelRuntimeStatus =
   | "workflow_ready"
   | "workflow_pending"
@@ -31,6 +35,9 @@ export interface ModelRuntimeEntry extends ModelRuntimeBinding {
   status: ModelRuntimeStatus;
   adminOnly: true;
   canRunAdminSmoke: boolean;
+  engine: ModelExecutionEngine;
+  hardwareProfile: ModelHardwareProfile;
+  commercialPolicy: ModelCommercialPolicy;
 }
 
 const bindings = [
@@ -260,6 +267,15 @@ type InstallStateRecord = { state: ModelRuntimeEntry["installState"]; note: stri
 
 const installStates = installState.models as Record<string, InstallStateRecord>;
 const benchmarkById = new Map(ADMIN_MODEL_BENCHMARK.map((entry) => [entry.id, entry]));
+type RuntimeRequirement = {
+  id: string;
+  engine: ModelExecutionEngine;
+  hardwareProfile: ModelHardwareProfile;
+  commercialPolicy: ModelCommercialPolicy;
+};
+const requirementsById = new Map(
+  (runtimeRequirements.models as RuntimeRequirement[]).map((requirement) => [requirement.id, requirement]),
+);
 
 export const MODEL_RUNTIME_CATALOG = bindings;
 
@@ -269,6 +285,8 @@ export function listModelRuntimeCatalog(): ModelRuntimeEntry[] {
     const installation = installStates[binding.id];
     const workflowConfigured = binding.workflowVersions.some(isWorkflowConfigured);
     const status = resolveRuntimeStatus(binding, workflowConfigured);
+    const requirement = requirementsById.get(binding.id);
+    if (!requirement) throw new Error(`Falta el requisito operativo de ${binding.id}.`);
     return {
       ...binding,
       name: benchmark?.name ?? binding.id,
@@ -280,12 +298,19 @@ export function listModelRuntimeCatalog(): ModelRuntimeEntry[] {
       canRunAdminSmoke: installation?.state === "installed"
         && workflowConfigured
         && binding.policy === "admin_smoke",
+      engine: requirement.engine,
+      hardwareProfile: requirement.hardwareProfile,
+      commercialPolicy: requirement.commercialPolicy,
     };
   });
 }
 
 export function getModelRuntimeEntry(id: string) {
   return listModelRuntimeCatalog().find((entry) => entry.id === id) ?? null;
+}
+
+export function getModelRuntimeEntryForBackendModel(backendModel: string) {
+  return listModelRuntimeCatalog().find((entry) => entry.backendModels.includes(backendModel)) ?? null;
 }
 
 export function summarizeModelRuntime() {

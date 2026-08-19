@@ -19,10 +19,29 @@ muestra cuatro estados importantes:
 
 ## Estado actual
 
-Flux Schnell es el único modelo con workflow real (`image/flux-schnell-v1`). El
-resto ya tiene backend, ruta y manifiesto contractual en Bellas Artes, pero no
-se puede considerar ejecutable hasta que exista un workflow API real y se
-valide contra los pesos instalados.
+Flux Schnell es el único modelo con workflow API real
+(`image/flux-schnell-v1`). La auditoría del 18 de agosto encontró que ese grafo
+fue probado con un repack efímero distinto y que el paquete Diffusers local
+quedó sin sus text encoders. Por tanto, hoy hay un workflow validado, pero cero
+paquetes locales que cumplan simultáneamente artefactos, workflow y política.
+
+La matriz canónica de los 22 paquetes está en
+`infra/models/model-runtime-requirements.json`. Separa motor (`comfyui-api`,
+`native-api`, componente o reemplazado), perfil de 16/24/48/80 GB, política y
+artefactos mínimos. `npm run models:audit` contrasta esa matriz con ambos
+vaults, los manifests y los grafos API. Un estado `installed` no basta.
+
+Cinco paquetes quedaron correctamente reclasificados como `partial`: Flux
+Schnell, SD3.5 Medium, FLUX.2 Klein 4B, HunyuanVideo 1.5 y LivePortrait. El
+instalador ya corrige la causa: los patrones `/**/*` ahora también coinciden
+con archivos ubicados directamente en la carpeta objetivo y el chequeo de
+espacio descuenta los bytes existentes.
+
+Los motores `native-api` ya disponen del transporte común documentado en
+`docs/native-runtime-contract.md`: autenticación server-side, idempotencia,
+health/modelos cargados, cola, polling, cancelación, base64 limitado y URLs de
+salida con allowlist. Los servidores GPU de inferencia por modelo y sus smokes
+siguen siendo un gate separado.
 
 El estado de instalación `installed` sólo significa que el paquete fue
 descargado y pasó la validación SHA-256 del vault. No implica que el modelo
@@ -51,18 +70,20 @@ instalado o un template descargable no cambia por sí solo ese estado.
 
 ## Cómo activar un modelo para un smoke administrativo
 
-1. Arrancar un único endpoint GPU Vast con el vault montado y la variante de
+1. Ejecutar `npm run models:audit` y no continuar si hay errores de catálogo o
+   artefactos obligatorios ausentes.
+2. Arrancar un único endpoint GPU Vast con el vault montado y la variante de
    pesos correspondiente. No copiar tokens al repositorio, a workflows ni a
    notas.
-2. Exportar desde ComfyUI el grafo en formato API. El grafo debe coincidir con
+3. Exportar desde ComfyUI el grafo en formato API. El grafo debe coincidir con
    todos los bindings de `src/lib/generation/workflow-manifests.ts`.
-3. Guardar el JSON versionado en `workflows/<modalidad>/` y registrarlo en
+4. Guardar el JSON versionado en `workflows/<modalidad>/` y registrarlo en
    `src/lib/generation/workflows.ts`, o pasarlo como override seguro
    `WORKFLOW_*` en el worker aislado.
-4. Validar `isWorkflowConfigured()` y ejecutar un solo smoke con cuenta de
+5. Validar `isWorkflowConfigured()` y ejecutar un solo smoke con cuenta de
    operador, `GENERATION_ACCESS_MODE=admin`, `GENERATION_BILLING_MODE=shadow`,
    un worker y escala cero al terminar.
-5. Registrar VRAM, tiempo, coste, output privado y resultado de licencia en
+6. Registrar VRAM, tiempo, coste, output privado y resultado de licencia en
    Obsidian antes de considerar otra operación.
 
 No se deben cambiar durante esa ventana `GENERATION_ENABLED` en el repositorio,

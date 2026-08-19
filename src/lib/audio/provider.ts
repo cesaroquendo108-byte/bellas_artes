@@ -59,8 +59,8 @@ export function getAudioProviderStatus() {
   const config = getAudioProviderEnv();
   const generation = getGenerationConfig();
   const openSourceWorkflowConfigured = Boolean(
-    isGenerationRouteConfigured({ providerRoute: generation.route ?? "vast", workflowVersion: "audio/f5-tts-es-v1" })
-      || isGenerationRouteConfigured({ providerRoute: generation.route ?? "vast", workflowVersion: "audio/rvc-v1" }),
+    isGenerationRouteConfigured({ providerRoute: generation.route ?? "vast", workflowVersion: "audio/f5-tts-es-v1", backendModel: "f5-tts-es" })
+      || isGenerationRouteConfigured({ providerRoute: generation.route ?? "vast", workflowVersion: "audio/rvc-v1", backendModel: "rvc" }),
   );
   return {
     state: openSourceWorkflowConfigured ? "configured" as const : "provider_unconfigured" as const,

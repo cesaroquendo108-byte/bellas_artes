@@ -46,6 +46,9 @@ describe("contratos administrativos Vast", () => {
   it("mantiene un allowlist explícito de familias GPU", () => {
     expect(getSupportedVastGpuFamily("NVIDIA GeForce RTX 3090")).toBe("RTX 3090");
     expect(getSupportedVastGpuFamily("RTX PRO 4000 Blackwell")).toBe("RTX PRO 4000");
+    expect(getSupportedVastGpuFamily("NVIDIA A100 SXM4 80GB")).toBe("A100 SXM4");
+    expect(getSupportedVastGpuFamily("NVIDIA H100 SXM5 80GB")).toBe("H100 SXM");
+    expect(getSupportedVastGpuFamily("NVIDIA RTX 6000 Ada")).toBe("RTX 6000 ADA");
     expect(isSupportedVastGpuFamily("Tesla P40")).toBe(false);
     expect(isSupportedVastGpuFamily("Titan RTX")).toBe(false);
     expect(validateOfferForRental({

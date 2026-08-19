@@ -169,6 +169,7 @@ function resolveReason(model: ModelRuntimeEntry) {
   if (model.role === "component" || model.role === "postprocess" || model.category === "character") {
     return "Validar dentro de un workflow padre; no presentarlo como generador autónomo.";
   }
+  if (model.installState !== "installed") return `Paquete ${model.installState}: ${model.installNote}`;
   if (!model.workflowConfigured) return "Instalado, pero falta workflow API real y aceptación GPU.";
   return model.useNote;
 }

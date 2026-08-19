@@ -22,6 +22,9 @@ aliases que redirijan varias operaciones al mismo backend:
 
 - `image/flux-schnell-v1`
 - `image/flux-dev-v1`
+- `image/{pixart-sigma,sd35-medium,flux2-klein-4b,z-image,qwen-image}-v1`
+- `image/{flux2-klein-9b,juggernaut-xl,dynavision-xl,wai-ani-ponyxl}-v1`
+- `video/wan22-ti2v-5b-{t2v,i2v}-v1`
 - `video/hunyuan-8.3b-{t2v,i2v,v2v,action-sync,effects,upscale,lip-sync,replace-character,extend}-v1`
 - `video/hunyuan-13b-{t2v,i2v,v2v,action-sync,effects,upscale,lip-sync,replace-character,extend}-v1`
 - `audio/f5-tts-es-v1`
@@ -38,6 +41,8 @@ de su `WorkflowManifest`.
 No se generan resultados de prueba si falta el workflow. El worker marca el
 job como fallido y devuelve la reserva cuando el proveedor no puede ejecutarlo.
 
-Vast.ai Serverless es el único proveedor GPU activo. Cada endpoint debe usar
+Vast.ai Serverless es el único proveedor GPU activo. La matriz de preparación
+también identifica motores nativos que aún necesitan un runtime HTTP compatible;
+no se enrutan silenciosamente por ComfyUI. Cada endpoint activo debe usar
 `min_load=0`, `cold_workers=0` y `max_workers=1`; las GPU temporales de
 depuración se apagan tras 10 minutos de inactividad.

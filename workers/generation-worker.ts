@@ -9,6 +9,7 @@ import { getDeadLetterQueue, getGenerationQueue, moveToDLQ, type GenerationQueue
 import { claimVastTestBudget, finalizeVastTestBudget } from "@/lib/generation/vast-test-budget";
 import { loadWorkflowManifest, validateWorkflowAssets } from "@/lib/generation/workflow-manifests";
 import { recordServiceHeartbeat } from "@/lib/admin/service-heartbeats";
+import { getModelRuntimeEntryForBackendModel } from "@/lib/generation/model-runtime-catalog";
 import { startVastLifecycleWorker } from "./vast-lifecycle-worker";
 
 type WorkerPayload = { jobId: string };
@@ -57,11 +58,13 @@ async function processGenerationJob(job: Job<WorkerPayload>) {
     sourceUrls,
     referenceUrls,
   };
-  const usesServerlessRouter = Boolean(getVastServerlessEndpointName(record.kind, record.workflow_version));
+  const runtimeEngine = getModelRuntimeEntryForBackendModel(record.backend_model)?.engine;
+  const usesServerlessRouter = runtimeEngine === "comfyui-api"
+    && Boolean(getVastServerlessEndpointName(record.kind, record.workflow_version));
   const resumingExistingProviderJob = record.provider_route === "vast" && Boolean(record.provider_job_id);
   const provider = resumingExistingProviderJob && !usesServerlessRouter
-    ? getProvider("vast", record.kind)
-    : await selectProvider({ kind: record.kind });
+    ? getProvider("vast", record.kind, record.backend_model)
+    : await selectProvider({ kind: record.kind, backendModel: record.backend_model });
   let result: ProviderResult;
   let submittedAt: number;
   let providerTimings: Record<string, number> | undefined;

@@ -15,9 +15,9 @@ import {
 const VAST_API_BASE = "https://console.vast.ai";
 const VAST_LAB_DISK_GB = 100;
 const VAST_LAB_BOOTSTRAP_URL = process.env.VAST_LAB_BOOTSTRAP_URL?.trim()
-  || "https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/1a4117ee118229c8389d438e42706a177ec9b01c/infra/vast/bootstrap_3090_lab.sh";
+  || "https://raw.githubusercontent.com/cesaroquendo108-byte/bellas_artes/dfca38d71a7495edf2e632063b9cb13ee42552ab/infra/vast/bootstrap_3090_lab.sh";
 const VAST_LAB_BOOTSTRAP_SHA256 = process.env.VAST_LAB_BOOTSTRAP_SHA256?.trim()
-  || "5d19273adae1e948eb02f0206ff575ce665720f7150b67b33445e869d74680d8";
+  || "51df4045cd8d1ab47d3561ecc304df53ec7adcb6d7aa9895b90c0ca73404d96a";
 
 type VastApiMode = "admin" | "lifecycle";
 
@@ -50,8 +50,8 @@ type VastRaw = Record<string, unknown>;
 export function getVastAdminServerConfig(): VastAdminServerConfig {
   const limits = {
     maxActiveInstances: boundedInteger(process.env.VAST_ADMIN_MAX_ACTIVE_INSTANCES, 1, 1, 1),
-    maxHourlyUsd: boundedNumber(process.env.VAST_ADMIN_MAX_HOURLY_USD, 0.6, 0.01, 0.6),
-    maxRentalUsd: boundedNumber(process.env.VAST_ADMIN_MAX_RENTAL_USD, 1.2, 0.01, 1.2),
+    maxHourlyUsd: boundedNumber(process.env.VAST_ADMIN_MAX_HOURLY_USD, 0.6, 0.01, 5),
+    maxRentalUsd: boundedNumber(process.env.VAST_ADMIN_MAX_RENTAL_USD, 1.2, 0.01, 25),
     minBalanceReserveUsd: boundedNumber(process.env.VAST_ADMIN_MIN_BALANCE_RESERVE_USD, 0.4, 0.4, 100),
     minReliability: boundedNumber(process.env.VAST_ADMIN_MIN_RELIABILITY, 0.98, 0.98, 1),
     minGpuRamMb: boundedInteger(process.env.VAST_ADMIN_MIN_GPU_RAM_MB, 24_000, 24_000, 1_000_000),
@@ -274,7 +274,7 @@ function buildInstanceWatchdogCommand(expiresAt: string) {
   const expiresAtSeconds = Math.floor(expiresAtMs / 1_000);
   return [
     `printf '%s' '${encoded}' | base64 -d > /tmp/bellas-artes-vast-watchdog.py`,
-    `nohup python /tmp/bellas-artes-vast-watchdog.py ${expiresAtSeconds} >/tmp/bellas-artes-vast-watchdog.log 2>&1 &`,
+    `nohup python3 /tmp/bellas-artes-vast-watchdog.py ${expiresAtSeconds} >/tmp/bellas-artes-vast-watchdog.log 2>&1 &`,
   ].join("\n");
 }
 

@@ -18,7 +18,7 @@ describe("model test plan", () => {
     expect(getModelTestPlanEntry("flux-schnell")).toMatchObject({
       wave: "image-3090",
       execution: "gpu",
-      canRunAdminSmoke: true,
+      canRunAdminSmoke: false,
       acceptanceJobs: 5,
     });
     expect(getModelTestPlanEntry("real-esrgan")).toMatchObject({
@@ -40,8 +40,8 @@ describe("model test plan", () => {
   it("publica los límites de la primera sesión", () => {
     expect(summarizeModelTestPlan()).toMatchObject({
       total: 22,
-      installed: 22,
-      executable: 1,
+      installed: 17,
+      executable: 0,
       pending: 9,
       researchOnly: 7,
       components: 3,
@@ -51,7 +51,7 @@ describe("model test plan", () => {
       budgetUsd: 5,
       minimumVramGb: 24,
       models: 5,
-      ready: 1,
+      ready: 0,
     });
   });
 });

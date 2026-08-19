@@ -19,3 +19,20 @@ describe("Vast Flux provisioning", () => {
     expect(script).toContain('expected_sha256="ead426278b49030e9da5df862994f25ce94ab2ee4df38b556ddddb3db093bf72"');
   });
 });
+
+describe("Vast 3090 lab bootstrap", () => {
+  const script = readFileSync(resolve(process.cwd(), "infra/vast/bootstrap_3090_lab.sh"), "utf8");
+
+  it("fija todas las revisiones de pesos y elimina resolve/main", () => {
+    const modelUrls = [...script.matchAll(/https:\/\/huggingface\.co\/[^"\s]+/g)].map(([url]) => url);
+    expect(modelUrls).toHaveLength(11);
+    expect(modelUrls.every((url) => /\/resolve\/[0-9a-f]{7,40}\//.test(url))).toBe(true);
+    expect(script).not.toMatch(/huggingface\.co\/[^"\s]+\/resolve\/main\//);
+  });
+
+  it("verifica SHA-256 antes de publicar cada peso", () => {
+    expect(script.split("\n").filter((line) => line === "  download_verified \\")).toHaveLength(11);
+    expect(script).toContain('printf \'%s  %s\\n\' "$expected_sha256" "$destination.partial" | sha256sum -c -');
+    expect(script.indexOf('sha256sum -c -\n  mv "$destination.partial"')).toBeGreaterThan(-1);
+  });
+});

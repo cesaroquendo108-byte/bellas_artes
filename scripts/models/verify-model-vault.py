@@ -21,11 +21,26 @@ def sha256_file(path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--model", action="append", default=[], help="Verifica sólo este modelId; puede repetirse.")
+    parser.add_argument("--progress", action="store_true", help="Publica avance por modelo en stderr.")
     args = parser.parse_args()
     failures: list[str] = []
     verified = 0
-    for manifest_path in sorted((args.root / "manifests").glob("*.json")):
-        record = json.loads(manifest_path.read_text(encoding="utf-8"))
+    records = [
+        (manifest_path, json.loads(manifest_path.read_text(encoding="utf-8")))
+        for manifest_path in sorted((args.root / "manifests").glob("*.json"))
+    ]
+    requested = set(args.model)
+    available = {record["modelId"] for _, record in records}
+    unknown = sorted(requested - available)
+    if unknown:
+        parser.error(f"modelId sin manifest: {', '.join(unknown)}")
+    selected = [(path, record) for path, record in records if not requested or record["modelId"] in requested]
+    verified_models: list[str] = []
+    for index, (_, record) in enumerate(selected, start=1):
+        model_id = record["modelId"]
+        if args.progress:
+            print(f"[{index}/{len(selected)}] verificando {model_id}", file=sys.stderr, flush=True)
         model_root = args.root / record["modelId"]
         for entry in record.get("files", []):
             path = model_root / entry["path"]
@@ -39,7 +54,10 @@ def main() -> int:
                 failures.append(f"sha256:{record['modelId']}:{entry['path']}")
                 continue
             verified += 1
-    print(json.dumps({"verifiedFiles": verified, "failures": failures}, indent=2))
+        verified_models.append(model_id)
+        if args.progress:
+            print(f"[{index}/{len(selected)}] terminado {model_id}", file=sys.stderr, flush=True)
+    print(json.dumps({"verifiedModels": verified_models, "verifiedFiles": verified, "failures": failures}, indent=2))
     return 1 if failures else 0
 
 

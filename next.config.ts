@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  experimental: {
+    // TypeScript 5.9 still exposes the JS compiler API. Keeping the checker in a
+    // worker thread avoids environments where nested Node processes lose stdout.
+    useTypeScriptCli: false,
+    workerThreads: true,
+  },
 };
 
 const withMDX = createMDX();
