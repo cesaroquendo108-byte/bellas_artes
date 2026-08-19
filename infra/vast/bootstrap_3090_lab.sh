@@ -72,6 +72,25 @@ download() {
   mv "$destination.partial" "$destination"
 }
 
+download_verified() {
+  local url="$1"
+  local destination="$2"
+  local expected_sha256="$3"
+
+  mkdir -p "$(dirname "$destination")"
+  if [[ -s "$destination" ]]; then
+    printf '%s  %s\n' "$expected_sha256" "$destination" | sha256sum -c -
+    printf 'Ya existe y pasó SHA-256: %s\n' "$destination"
+    return
+  fi
+
+  printf 'Descargando y verificando %s\n' "$(basename "$destination")"
+  curl --fail --location --retry 5 --retry-all-errors --continue-at - \
+    --output "$destination.partial" "$url"
+  printf '%s  %s\n' "$expected_sha256" "$destination.partial" | sha256sum -c -
+  mv "$destination.partial" "$destination"
+}
+
 ensure_comfyui() {
   if [[ ! -d "$COMFY_ROOT/.git" ]]; then
     mkdir -p "$(dirname "$COMFY_ROOT")"
@@ -85,42 +104,52 @@ ensure_comfyui() {
 
 install_models() {
   local flux_schnell="$COMFY_ROOT/models/checkpoints/flux1-schnell-fp8.safetensors"
-  download \
+  download_verified \
     "https://huggingface.co/Comfy-Org/flux1-schnell/resolve/0cb207e7e753453ef479ae266caf7c1ab364e363/flux1-schnell-fp8.safetensors?download=true" \
-    "$flux_schnell"
+    "$flux_schnell" \
+    "ead426278b49030e9da5df862994f25ce94ab2ee4df38b556ddddb3db093bf72"
   [[ "$(stat -c '%s' "$flux_schnell")" == "17236328572" ]]
-  printf '%s  %s\n' "ead426278b49030e9da5df862994f25ce94ab2ee4df38b556ddddb3db093bf72" "$flux_schnell" | sha256sum -c -
 
-  download \
-    "https://huggingface.co/Comfy-Org/flux2-klein/resolve/main/split_files/diffusion_models/flux-2-klein-4b.safetensors" \
-    "$COMFY_ROOT/models/diffusion_models/flux-2-klein-4b.safetensors"
-  download \
-    "https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4b-fp8/resolve/main/flux-2-klein-base-4b-fp8.safetensors" \
-    "$COMFY_ROOT/models/diffusion_models/flux-2-klein-base-4b-fp8.safetensors"
-  download \
-    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors" \
-    "$COMFY_ROOT/models/text_encoders/qwen_3_4b.safetensors"
-  download \
-    "https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors" \
-    "$COMFY_ROOT/models/vae/flux2-vae.safetensors"
-  download \
-    "https://huggingface.co/black-forest-labs/FLUX.2-small-decoder/resolve/main/full_encoder_small_decoder.safetensors" \
-    "$COMFY_ROOT/models/vae/full_encoder_small_decoder.safetensors"
-  download \
-    "https://huggingface.co/Comfy-Org/z_image/resolve/main/split_files/diffusion_models/z_image_bf16.safetensors" \
-    "$COMFY_ROOT/models/diffusion_models/z_image_bf16.safetensors"
-  download \
-    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors" \
-    "$COMFY_ROOT/models/vae/ae.safetensors"
-  download \
-    "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors?download=true" \
-    "$COMFY_ROOT/models/checkpoints/sd_xl_base_1.0.safetensors"
-  download \
-    "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors?download=true" \
-    "$COMFY_ROOT/models/checkpoints/sd_xl_refiner_1.0.safetensors"
-  download \
-    "https://huggingface.co/Comfy-Org/Real-ESRGAN_repackaged/resolve/main/RealESRGAN_x4plus.safetensors" \
-    "$COMFY_ROOT/models/upscale_models/RealESRGAN_x4plus.safetensors"
+  download_verified \
+    "https://huggingface.co/black-forest-labs/FLUX.2-klein-4B/resolve/e7b7dc27f91deacad38e78976d1f2b499d76a294/flux-2-klein-4b.safetensors" \
+    "$COMFY_ROOT/models/diffusion_models/flux-2-klein-4b.safetensors" \
+    "ec3d4e733a771f61c052fb4856c48b336c55eaf2c65487c2a1faeb9bbda7a343"
+  download_verified \
+    "https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4b-fp8/resolve/42a82b867533f06de33de3c955a8b6a30c7feebc/flux-2-klein-base-4b-fp8.safetensors" \
+    "$COMFY_ROOT/models/diffusion_models/flux-2-klein-base-4b-fp8.safetensors" \
+    "44bab3a86fe98b85d21dd2a4729ebdc3ae51fb8a39f76e457e18c724219e6840"
+  download_verified \
+    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/429cce00bd1829a3dfd6c57c3204772542876215/split_files/text_encoders/qwen_3_4b.safetensors" \
+    "$COMFY_ROOT/models/text_encoders/qwen_3_4b.safetensors" \
+    "6c671498573ac2f7a5501502ccce8d2b08ea6ca2f661c458e708f36b36edfc5a"
+  download_verified \
+    "https://huggingface.co/Comfy-Org/flux2-dev/resolve/ca4ac7c84eb42f3200fffc85b5fbee67129e6ffa/split_files/vae/flux2-vae.safetensors" \
+    "$COMFY_ROOT/models/vae/flux2-vae.safetensors" \
+    "d64f3a68e1cc4f9f4e29b6e0da38a0204fe9a49f2d4053f0ec1fa1ca02f9c4b5"
+  download_verified \
+    "https://huggingface.co/black-forest-labs/FLUX.2-small-decoder/resolve/a3efc24f613ef42d9428af62fdbd6f5fd8856c4a/full_encoder_small_decoder.safetensors" \
+    "$COMFY_ROOT/models/vae/full_encoder_small_decoder.safetensors" \
+    "ea4273f02d1fafbf8e1d1c2cf6018ed8748652eb0bf34f2dd91171f16f15ab62"
+  download_verified \
+    "https://huggingface.co/Comfy-Org/z_image/resolve/b4924d676513e728754668e1813533deabb0c44a/split_files/diffusion_models/z_image_bf16.safetensors" \
+    "$COMFY_ROOT/models/diffusion_models/z_image_bf16.safetensors" \
+    "996a67d3ff666946b1c25cbc16d1b1918b6cc0ac166309e23fe3b3d830263dee"
+  download_verified \
+    "https://huggingface.co/Comfy-Org/z_image/resolve/b4924d676513e728754668e1813533deabb0c44a/split_files/vae/ae.safetensors" \
+    "$COMFY_ROOT/models/vae/ae.safetensors" \
+    "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38"
+  download_verified \
+    "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/7fe97f7c04f42eeb76cdc313dee014dc41d0dff5/sd_xl_base_1.0.safetensors?download=true" \
+    "$COMFY_ROOT/models/checkpoints/sd_xl_base_1.0.safetensors" \
+    "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b"
+  download_verified \
+    "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/de759911a90edadf11e4ee4b844de666892edd46/sd_xl_refiner_1.0.safetensors?download=true" \
+    "$COMFY_ROOT/models/checkpoints/sd_xl_refiner_1.0.safetensors" \
+    "7440042bbdc8a24813002c09b6b69b64dc90fded4472613437b7f55f9b7d9c5f"
+  download_verified \
+    "https://huggingface.co/Comfy-Org/Real-ESRGAN_repackaged/resolve/612512c/RealESRGAN_x4plus.safetensors" \
+    "$COMFY_ROOT/models/upscale_models/RealESRGAN_x4plus.safetensors" \
+    "37f9a931c215f040aa6d50f711f2cb115f713c46df1d0d6469a8bd7bfe9a60bb"
 }
 
 install_workflows() {
