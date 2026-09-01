@@ -186,4 +186,7 @@ async function runE2ETests() {
   console.log("\n🎉 TODAS LAS PRUEBAS E2E (RLS, Triggers, Créditos) FUERON EXITOSAS.");
 }
 
-runE2ETests().catch(console.error);
+runE2ETests().catch((error) => {
+  console.error("❌ Error fatal:", error);
+  process.exitCode = 1;
+});

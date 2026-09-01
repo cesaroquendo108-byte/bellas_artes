@@ -6,6 +6,13 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import { getGenerationCreditCost } from "@/lib/generation/rates";
 import { reserveGenerationJob, refundGenerationJob, completeGenerationJob } from "@/lib/generation/db";
 
+async function assertQuery<T>(label: string, query: PromiseLike<{ data: T | null; error: { message: string } | null }>) {
+  const { data, error } = await query;
+  if (error) throw new Error(`${label}: ${error.message}`);
+  if (data === null) throw new Error(`${label}: la consulta no devolvió datos.`);
+  return data;
+}
+
 async function run() {
   console.log("🚀 Iniciando pruebas E2E de Billing y Créditos\n");
 
@@ -27,16 +34,23 @@ async function run() {
   console.log(`✅ Usuario de prueba creado: ${userId}`);
 
   try {
-    // Añadir 1000 créditos al usuario de prueba para poder operar
-    await admin.from("wallets").upsert({ user_id: userId, balance: 1000 });
-    await admin.from("users").update({ credits: 1000 }).eq("id", userId);
+    // Sembrar créditos mediante el ledger transaccional, igual que el producto.
+    await assertQuery("No se pudieron asignar créditos", admin.rpc("apply_credit_delta", {
+      p_user_id: userId,
+      p_delta: 1000,
+      p_type: "bonus",
+      p_description: "Créditos iniciales de prueba E2E",
+      p_metadata: { source: "e2e-billing-tests" },
+      p_actor_id: null,
+    }));
     console.log("✅ Asignados 1000 créditos iniciales al usuario.");
 
     // --- PRUEBA A: Cálculo dinámico ---
     console.log("\n--- Prueba A: Fórmula dinámica ---");
     // Imagen Flux Schnell 1k Low sin refs
     const costSchnell = getGenerationCreditCost("image", { quality: "low", resolution: "1k" }, "flux-schnell");
-    console.log(`Costo Flux Schnell (Base 2): ${costSchnell} (Esperado: 2)`);
+    if (costSchnell !== 1) throw new Error(`Costo inesperado para Flux Schnell: ${costSchnell}`);
+    console.log(`Costo Flux Schnell: ${costSchnell} (esperado: 1)`);
 
     // Imagen Flux Dev 4k High con 2 refs y batch 4
     const costDev = getGenerationCreditCost("image", {
@@ -46,13 +60,14 @@ async function run() {
       references: ["a", "b"]
     }, "flux-dev");
     // Base(8) * High(21) * 4k(2) * 4 imgs = 1344. Refs: 2 * 3 = 6. Total = 1350
-    console.log(`Costo Flux Dev complejo: ${costDev} (Esperado: 1350)`);
+    if (costDev !== 1350) throw new Error(`Costo inesperado para Flux Dev: ${costDev}`);
+    console.log(`Costo Flux Dev complejo: ${costDev} (esperado: 1350)`);
 
     // --- PRUEBA B: Reserva Idempotente ---
     console.log("\n--- Prueba B: Reserva idempotente ---");
     const idempotencyKey = randomUUID();
 
-    // Primera llamada (Debería restar 50 créditos y guardar en reserved_credits)
+    // Primera llamada (debe restar 50 créditos de la wallet)
     const reserve1 = await reserveGenerationJob({
       userId,
       idempotencyKey,
@@ -76,15 +91,17 @@ async function run() {
     });
     console.log(`Reserva idempotente: Mismo Job ID? ${reserve1.job_id === reserve2.job_id}`);
 
-    const { data: userAfterReserve } = await admin.from("users").select("credits_available, credits_reserved").eq("id", userId).single();
-    console.log(`Saldo tras reservar: Disponibles = ${userAfterReserve?.credits_available}, Reservados = ${userAfterReserve?.credits_reserved}`);
+    const userAfterReserve = await assertQuery<{ balance: number }>("No se pudo consultar la wallet tras reservar", admin.from("wallets").select("balance").eq("user_id", userId).single());
+    if (Number(userAfterReserve.balance) !== 950) throw new Error(`La reserva dejó un saldo inesperado: ${userAfterReserve.balance}`);
+    console.log(`Saldo tras reservar: ${userAfterReserve.balance}`);
 
     // --- PRUEBA C: Devolución (Refund) ---
     console.log("\n--- Prueba C: Refund tras fallo ---");
     await refundGenerationJob({ jobId: reserve1.job_id, code: "TEST_FAIL", message: "Fallo de prueba" });
 
-    const { data: userAfterRefund } = await admin.from("users").select("credits_available, credits_reserved, credits_refunded").eq("id", userId).single();
-    console.log(`Saldo tras refund: Disponibles = ${userAfterRefund?.credits_available}, Reservados = ${userAfterRefund?.credits_reserved}, Refunded = ${userAfterRefund?.credits_refunded}`);
+    const userAfterRefund = await assertQuery<{ balance: number }>("No se pudo consultar la wallet tras reembolso", admin.from("wallets").select("balance").eq("user_id", userId).single());
+    if (Number(userAfterRefund.balance) !== 1000) throw new Error(`El reembolso dejó un saldo inesperado: ${userAfterRefund.balance}`);
+    console.log(`Saldo tras refund: ${userAfterRefund.balance}`);
 
     // --- PRUEBA D: Captura ---
     console.log("\n--- Prueba D: Captura al completar ---");
@@ -100,8 +117,12 @@ async function run() {
 
     await completeGenerationJob(captureJobId, []);
 
-    const { data: userAfterCapture } = await admin.from("users").select("credits_available, credits_reserved, credits_captured").eq("id", userId).single();
-    console.log(`Saldo tras captura (15): Disponibles = ${userAfterCapture?.credits_available}, Reservados = ${userAfterCapture?.credits_reserved}, Capturados = ${userAfterCapture?.credits_captured}`);
+    const captureJob = await assertQuery<{ status: string; credits_reserved: number; credits_captured: number; credits_refunded: number }>("No se pudo consultar el job capturado", admin.from("generation_jobs").select("status,credits_reserved,credits_captured,credits_refunded").eq("id", captureJobId).single());
+    const userAfterCapture = await assertQuery<{ balance: number }>("No se pudo consultar la wallet tras captura", admin.from("wallets").select("balance").eq("user_id", userId).single());
+    if (captureJob.status !== "completed" || Number(captureJob.credits_reserved) !== 15 || Number(captureJob.credits_captured) !== 15 || Number(captureJob.credits_refunded) !== 0 || Number(userAfterCapture.balance) !== 985) {
+      throw new Error(`La captura dejó un estado inesperado: ${JSON.stringify({ captureJob, balance: userAfterCapture.balance })}`);
+    }
+    console.log(`Saldo tras captura (15): ${userAfterCapture.balance}; job=${captureJob.status}`);
 
     console.log("\n🎉 TODAS LAS PRUEBAS DE BILLING FUERON EXITOSAS.");
 
@@ -112,4 +133,7 @@ async function run() {
   }
 }
 
-run().catch(console.error);
+run().catch((error) => {
+  console.error("❌ Error fatal:", error);
+  process.exitCode = 1;
+});

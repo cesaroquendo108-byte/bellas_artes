@@ -113,15 +113,14 @@ async function runCronTests() {
     console.log(`✅ Resultado del cron: Escaneados: ${result.scanned}, Borrados: ${result.deleted}, Fallos: ${result.failures.length}`);
 
     if (result.deleted === 0) {
-       console.error("❌ El cron no borró el archivo insertado.");
-       process.exit(1);
+       throw new Error("El cron no borró el archivo insertado.");
     }
 
     // Comprobar que en BD no existe
     console.log("\n--- 4. Validando borrado en BD y R2 ---");
     const { data: dbCheck } = await supabase.from("assets").select("id").eq("id", assetRow.id).single();
     if (dbCheck) {
-        console.error("❌ El asset sigue existiendo en BD.");
+        throw new Error("El asset sigue existiendo en BD.");
     } else {
         console.log("✅ Asset borrado de la BD.");
     }
@@ -135,14 +134,18 @@ async function runCronTests() {
         if (error.name === 'NoSuchKey' || error.message?.includes('No such key')) {
           console.log("✅ El archivo ya no existe en R2 (borrado exitoso).");
         } else {
-          console.error("❌ Error inesperado al verificar R2:", error);
+          throw new Error(`Error inesperado al verificar R2: ${error.message ?? error.name ?? "desconocido"}`);
         }
     }
 
     console.log("\n🎉 TODAS LAS PRUEBAS DE RETENCIÓN FUERON EXITOSAS.");
   } catch (err) {
     console.error("\n❌ Error en las pruebas:", err);
+    process.exitCode = 1;
   }
 }
 
-runCronTests();
+runCronTests().catch((error) => {
+  console.error("❌ Error fatal:", error);
+  process.exitCode = 1;
+});

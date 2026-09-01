@@ -9,6 +9,7 @@ import {
   isCreditPackageId,
 } from "@/lib/credits/packages";
 import { extractReceiptData } from "@/lib/payments/extract";
+import { parseManualPaymentCorrection } from "@/lib/payments/manual-review";
 import { classifyPayment } from "@/lib/payments/status";
 import {
   deletePrivateObject,
@@ -148,28 +149,60 @@ export async function reviewPayment(
   paymentId: string,
   decision: PaymentDecision,
   note?: string,
-) {
+  manualAmountBs?: string,
+  manualReference?: string,
+  manualCorrection?: string,
+): Promise<{ ok: boolean; message: string; data?: unknown }> {
   const { profile } = await requireAdmin();
   if (!paymentId || !["approved", "rejected"].includes(decision)) {
     return { ok: false, message: "Decisión inválida." };
   }
-  const { data, error } = await createAdminClient().rpc("review_payment", {
+  const normalizedNote = note?.trim() || null;
+  const manual = manualCorrection === "on"
+    ? parseManualPaymentCorrection(manualAmountBs, manualReference)
+    : {};
+  if (manual.error) return { ok: false, message: manual.error };
+  const reviewNote = normalizedNote || (manual.correction ? "Datos corregidos manualmente durante la revisión." : null);
+
+  const admin = createAdminClient();
+  if (decision === "approved" && manual.correction) {
+    const { error: correctionError } = await admin
+      .from("pago_movil_proofs")
+      .update({
+        extracted_amount_bs: manual.correction.amountBs,
+        extracted_reference: manual.correction.reference,
+        review_note: reviewNote,
+      })
+      .eq("id", paymentId)
+      .in("status", ["pending", "manual_review", "amount_mismatch"]);
+    if (correctionError) return { ok: false, message: "No pudimos guardar la corrección del comprobante." };
+  }
+
+  const { data, error } = await admin.rpc("review_payment", {
     p_payment_id: paymentId,
     p_reviewer: profile.id,
     p_decision: decision,
-    p_note: note?.trim() || null,
+    p_note: reviewNote,
   });
-  if (error) return { ok: false, message: error.message };
+  if (error) return { ok: false, message: error.message || "No pudimos completar la revisión." };
   revalidatePath("/admin/payments");
   revalidatePath("/credits");
-  return { ok: true, data };
+  return { ok: true, message: "Revisión completada.", data };
 }
 
-export async function reviewPaymentForm(formData: FormData) {
+export async function reviewPaymentForm(
+  _previous: PaymentActionState,
+  formData: FormData,
+): Promise<PaymentActionState> {
   const decision = String(formData.get("decision")) as PaymentDecision;
-  await reviewPayment(
+  const result = await reviewPayment(
     String(formData.get("paymentId") ?? ""),
     decision,
     String(formData.get("note") ?? ""),
+    String(formData.get("manualAmountBs") ?? ""),
+    String(formData.get("manualReference") ?? ""),
+    String(formData.get("manualCorrection") ?? ""),
   );
+  if (!result.ok) return { ok: false, message: result.message };
+  return { ok: true, message: decision === "approved" ? "Pago aprobado y créditos acreditados." : "Pago rechazado." };
 }

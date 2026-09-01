@@ -66,7 +66,17 @@ export async function reserveGenerationJob(input: {
     p_billing_mode: input.billingMode,
     p_quoted_credits: input.route.credits,
   });
-  if (metadataError) throw rpcError(metadataError);
+  if (metadataError) {
+    // The reservation and metadata update are separate RPCs for backwards
+    // compatibility. Compensate immediately if metadata cannot be persisted,
+    // otherwise live billing could leave credits reserved without a usable job.
+    await refundGenerationJob({
+      jobId: result.job_id,
+      code: "BILLING_METADATA_FAILED",
+      message: "No se pudo persistir la configuración de billing del job.",
+    }).catch(() => undefined);
+    throw rpcError(metadataError);
+  }
   return result;
 }
 

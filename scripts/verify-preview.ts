@@ -56,4 +56,7 @@ async function verifyPreview() {
   console.log("\n=== Verificación completada ===");
 }
 
-verifyPreview().catch(console.error);
+verifyPreview().catch((error) => {
+  console.error("❌ Error fatal:", error);
+  process.exitCode = 1;
+});
