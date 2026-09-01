@@ -13,24 +13,23 @@ export async function POST(request: Request) {
   const assetIds = [...new Set([input.sourceVideoAssetId, ...input.tracks.map((track) => track.assetId)].filter(Boolean))] as string[];
   const admin = createAdminClient();
   if (assetIds.length) {
-    const { data } = await admin.from("assets").select("id").eq("user_id", user.id).in("id", assetIds);
+    const { data, error } = await admin.from("assets").select("id").eq("user_id", user.id).in("id", assetIds);
+    if (error) return NextResponse.json({ errorCode: "ASSET_LOOKUP_FAILED", message: "No se pudieron verificar los archivos del proyecto." }, { status: 503 });
     if ((data?.length ?? 0) !== assetIds.length) return NextResponse.json({ errorCode: "INVALID_ASSET_OWNER", message: "Uno de los archivos no pertenece a tu biblioteca." }, { status: 403 });
   }
-  let projectId = input.id;
-  if (projectId) {
-    const { data } = await admin.from("audio_projects").select("id").eq("id", projectId).eq("user_id", user.id).maybeSingle();
-    if (!data) return NextResponse.json({ errorCode: "PROJECT_NOT_FOUND" }, { status: 404 });
-    const { error } = await admin.from("audio_projects").update({ name: input.name, source_video_asset_id: input.sourceVideoAssetId, duration_ms: input.durationMs, preset: input.preset }).eq("id", projectId).eq("user_id", user.id);
-    if (error) return NextResponse.json({ errorCode: "PROJECT_SAVE_FAILED" }, { status: 500 });
-  } else {
-    const { data, error } = await admin.from("audio_projects").insert({ user_id: user.id, name: input.name, source_video_asset_id: input.sourceVideoAssetId, duration_ms: input.durationMs, preset: input.preset }).select("id").single();
-    if (error || !data) return NextResponse.json({ errorCode: "PROJECT_SAVE_FAILED" }, { status: 500 });
-    projectId = data.id;
+  const { data: projectId, error } = await admin.rpc("save_audio_project", {
+    p_user_id: user.id,
+    p_name: input.name,
+    p_source_video_asset_id: input.sourceVideoAssetId,
+    p_duration_ms: input.durationMs,
+    p_preset: input.preset,
+    p_tracks: input.tracks,
+    p_project_id: input.id ?? null,
+  });
+  if (error) {
+    if (error.message.includes("PROJECT_NOT_FOUND")) return NextResponse.json({ errorCode: "PROJECT_NOT_FOUND", message: "Proyecto no encontrado." }, { status: 404 });
+    return NextResponse.json({ errorCode: "PROJECT_SAVE_FAILED", message: "No se pudo guardar el proyecto de audio." }, { status: 503 });
   }
-  await admin.from("audio_tracks").delete().eq("project_id", projectId).eq("user_id", user.id);
-  if (input.tracks.length) {
-    const { error } = await admin.from("audio_tracks").insert(input.tracks.map((track) => ({ project_id: projectId, user_id: user.id, asset_id: track.assetId, kind: track.kind, name: track.name, start_ms: track.startMs, trim_start_ms: track.trimStartMs, duration_ms: track.durationMs, volume: track.volume, speed: track.speed, muted: track.muted })));
-    if (error) return NextResponse.json({ errorCode: "TRACK_SAVE_FAILED" }, { status: 500 });
-  }
+  if (!projectId) return NextResponse.json({ errorCode: "PROJECT_SAVE_FAILED", message: "No se pudo guardar el proyecto de audio." }, { status: 503 });
   return NextResponse.json({ projectId }, { status: 201 });
 }

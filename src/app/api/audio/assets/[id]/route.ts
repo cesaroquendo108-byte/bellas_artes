@@ -31,8 +31,13 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const { id } = await params;
   const asset = await ownAsset(id, user.id);
   if (!asset) return NextResponse.json({ errorCode: "NOT_FOUND" }, { status: 404 });
+  try {
+    await deletePrivateObject(asset.r2_key);
+  } catch {
+    // Preserve the row so a retry can remove the object and the metadata together.
+    return NextResponse.json({ errorCode: "STORAGE_DELETE_FAILED", message: "No se pudo eliminar el archivo privado. Inténtalo de nuevo." }, { status: 503 });
+  }
   const { error } = await createAdminClient().from("assets").delete().eq("id", id).eq("user_id", user.id);
   if (error) return NextResponse.json({ errorCode: "DELETE_FAILED" }, { status: 500 });
-  await deletePrivateObject(asset.r2_key).catch(() => undefined);
   return NextResponse.json({ ok: true });
 }
