@@ -4,6 +4,7 @@ import { z } from "zod";
 import { adminUserRoles } from "@/lib/admin/user-contracts";
 import { updateAdminUserRole } from "@/lib/admin/users";
 import { requireAdminApiSession } from "@/lib/phase7/auth";
+import { sessionErrorResponse } from "@/lib/phase7/http";
 
 export const runtime = "nodejs";
 
@@ -18,7 +19,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> },
 ) {
   const session = await requireAdminApiSession();
-  if (!session.ok) return unauthorized(session.status);
+  if (!session.ok) return sessionErrorResponse(session.status);
 
   const id = z.string().uuid().safeParse((await context.params).id);
   if (!id.success) return invalid("INVALID_USER_ID", "El identificador de usuario no es válido.");
@@ -48,13 +49,6 @@ export async function PATCH(
 
 function invalid(errorCode: string, message: string, status = 422) {
   return NextResponse.json({ errorCode, message }, { status, headers: privateNoStoreHeaders() });
-}
-
-function unauthorized(status: 401 | 403) {
-  return NextResponse.json(
-    { errorCode: status === 401 ? "UNAUTHORIZED" : "FORBIDDEN", message: status === 401 ? "Inicia sesión para continuar." : "Se requieren permisos de administración." },
-    { status, headers: privateNoStoreHeaders() },
-  );
 }
 
 function safeMessage(error: unknown, fallback: string) {

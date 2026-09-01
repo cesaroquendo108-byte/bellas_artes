@@ -3,19 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseAdminDashboardWindow } from "@/lib/admin/contracts";
 import { getAdminDashboardSnapshot } from "@/lib/admin/dashboard";
 import { requireAdminApiSession } from "@/lib/phase7/auth";
+import { sessionErrorResponse } from "@/lib/phase7/http";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   const session = await requireAdminApiSession();
   if (!session.ok) {
-    return NextResponse.json(
-      {
-        errorCode: session.status === 401 ? "UNAUTHORIZED" : "FORBIDDEN",
-        message: session.status === 401 ? "Inicia sesión para continuar." : "Se requieren permisos de administración.",
-      },
-      { status: session.status, headers: privateNoStoreHeaders() },
-    );
+    return sessionErrorResponse(session.status);
   }
 
   try {

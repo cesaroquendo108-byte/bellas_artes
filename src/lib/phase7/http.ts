@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server"
 import { ZodError } from "zod"
 
+export type ApiSessionStatus = 401 | 403 | 503
+
+export function sessionErrorResponse(status: ApiSessionStatus) {
+  const unavailable = status === 503
+  return NextResponse.json({
+    errorCode: unavailable ? "AUTH_UNAVAILABLE" : status === 401 ? "UNAUTHORIZED" : "FORBIDDEN",
+    message: unavailable ? "El servicio de autenticación no está disponible." : status === 401 ? "Inicia sesión para continuar." : "Se requieren permisos de administración.",
+  }, { status, headers: { "Cache-Control": "private, no-store, max-age=0" } })
+}
+
 export class PhaseSevenError extends Error {
   constructor(public code: "NOT_FOUND" | "FORBIDDEN" | "INVALID_ASSET" | "LIMIT_EXCEEDED" | "DATABASE_ERROR" | "LEGAL_CONSENT_REQUIRED" | "LEGAL_CONSENT_UNAVAILABLE", message: string) { super(message) }
 }

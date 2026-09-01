@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { pauseGenerationRuntime } from "@/lib/admin/runtime-controls";
 import { requireAdminApiSession } from "@/lib/phase7/auth";
+import { sessionErrorResponse } from "@/lib/phase7/http";
 
 export const runtime = "nodejs";
 
@@ -13,15 +14,7 @@ const pauseSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const session = await requireAdminApiSession();
-  if (!session.ok) {
-    return NextResponse.json(
-      {
-        errorCode: session.status === 401 ? "UNAUTHORIZED" : "FORBIDDEN",
-        message: session.status === 401 ? "Inicia sesión para continuar." : "Se requieren permisos de administración.",
-      },
-      { status: session.status, headers: privateNoStoreHeaders() },
-    );
-  }
+  if (!session.ok) return sessionErrorResponse(session.status);
 
   let body: unknown;
   try {

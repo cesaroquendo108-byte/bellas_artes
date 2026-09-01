@@ -4,16 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getVastAdminServerConfig, isVastAdminOperator, VastAdminError } from "@/lib/admin/vast-client";
 import { requireAdminApiSession } from "@/lib/phase7/auth";
+import { sessionErrorResponse } from "@/lib/phase7/http";
 
 export async function requireVastAdminApiSession() {
   const session = await requireAdminApiSession();
   if (!session.ok) {
     return {
       ok: false as const,
-      response: NextResponse.json({
-        errorCode: session.status === 401 ? "UNAUTHORIZED" : "FORBIDDEN",
-        message: session.status === 401 ? "Inicia sesión para continuar." : "Se requieren permisos de administración.",
-      }, { status: session.status, headers: privateNoStoreHeaders() }),
+      response: sessionErrorResponse(session.status),
     };
   }
   if (!isVastAdminOperator(session.user.email, getVastAdminServerConfig())) {

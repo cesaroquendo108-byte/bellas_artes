@@ -4,6 +4,7 @@ import { z } from "zod";
 import { adminAccessFilters, adminPlanTiers, adminUserRoles } from "@/lib/admin/user-contracts";
 import { listAdminUsers } from "@/lib/admin/users";
 import { requireAdminApiSession } from "@/lib/phase7/auth";
+import { sessionErrorResponse } from "@/lib/phase7/http";
 
 export const runtime = "nodejs";
 
@@ -18,7 +19,7 @@ const querySchema = z.object({
 
 export async function GET(request: NextRequest) {
   const session = await requireAdminApiSession();
-  if (!session.ok) return unauthorized(session.status);
+  if (!session.ok) return sessionErrorResponse(session.status);
 
   const parsed = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));
   if (!parsed.success) {
@@ -36,16 +37,6 @@ export async function GET(request: NextRequest) {
       { status: 503, headers: privateNoStoreHeaders() },
     );
   }
-}
-
-function unauthorized(status: 401 | 403) {
-  return NextResponse.json(
-    {
-      errorCode: status === 401 ? "UNAUTHORIZED" : "FORBIDDEN",
-      message: status === 401 ? "Inicia sesión para continuar." : "Se requieren permisos de administración.",
-    },
-    { status, headers: privateNoStoreHeaders() },
-  );
 }
 
 function safeMessage(error: unknown, fallback: string) {
