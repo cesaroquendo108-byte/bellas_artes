@@ -6,6 +6,7 @@ import { PhaseSevenError } from "@/lib/phase7/http"
 import { getPrivateObjectUrl } from "@/lib/storage/r2"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { createClient } from "@/utils/supabase/server"
+import { assertLegalConsent, LegalConsentError } from "@/lib/legal/consent"
 
 import { communityDirectPayloadSchema, communityListQuerySchema, type CommunityPost, type CommunityStatus, type CreateCommunityPostInput, type ModerationDecision } from "./contracts"
 
@@ -82,6 +83,12 @@ export async function getVisiblePost(client: Client, id: string) {
 }
 
 export async function createCommunityPost(client: Client, userId: string, input: CreateCommunityPostInput) {
+  try {
+    await assertLegalConsent(userId)
+  } catch (error) {
+    if (error instanceof LegalConsentError) throw new PhaseSevenError(error.code, error.message)
+    throw error
+  }
   const [{ data: asset, error: assetError }, { data: profile }] = await Promise.all([
     client.from("assets").select("id,type,expires_at").eq("id", input.assetId).eq("user_id", userId).maybeSingle(),
     client.from("users").select("display_name,avatar_url").eq("id", userId).maybeSingle(),

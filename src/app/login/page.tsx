@@ -104,7 +104,6 @@ export default async function LoginPage({
                 <button
                   type="submit"
                   formAction={loginWithGoogle}
-                  formNoValidate
                   disabled={configMissing}
                   className="w-full bg-white hover:bg-neutral-200 text-black font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -138,6 +137,17 @@ export default async function LoginPage({
                 >
                   Registrarme
                 </button>
+              </div>
+
+              <div className="mt-5 space-y-3 border-t border-normal-border pt-5">
+                <label className="flex gap-3 text-xs leading-5 text-text-icon-neutral-secondary">
+                  <input name="termsAccepted" type="checkbox" required className="mt-1 accent-primary" />
+                  <span>Acepto los <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline">Términos de Servicio</a>.</span>
+                </label>
+                <label className="flex gap-3 text-xs leading-5 text-text-icon-neutral-secondary">
+                  <input name="moderationAccepted" type="checkbox" required className="mt-1 accent-primary" />
+                  <span>Acepto las reglas de moderación y no usaré la plataforma para contenido ilegal, suplantación o deepfakes sin consentimiento.</span>
+                </label>
               </div>
             </form>
           </div>

@@ -11,6 +11,7 @@ import type { GenerationRouteSpec } from "./registry";
 import { hasWorkflowManifest, loadWorkflowManifest, validateWorkflowRequest } from "./workflow-manifests";
 import { assertGenerationAccess } from "./access";
 import { isGenerationEmergencyPaused } from "@/lib/admin/runtime-controls";
+import { assertLegalConsent, LegalConsentError } from "@/lib/legal/consent";
 
 export class GenerationServiceError extends Error {
   constructor(readonly code: string, message: string, readonly status = 422) {
@@ -65,6 +66,7 @@ export async function enqueueGeneration(input: {
         503,
       );
     }
+    await assertLegalConsent(input.userId);
     const access = await assertGenerationAccess(input.userId, input.kind, input.route.backendModel);
     if (!access.allowed) throw new GenerationServiceError(access.code, access.message, access.status);
     await consumeGenerationRateLimit({ userId: input.userId, kind: input.kind });
@@ -108,6 +110,7 @@ export async function enqueueGeneration(input: {
     };
   } catch (error) {
     if (error instanceof GenerationServiceError) throw error;
+    if (error instanceof LegalConsentError) throw new GenerationServiceError(error.code, error.message, error.status);
     if (error instanceof GenerationRateLimitError) throw new GenerationServiceError(error.code, error.message, error.status);
     if (error && typeof error === "object" && "code" in error && error.code === "ASSET_NOT_OWNED") {
       throw new GenerationServiceError("ASSET_NOT_OWNED", "Uno de los assets no pertenece al usuario.", 403);

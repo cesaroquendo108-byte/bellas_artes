@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 vi.mock("server-only", () => ({}));
 
 const mockCleanupExpiredAssets = vi.fn();
+const mockCleanupExpiredModerationEvents = vi.fn();
 const mockRecordServiceHeartbeat = vi.fn();
 
 vi.mock("@/lib/assets/cleanup", () => ({
@@ -14,6 +15,9 @@ vi.mock("@/lib/admin/service-heartbeats", () => ({
     mockRecordServiceHeartbeat(input);
     return Promise.resolve();
   },
+}));
+vi.mock("@/lib/generation/audit", () => ({
+  cleanupExpiredModerationEvents: () => mockCleanupExpiredModerationEvents(),
 }));
 
 import { GET } from "./route";
@@ -77,6 +81,7 @@ describe("Empirical Stress Testing: GET /api/cron/assets-retention", () => {
       deleted: 95,
       failures: [{ id: "asset-10", reason: "R2 error" }],
     });
+    mockCleanupExpiredModerationEvents.mockResolvedValueOnce(0);
 
     const req = new NextRequest("http://localhost/api/cron/assets-retention", {
       headers: { authorization: "Bearer secret_token_123" },
@@ -88,6 +93,7 @@ describe("Empirical Stress Testing: GET /api/cron/assets-retention", () => {
       scanned: 100,
       deleted: 95,
       failures: [{ id: "asset-10", reason: "R2 error" }],
+      moderationEventsDeleted: 0,
     });
   });
 

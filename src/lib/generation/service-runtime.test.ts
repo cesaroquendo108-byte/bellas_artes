@@ -23,6 +23,10 @@ vi.mock("./db", () => ({
 }));
 vi.mock("./workflow-manifests", () => ({ hasWorkflowManifest: () => false, loadWorkflowManifest: vi.fn(), validateWorkflowRequest: vi.fn() }));
 vi.mock("./access", () => ({ assertGenerationAccess: vi.fn() }));
+vi.mock("@/lib/legal/consent", () => ({
+  assertLegalConsent: vi.fn(),
+  LegalConsentError: class extends Error {},
+}));
 
 import { enqueueGeneration } from "./service";
 

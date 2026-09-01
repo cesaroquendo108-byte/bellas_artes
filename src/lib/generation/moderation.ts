@@ -1,4 +1,52 @@
-const defaultBlockedTerms = ["child sexual", "csam", "sexual minor", "deepfake without consent"];
+const defaultBlockedTerms = [
+  "child sexual",
+  "child porn",
+  "csam",
+  "sexual minor",
+  "abuso sexual infantil",
+  "explotacion sexual infantil",
+  "pornografia infantil",
+  "violencia sexual",
+  "deepfake without consent",
+  "deepfake sin consentimiento",
+];
+
+const realIdentityTerms = [
+  "persona real",
+  "real person",
+  "celebridad",
+  "celebrity",
+  "famoso",
+  "famosa",
+  "politico",
+  "politica",
+  "actor",
+  "actriz",
+  "rostro de",
+  "face swap",
+  "suplantar",
+  "suplantacion",
+  "imitar a",
+  "clonar la cara",
+];
+
+const nonConsensualTerms = [
+  "sin consentimiento",
+  "sin su permiso",
+  "sin permiso",
+  "no consent",
+  "without consent",
+  "non-consensual",
+  "revenge porn",
+];
+
+const explicitConsentTerms = [
+  "con consentimiento",
+  "consentimiento explicito",
+  "with consent",
+  "authorized likeness",
+  "imagen autorizada",
+];
 
 export interface ModerationResult {
   allowed: boolean;
@@ -9,14 +57,19 @@ export interface ModerationResult {
 export function moderateGenerationInput(input: { prompt?: string; negativePrompt?: string }): ModerationResult {
   const configured = process.env.GENERATION_BLOCKED_TERMS
     ?.split(",")
-    .map((term) => term.trim().toLowerCase())
+    .map(normalize)
     .filter(Boolean);
-  const terms = configured?.length ? configured : defaultBlockedTerms;
-  const haystack = `${input.prompt ?? ""}\n${input.negativePrompt ?? ""}`.toLowerCase();
+  const terms = configured?.length ? configured : defaultBlockedTerms.map(normalize);
+  const haystack = normalize(`${input.prompt ?? ""}\n${input.negativePrompt ?? ""}`);
   const match = terms.find((term) => haystack.includes(term));
-  return match
-    ? { allowed: false, code: "PROMPT_BLOCKED", reason: "La solicitud no supera la moderación de seguridad." }
-    : { allowed: true };
+  if (match) return blocked();
+
+  const targetsRealIdentity = realIdentityTerms.some((term) => haystack.includes(term));
+  const lacksConsent = nonConsensualTerms.some((term) => haystack.includes(term));
+  const explicitlyConsented = explicitConsentTerms.some((term) => haystack.includes(term));
+  if (targetsRealIdentity && lacksConsent && !explicitlyConsented) return blocked();
+  if (targetsRealIdentity && haystack.includes("deepfake") && !explicitlyConsented) return blocked();
+  return { allowed: true };
 }
 
 export async function moderateGenerationRequest(input: { prompt?: string; negativePrompt?: string }): Promise<ModerationResult> {
@@ -63,4 +116,15 @@ export async function moderateGenerationRequest(input: { prompt?: string; negati
   return decision.allowed
     ? { allowed: true }
     : { allowed: false, code: "PROMPT_BLOCKED", reason: typeof decision.reason === "string" ? decision.reason.slice(0, 500) : "La solicitud no supera la moderación de seguridad." };
+}
+
+function normalize(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function blocked(): ModerationResult {
+  return { allowed: false, code: "PROMPT_BLOCKED", reason: "La solicitud no supera la moderación de seguridad." };
 }

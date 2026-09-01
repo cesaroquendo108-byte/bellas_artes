@@ -52,6 +52,7 @@ export async function updateSession(request: NextRequest) {
     "/suite/director",
     "/video",
     "/world",
+    "/legal/consent",
   ];
   const isPrivate = privatePrefixes.some((prefix) =>
     request.nextUrl.pathname.startsWith(prefix),

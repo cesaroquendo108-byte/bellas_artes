@@ -35,6 +35,14 @@ export async function recordModerationEvent(input: {
   if (error && process.env.GENERATION_REQUIRE_AUDIT === "true") throw error;
 }
 
+export async function cleanupExpiredModerationEvents(limit = 500) {
+  const { data, error } = await createAdminClient().rpc("prune_generation_moderation_events", {
+    p_limit: Math.min(Math.max(Math.trunc(limit), 1), 5_000),
+  });
+  if (error) throw new Error(`No se pudo limpiar la auditoría de moderación: ${error.message}`);
+  return Number(data ?? 0);
+}
+
 export function getGenerationAuditContext(request: Request) {
   return {
     ipAddress: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip") ?? undefined,

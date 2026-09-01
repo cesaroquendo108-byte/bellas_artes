@@ -18,6 +18,11 @@ describe("generation moderation", () => {
     expect(moderateGenerationInput({ prompt: "deepfake without consent de una persona real" })).toMatchObject({ allowed: false, code: "PROMPT_BLOCKED" });
   });
 
+  it("normaliza acentos y bloquea suplantación no consentida", () => {
+    expect(moderateGenerationInput({ prompt: "Suplantación de una persona real sin su permiso" })).toMatchObject({ allowed: false, code: "PROMPT_BLOCKED" });
+    expect(moderateGenerationInput({ prompt: "Retrato de una celebridad con consentimiento explícito" }).allowed).toBe(true);
+  });
+
   it("falla cerrado si L2 fue exigido pero no está configurado", async () => {
     process.env.GENERATION_MODERATION_LEVEL = "l2";
     await expect(moderateGenerationRequest({ prompt: "Retrato editorial" })).rejects.toThrow("GENERATION_L2_MODERATION_NOT_CONFIGURED");

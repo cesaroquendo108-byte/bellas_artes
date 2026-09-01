@@ -4,6 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getOAuthRedirectBaseUrl } from "@/lib/auth-redirect";
 import { createClient } from "@/utils/supabase/server";
+import { recordLegalConsent } from "@/lib/legal/consent";
+
+function hasRequiredConsent(formData: FormData) {
+  return formData.get("termsAccepted") === "on" && formData.get("moderationAccepted") === "on";
+}
+
+function redirectForMissingConsent(nextPath: string): never {
+  redirect(`/login?message=${encodeURIComponent("Debes aceptar los términos y las reglas de moderación para continuar.")}&next=${encodeURIComponent(nextPath)}`);
+}
 
 export async function safeNextPath(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return "/dashboard";
@@ -22,6 +31,7 @@ export async function safeNextPath(value: FormDataEntryValue | null) {
 
 export async function login(formData: FormData) {
   const nextPath = await safeNextPath(formData.get("next"));
+  if (!hasRequiredConsent(formData)) redirectForMissingConsent(nextPath);
   let supabase;
 
   try {
@@ -43,12 +53,21 @@ export async function login(formData: FormData) {
     redirect(`/login?${query}`);
   }
 
+  try {
+    const { data: currentUser } = await supabase.auth.getUser();
+    if (!currentUser.user) throw new Error("La sesión no está disponible.");
+    await recordLegalConsent({ userId: currentUser.user.id, source: "login" });
+  } catch {
+    redirect(`/legal/consent?next=${encodeURIComponent(nextPath)}`);
+  }
+
   revalidatePath("/", "layout");
   redirect(nextPath);
 }
 
 export async function signup(formData: FormData) {
   const nextPath = await safeNextPath(formData.get("next"));
+  if (!hasRequiredConsent(formData)) redirectForMissingConsent(nextPath);
   let supabase;
 
   try {
@@ -78,6 +97,16 @@ export async function signup(formData: FormData) {
     redirect(`/login?${query}`);
   }
 
+  if (!authData.user) {
+    redirect(`/login?message=${encodeURIComponent("No se pudo completar el registro.")}&next=${encodeURIComponent(nextPath)}`);
+  }
+
+  try {
+    await recordLegalConsent({ userId: authData.user.id, source: "signup" });
+  } catch {
+    redirect(`/legal/consent?next=${encodeURIComponent(nextPath)}`);
+  }
+
   revalidatePath("/", "layout");
   redirect(nextPath);
 }
@@ -94,6 +123,7 @@ export async function logout() {
 
 export async function loginWithGoogle(formData: FormData) {
   const nextPath = await safeNextPath(formData.get("next"));
+  if (!hasRequiredConsent(formData)) redirectForMissingConsent(nextPath);
   let supabase;
 
   try {
@@ -104,7 +134,7 @@ export async function loginWithGoogle(formData: FormData) {
   }
 
   const redirectUrl = new URL("/auth/callback", getOAuthRedirectBaseUrl());
-  redirectUrl.searchParams.set("next", nextPath);
+  redirectUrl.searchParams.set("next", `/legal/consent?next=${encodeURIComponent(nextPath)}`);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

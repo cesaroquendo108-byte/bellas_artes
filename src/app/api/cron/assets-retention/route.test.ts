@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 vi.mock("server-only", () => ({}));
 
 const mockCleanupExpiredAssets = vi.fn();
+const mockCleanupExpiredModerationEvents = vi.fn();
 const mockRecordServiceHeartbeat = vi.fn();
 
 vi.mock("@/lib/assets/cleanup", () => ({
@@ -14,6 +15,9 @@ vi.mock("@/lib/admin/service-heartbeats", () => ({
     mockRecordServiceHeartbeat(input);
     return Promise.resolve();
   },
+}));
+vi.mock("@/lib/generation/audit", () => ({
+  cleanupExpiredModerationEvents: () => mockCleanupExpiredModerationEvents(),
 }));
 
 import { GET } from "./route";
@@ -95,6 +99,7 @@ describe("GET /api/cron/assets-retention", () => {
       failures: [{ id: "ast-3", reason: "Storage timeout" }],
     };
     mockCleanupExpiredAssets.mockResolvedValueOnce(expectedResult);
+    mockCleanupExpiredModerationEvents.mockResolvedValueOnce(0);
 
     const request = new NextRequest(
       "http://localhost/api/cron/assets-retention",
@@ -106,7 +111,7 @@ describe("GET /api/cron/assets-retention", () => {
 
     expect(response.status).toBe(200);
     const data = await response.json();
-    expect(data).toEqual(expectedResult);
+    expect(data).toEqual({ ...expectedResult, moderationEventsDeleted: 0 });
     expect(mockCleanupExpiredAssets).toHaveBeenCalledTimes(1);
   });
 

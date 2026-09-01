@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cleanupExpiredAssets } from "@/lib/assets/cleanup";
 import { recordServiceHeartbeat } from "@/lib/admin/service-heartbeats";
+import { cleanupExpiredModerationEvents } from "@/lib/generation/audit";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await cleanupExpiredAssets();
+    const moderationEventsDeleted = await cleanupExpiredModerationEvents();
     await recordServiceHeartbeat({
       serviceKey: "cron:assets-retention",
       status: result.failures.length ? "error" : "healthy",
@@ -26,9 +28,10 @@ export async function GET(request: NextRequest) {
         scanned: result.scanned,
         deleted: result.deleted,
         failures: result.failures.length,
+        moderationEventsDeleted,
       },
     });
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, moderationEventsDeleted });
   } catch (error) {
     await recordServiceHeartbeat({
       serviceKey: "cron:assets-retention",
