@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { validateMediaFile, voiceChangerRequestSchema } from "@/lib/audio/validation";
-import { persistGenerationInput } from "@/lib/generation/input";
+import { cleanupGenerationInput, persistGenerationInput } from "@/lib/generation/input";
 import { isGenerationRouteConfigured } from "@/lib/generation/config";
 import { resolveAudioRoute } from "@/lib/generation/registry";
 import { enqueueGeneration, generationErrorResponse, requireGenerationUser } from "@/lib/generation/service";
@@ -31,8 +31,10 @@ export async function POST(request: Request) {
 
   const route = resolveAudioRoute("voice_changer", "rvc");
   if (!isGenerationRouteConfigured(route)) return NextResponse.json({ jobId: null, kind: "voice_changer", status: "not_configured", creditsReserved: 0, errorCode: "AUDIO_PROVIDER_NOT_CONFIGURED", message: "La generación de audio todavía no está conectada." }, { status: 503 });
+  let input: Awaited<ReturnType<typeof persistGenerationInput>> | null = null;
+  let handedOff = false;
   try {
-    const input = await persistGenerationInput({ userId: user.id, file, type: "audio", source: "voice-changer" });
+    input = await persistGenerationInput({ userId: user.id, file, type: "audio", source: "voice-changer" });
     const result = await enqueueGeneration({
       userId: user.id,
       kind: "audio",
@@ -42,8 +44,11 @@ export async function POST(request: Request) {
       assetIds: [input.id],
       idempotencyKey: parsed.data.idempotencyKey,
     });
+    handedOff = result.status === "queued" && !result.idempotent;
+    if (!handedOff) await cleanupGenerationInput({ userId: user.id, assetId: input.id, key: input.key });
     return NextResponse.json({ ...result, kind: "voice_changer" }, { status: result.status === "not_configured" ? 503 : 202 });
   } catch (error) {
+    if (input && !handedOff) await cleanupGenerationInput({ userId: user.id, assetId: input.id, key: input.key });
     const result = generationErrorResponse(error);
     return NextResponse.json({ ...result.body, kind: "voice_changer", creditsReserved: 0 }, { status: result.status });
   }

@@ -105,6 +105,7 @@ export async function enqueueGeneration(input: {
       kind: input.kind,
       operation: input.route.operation as GenerationJobResponse["operation"],
       status: "queued",
+      idempotent: Boolean(result.idempotent),
       creditsReserved: Number(result.reserved_credits ?? 0),
       message: "La generación fue encolada.",
     };

@@ -26,6 +26,7 @@ export interface GenerationJobResponse {
   kind: GenerationKind
   operation?: VideoOperation
   status: GenerationStatus
+  idempotent?: boolean
   creditsReserved: number
   outputAssetIds?: string[]
   assetId?: string
