@@ -97,7 +97,7 @@ describe("Empirical Stress Testing: GET /api/cron/assets-retention", () => {
     });
   });
 
-  it("returns 500 when cleanupExpiredAssets throws primitive value (null, number, object)", async () => {
+  it("returns 503 without leaking primitive failures", async () => {
     process.env.CRON_SECRET = "secret_token_123";
 
     const primitives = [null, undefined, 404, { customError: "failed" }];
@@ -108,8 +108,8 @@ describe("Empirical Stress Testing: GET /api/cron/assets-retention", () => {
         headers: { authorization: "Bearer secret_token_123" },
       });
       const res = await GET(req);
-      expect(res.status).toBe(500);
-      expect(await res.json()).toEqual({ error: "No se pudo completar la limpieza." });
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: "La limpieza no está disponible temporalmente. Se reintentará en la próxima ejecución." });
     }
   });
 });

@@ -32,19 +32,15 @@ export async function GET(request: NextRequest) {
       },
     });
     return NextResponse.json({ ...result, moderationEventsDeleted });
-  } catch (error) {
+  } catch {
     await recordServiceHeartbeat({
       serviceKey: "cron:assets-retention",
       status: "error",
       details: { failures: 1 },
     }).catch(() => undefined);
     return NextResponse.json(
-      {
-        error: error instanceof Error
-          ? error.message
-          : "No se pudo completar la limpieza.",
-      },
-      { status: 500 },
+      { error: "La limpieza no está disponible temporalmente. Se reintentará en la próxima ejecución." },
+      { status: 503 },
     );
   }
 }

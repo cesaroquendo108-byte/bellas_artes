@@ -115,7 +115,7 @@ describe("GET /api/cron/assets-retention", () => {
     expect(mockCleanupExpiredAssets).toHaveBeenCalledTimes(1);
   });
 
-  it("should return 500 on standard Error exception from cleanupExpiredAssets", async () => {
+  it("should return 503 without leaking dependency errors", async () => {
     process.env.CRON_SECRET = "secret_token_123";
     mockCleanupExpiredAssets.mockRejectedValueOnce(
       new Error("Supabase connection timeout"),
@@ -129,12 +129,12 @@ describe("GET /api/cron/assets-retention", () => {
     );
     const response = await GET(request);
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(503);
     const data = await response.json();
-    expect(data).toEqual({ error: "Supabase connection timeout" });
+    expect(data).toEqual({ error: "La limpieza no está disponible temporalmente. Se reintentará en la próxima ejecución." });
   });
 
-  it("should return 500 on non-Error exception from cleanupExpiredAssets", async () => {
+  it("should return 503 on non-Error exception from cleanupExpiredAssets", async () => {
     process.env.CRON_SECRET = "secret_token_123";
     mockCleanupExpiredAssets.mockRejectedValueOnce("Unknown primitive failure");
 
@@ -146,8 +146,8 @@ describe("GET /api/cron/assets-retention", () => {
     );
     const response = await GET(request);
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(503);
     const data = await response.json();
-    expect(data).toEqual({ error: "No se pudo completar la limpieza." });
+    expect(data).toEqual({ error: "La limpieza no está disponible temporalmente. Se reintentará en la próxima ejecución." });
   });
 });
