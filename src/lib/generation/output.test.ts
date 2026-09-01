@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockUpload, mockDelete, mockInsert, mockCreateAdminClient } = vi.hoisted(() => ({
   mockUpload: vi.fn(),
@@ -17,6 +17,27 @@ vi.mock("@/utils/supabase/admin", () => ({ createAdminClient: mockCreateAdminCli
 import { persistGenerationOutput } from "./output";
 
 describe("persistGenerationOutput", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("reutiliza un output existente sin volver a subirlo", async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: "asset-existing", user_id: "user-1" }, error: null });
+    mockCreateAdminClient.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ maybeSingle }) }),
+      }),
+    });
+
+    await expect(persistGenerationOutput({
+      userId: "user-1",
+      jobId: "job-1",
+      kind: "image",
+      result: { contentType: "image/png", bytes: new Uint8Array([1, 2, 3]), filename: "salida.png" },
+    })).resolves.toBe("asset-existing");
+
+    expect(mockUpload).not.toHaveBeenCalled();
+    expect(mockDelete).not.toHaveBeenCalled();
+  });
+
   it("elimina el objeto privado si falla el registro en la base de datos", async () => {
     const single = vi.fn().mockResolvedValue({ data: null, error: { message: "insert failed" } });
     const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
