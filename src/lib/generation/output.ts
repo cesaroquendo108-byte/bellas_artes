@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
-import { uploadPrivateObject } from "@/lib/storage/r2";
+import { deletePrivateObject, uploadPrivateObject } from "@/lib/storage/r2";
 import { createAdminClient } from "@/utils/supabase/admin";
 import type { ProviderResult } from "./providers/types";
 import { createProvenanceEnvelope } from "./provenance";
@@ -29,6 +29,18 @@ export async function persistGenerationOutput(input: {
   });
   const type = input.kind === "character" || input.kind === "world" ? "image" : input.kind;
   const key = `users/${input.userId}/generated/${type}/${input.jobId}-${digest.slice(0, 16)}.${extension(input.result.contentType)}`;
+  const admin = createAdminClient();
+  const { data: existingAsset, error: existingAssetError } = await admin
+    .from("assets")
+    .select("id,user_id")
+    .eq("r2_key", key)
+    .maybeSingle();
+  if (existingAssetError) throw new Error(existingAssetError.message);
+  if (existingAsset) {
+    if (existingAsset.user_id !== input.userId) throw new Error("El output existente no pertenece al usuario.");
+    return existingAsset.id as string;
+  }
+
   await uploadPrivateObject({
     key,
     body: input.result.bytes,
@@ -42,22 +54,37 @@ export async function persistGenerationOutput(input: {
       provenanceSignature: provenance?.signature ?? "unsigned",
     },
   });
-  const { data, error } = await createAdminClient().from("assets").insert({
-    user_id: input.userId,
-    type,
-    name: input.result.filename.slice(0, 160) || `${type}-${input.jobId}`,
-    r2_key: key,
-    mime_type: input.result.contentType,
-    bytes: input.result.bytes.byteLength,
-    metadata: {
-      source: "generation",
-      provenance: provenance ?? { version: "unsigned" },
-      watermark: provenance ? "signed-provenance" : "metadata-only",
-      generationJobId: input.jobId,
-      sha256: digest,
-      backend: input.result.metadata ?? {},
-    },
-  }).select("id").single();
-  if (error || !data) throw new Error(error?.message ?? "No se pudo registrar el resultado.");
-  return data.id as string;
+  try {
+    const { data, error } = await admin.from("assets").insert({
+      user_id: input.userId,
+      type,
+      name: input.result.filename.slice(0, 160) || `${type}-${input.jobId}`,
+      r2_key: key,
+      mime_type: input.result.contentType,
+      bytes: input.result.bytes.byteLength,
+      metadata: {
+        source: "generation",
+        provenance: provenance ?? { version: "unsigned" },
+        watermark: provenance ? "signed-provenance" : "metadata-only",
+        generationJobId: input.jobId,
+        sha256: digest,
+        backend: input.result.metadata ?? {},
+      },
+    }).select("id").single();
+    if (error || !data) {
+      // Another worker can win the unique r2_key race while this one is retrying.
+      // Reuse its row instead of deleting the shared private object.
+      const { data: concurrentAsset } = await admin
+        .from("assets")
+        .select("id,user_id")
+        .eq("r2_key", key)
+        .maybeSingle();
+      if (concurrentAsset?.user_id === input.userId) return concurrentAsset.id as string;
+      throw new Error(error?.message ?? "No se pudo registrar el resultado.");
+    }
+    return data.id as string;
+  } catch (error) {
+    await deletePrivateObject(key).catch(() => undefined);
+    throw error;
+  }
 }

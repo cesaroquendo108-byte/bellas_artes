@@ -24,9 +24,11 @@ export async function POST(request: Request) {
   if (error) return NextResponse.json({ errorCode: "INVALID_FILE", message: error }, { status: 422 });
 
   const key = `users/${user.id}/${kind}/${randomUUID()}-${safeName(file.name)}`;
+  let admin: ReturnType<typeof createAdminClient> | null = null;
+  let assetId: string | null = null;
   try {
     await uploadPrivateObject({ key, body: new Uint8Array(await file.arrayBuffer()), contentType: file.type, metadata: { owner: user.id } });
-    const admin = createAdminClient();
+    admin = createAdminClient();
     const { data, error: insertError } = await admin.from("assets").insert({
       user_id: user.id,
       type: kind,
@@ -37,11 +39,19 @@ export async function POST(request: Request) {
       metadata: { source: "audio_suite" },
     }).select("id,name,type,mime_type,created_at").single();
     if (insertError || !data) {
-      await deletePrivateObject(key).catch(() => undefined);
       throw insertError ?? new Error("No se pudo registrar el archivo.");
     }
+    assetId = data.id;
     return NextResponse.json({ asset: data, signedUrl: await getPrivateObjectUrl(key) }, { status: 201 });
   } catch {
+    if (assetId && admin) {
+      try {
+        await admin.from("assets").delete().eq("id", assetId).eq("user_id", user.id);
+      } catch {
+        // El objeto privado se intenta borrar aunque la limpieza de la fila falle.
+      }
+    }
+    await deletePrivateObject(key).catch(() => undefined);
     return NextResponse.json({ errorCode: "STORAGE_UNAVAILABLE", message: "El almacenamiento privado todavía no está configurado en este entorno." }, { status: 503 });
   }
 }
