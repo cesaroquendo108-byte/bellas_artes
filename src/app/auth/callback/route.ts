@@ -18,8 +18,19 @@ export async function GET(request: Request) {
   }
 
   if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    let supabase;
+    try {
+      supabase = await createClient();
+    } catch {
+      return NextResponse.redirect(`${requestUrl.origin}/login?message=${encodeURIComponent("La autenticación no está disponible temporalmente.")}`);
+    }
+
+    let error;
+    try {
+      ({ error } = await supabase.auth.exchangeCodeForSession(code));
+    } catch {
+      return NextResponse.redirect(`${requestUrl.origin}/login?message=${encodeURIComponent("La autenticación no está disponible temporalmente.")}`);
+    }
     
     if (!error) {
       // Usar requestUrl.origin para redirigir localmente o en producción.

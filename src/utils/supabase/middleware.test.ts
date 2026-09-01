@@ -100,6 +100,32 @@ describe("Supabase session middleware", () => {
     expect(getUser).toHaveBeenCalledOnce()
   })
 
+  it("mantiene pública una ruta abierta si falla la consulta de sesión", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co")
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", validAnonKey)
+    getUser.mockRejectedValue(new Error("auth unavailable"))
+    createServerClient.mockReturnValue({ auth: { getUser } })
+
+    const response = await updateSession(new NextRequest("https://example.test/blog"))
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get("x-middleware-next")).toBe("1")
+  })
+
+  it("redirige una ruta privada con un aviso controlado si falla la sesión", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co")
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", validAnonKey)
+    getUser.mockRejectedValue(new Error("auth unavailable"))
+    createServerClient.mockReturnValue({ auth: { getUser } })
+
+    const response = await updateSession(new NextRequest("https://example.test/dashboard?tab=recent"))
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get("location")).toBe(
+      "https://example.test/login?message=La+autenticaci%C3%B3n+no+est%C3%A1+disponible+temporalmente.&next=%2Fdashboard%3Ftab%3Drecent",
+    )
+  })
+
   it("conserva los query params de un destino local", async () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co")
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", validAnonKey)
