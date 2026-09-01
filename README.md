@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bellas Artes
 
-## Getting Started
+SaaS creativo para crear y organizar imagen, video, audio, personajes y
+mundos. La aplicación web corre en Next.js; Supabase maneja autenticación y
+persistencia; Cloudflare R2 almacena los archivos privados; Redis/BullMQ y
+Vast.ai son infraestructura opcional para la generación asíncrona.
 
-First, run the development server:
+## Arranque local
+
+Requisitos: Node.js 24, npm y un archivo `.env.local` con las credenciales del
+entorno correspondiente. Las variables están documentadas en `.env.example`.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La aplicación queda disponible en `http://localhost:3000`. El arranque no
+activa generación por sí solo: el estado seguro por defecto mantiene
+`GENERATION_ENABLED=false`, billing en `shadow` y acceso administrativo.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verificación
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run verify
+npm run models:test
+npm run models:audit:markdown
+```
 
-## Learn More
+`npm run verify` ejecuta lint, pruebas, build Webpack y el escaneo de secretos.
+La auditoría estricta de modelos (`npm run models:audit`) debe permanecer
+fallando mientras falten workflows, pesos o runtimes compatibles; eso evita
+presentar módulos incompletos como operativos.
 
-To learn more about Next.js, take a look at the following resources:
+## Arquitectura operativa
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Vercel sirve la aplicación y las rutas API.
+- Supabase aplica las migraciones de `supabase/migrations/` y conserva RLS,
+  créditos, jobs, consentimiento legal y auditoría.
+- R2 es privado; la aplicación sólo entrega URLs firmadas y temporales.
+- El worker externo consume BullMQ y persiste resultados mediante el rol de
+  servicio. No se ejecuta dentro de Vercel.
+- El stack de Redis privado y su gateway HMAC están en
+  [`infra/redis-vps/`](infra/redis-vps/README.md).
+- Vast.ai Serverless es el único proveedor GPU aceptado. La generación real
+  permanece cerrada hasta validar runtimes, workflows y una aceptación
+  controlada.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Despliegue y cierre
 
-## Deploy on Vercel
+Antes de declarar el entorno operativo:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Aplicar las migraciones pendientes en el proyecto Supabase objetivo.
+2. Configurar en Vercel sólo las variables propias de la aplicación; Redis y
+   las credenciales del worker permanecen fuera de Vercel salvo el gateway
+   HTTPS y su HMAC.
+3. Construir `Dockerfile.worker` y desplegarlo en un host persistente con un
+   archivo de entorno fuera del repositorio.
+4. Validar el gateway, el healthcheck del worker, R2 privado y el verificador
+   de Preview antes de activar cualquier modalidad.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Runbooks detallados:
+
+- [`docs/worker-deployment.md`](docs/worker-deployment.md)
+- [`infra/vast/README.md`](infra/vast/README.md)
+- [`workflows/README.md`](workflows/README.md)
+- [`docs/migration_audit.md`](docs/migration_audit.md)
+
+Las claves existentes no se imprimen, se escanean ni se reemplazan por este
+proyecto. Los comandos E2E que escriben datos o consumen servicios externos
+requieren una autorización explícita mediante sus flags de entorno.
