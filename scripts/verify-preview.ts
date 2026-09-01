@@ -21,6 +21,7 @@ async function verifyPreview() {
   await assertTable("generation_jobs", "id");
   await assertTable("user_consents", "user_id");
   await assertTable("generation_moderation_events", "id");
+  await assertTable("generation_moderation_events", "retention_expires_at");
   console.log("✅ Tablas base, generación, consentimiento y auditoría OK");
 
   console.log("\n2. Verificando RPC de créditos...");
@@ -51,12 +52,7 @@ async function verifyPreview() {
   console.log(`✅ RPC reserve_generation_credits existe y rechaza entrada inválida (${rpcError.code ?? "sin código"})`);
 
   console.log("\n3. Verificando retención de auditoría...");
-  const { data: deleted, error: retentionError } = await supabase.rpc("prune_generation_moderation_events", { p_limit: 1 });
-  if (retentionError) throw new Error(`No se pudo ejecutar la poda de auditoría: ${retentionError.message}`);
-  if (!Number.isInteger(Number(deleted)) || Number(deleted) < 0) {
-    throw new Error(`La poda de auditoría devolvió un resultado inválido: ${String(deleted)}`);
-  }
-  console.log(`✅ RPC de retención operativo (eventos eliminados: ${deleted})`);
+  console.log("✅ La columna de vencimiento existe; este verificador no ejecuta podas ni muta datos.");
 
   console.log("\n=== Verificación completada sin fallos ===");
 }
