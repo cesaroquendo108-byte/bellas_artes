@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // BullMQ runs only in server routes. Keeping it external preserves its
+  // optional Valkey adapter without asking webpack to resolve that package.
+  serverExternalPackages: ["bullmq"],
   experimental: {
     // TypeScript 5.9 still exposes the JS compiler API. Keeping the checker in a
     // worker thread avoids environments where nested Node processes lose stdout.
