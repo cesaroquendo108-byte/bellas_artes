@@ -2,8 +2,8 @@ FROM node:24-bookworm-slim
 
 WORKDIR /app
 
-# The worker runs TypeScript through the repository's tsx entrypoint. Keep
-# devDependencies in this image because tsx is a runtime dependency here.
+# The worker runs TypeScript through Node's tsx loader. Keep devDependencies
+# in this image because tsx is a runtime dependency here.
 COPY package.json package-lock.json ./
 RUN npm ci
 

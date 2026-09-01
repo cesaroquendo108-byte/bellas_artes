@@ -44,7 +44,7 @@ services:
   gateway:
     <<: *service-defaults
     image: ${BELLAS_ARTES_IMAGE:?BELLAS_ARTES_IMAGE es obligatorio}
-    command: ["./node_modules/.bin/tsx", "gateway/redis-gateway.ts"]
+    command: ["node", "--import", "tsx", "gateway/redis-gateway.ts"]
     user: node
     read_only: true
     tmpfs:
@@ -76,7 +76,7 @@ services:
   worker:
     <<: *service-defaults
     image: ${BELLAS_ARTES_IMAGE:?BELLAS_ARTES_IMAGE es obligatorio}
-    command: ["./node_modules/.bin/tsx", "workers/generation-worker.ts"]
+    command: ["node", "--import", "tsx", "workers/generation-worker.ts"]
     user: node
     read_only: true
     tmpfs:
@@ -93,7 +93,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "./node_modules/.bin/tsx", "scripts/worker-healthcheck.ts"]
+      test: ["CMD", "node", "--import", "tsx", "scripts/worker-healthcheck.ts"]
       interval: 30s
       timeout: 15s
       retries: 3
