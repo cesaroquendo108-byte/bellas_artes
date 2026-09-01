@@ -91,25 +91,16 @@ async function runR2Tests() {
     console.log("\n--- 3. Descargando contenido crudo ---");
     const downloaded = await downloadPrivateObject(testKey);
     const downloadedText = new TextDecoder().decode(downloaded);
-    if (downloadedText === testContent) {
-      console.log("✅ El contenido descargado coincide con el original.");
-    } else {
-      console.error("❌ El contenido descargado NO coincide!");
-    }
+    if (downloadedText !== testContent) throw new Error("El contenido descargado NO coincide con el original.");
+    console.log("✅ El contenido descargado coincide con el original.");
 
     // 4. Testear HTTP fetch de la Signed URL
     console.log("\n--- 4. Probando acceso HTTP a la Signed URL ---");
     const response = await fetch(signedUrl);
-    if (response.ok) {
-      const fetchText = await response.text();
-      if (fetchText === testContent) {
-        console.log("✅ Petición HTTP a la Signed URL fue exitosa y el contenido coincide.");
-      } else {
-        console.error("❌ Petición exitosa pero el contenido no coincide.");
-      }
-    } else {
-      console.error("❌ Petición a la Signed URL falló:", response.status, response.statusText);
-    }
+    if (!response.ok) throw new Error(`Petición a la Signed URL falló: ${response.status} ${response.statusText}`);
+    const fetchText = await response.text();
+    if (fetchText !== testContent) throw new Error("La respuesta de la Signed URL no coincide con el original.");
+    console.log("✅ Petición HTTP a la Signed URL fue exitosa y el contenido coincide.");
 
     // 5. Borrado
     console.log("\n--- 5. Borrando archivo seguro ---");
@@ -120,13 +111,14 @@ async function runR2Tests() {
     // 6. Verificar borrado (debería dar error o no encontrarlo)
     try {
       await downloadPrivateObject(testKey);
-      console.error("❌ El archivo aún existe tras borrarlo!");
+      throw new Error("El archivo aún existe tras borrarlo.");
     } catch (err: unknown) {
+      if (err instanceof Error && err.message === "El archivo aún existe tras borrarlo.") throw err;
       const error = err as { name?: string; message?: string };
       if (error.name === 'NoSuchKey' || error.message?.includes('No such key')) {
         console.log("✅ El archivo ya no existe (borrado exitoso).");
       } else {
-        console.log("✅ Error esperado al descargar (indicando borrado):", error.name);
+        throw new Error(`Error inesperado verificando el borrado: ${error.message ?? error.name ?? "desconocido"}`);
       }
     }
 

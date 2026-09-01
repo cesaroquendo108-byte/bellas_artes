@@ -7,31 +7,27 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error("Missing Supabase credentials in .env.local");
-  process.exit(1);
+  throw new Error("Faltan credenciales de Supabase en .env.local.");
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function verifyPreview() {
-  console.log("=== Verificando Supabase Preview ===");
+  console.log("=== Verificando esquema Supabase Preview ===");
 
-  // 1. Verificar que las tablas existan
-  console.log("\n1. Verificando Tablas (Migrations 0000-0006)...");
-  const { error: usersError } = await supabase.from("users").select("id").limit(1);
-  if (usersError) console.error("❌ Error users table:", usersError.message);
-  else console.log("✅ Tabla users OK");
+  console.log("\n1. Verificando tablas operativas...");
+  await assertTable("users", "id");
+  await assertTable("wallets", "user_id");
+  await assertTable("generation_jobs", "id");
+  await assertTable("user_consents", "user_id");
+  await assertTable("generation_moderation_events", "id");
+  console.log("✅ Tablas base, generación, consentimiento y auditoría OK");
 
-  const { error: jobsError } = await supabase.from("generation_jobs").select("id").limit(1);
-  if (jobsError) console.error("❌ Error generation_jobs table (Migration 0006 missing?):", jobsError.message);
-  else console.log("✅ Tabla generation_jobs OK");
-
-  // 2. Verificar funciones RPC (reserva de créditos)
-  console.log("\n2. Verificando RPCs de Créditos...");
+  console.log("\n2. Verificando RPC de créditos...");
   const dummyUserId = "00000000-0000-0000-0000-000000000000";
-  const { error: rpcError } = await supabase.rpc("reserve_generation_credits", {
+  const { data: reservation, error: rpcError } = await supabase.rpc("reserve_generation_credits", {
     p_user_id: dummyUserId,
-    p_idempotency_key: "test-key-123",
+    p_idempotency_key: `preview-verification-${Date.now()}`,
     p_kind: "image",
     p_operation: "test",
     p_public_model: "test-model",
@@ -40,23 +36,37 @@ async function verifyPreview() {
     p_workflow_version: "1.0",
     p_credits: 5,
     p_request: { test: true },
-    p_max_attempts: 3
+    p_max_attempts: 3,
   });
 
-  if (rpcError) {
-    if (rpcError.code === "P0001" || rpcError.code === "23503" || rpcError.message.includes("Usuario no encontrado") || rpcError.message.includes("invalid input syntax")) {
-       console.log("✅ RPC reserve_generation_credits existe (falló con error esperado de validación: " + rpcError.message + ")");
-    } else {
-       console.error("❌ Error inesperado en RPC (¿falta aplicar 0006?):", rpcError);
-    }
-  } else {
-    console.log("⚠️ RPC reserve_generation_credits funcionó (inesperado sin un usuario real).");
+  if (!rpcError) {
+    throw new Error(`reserve_generation_credits aceptó un usuario inexistente: ${JSON.stringify(reservation)}`);
   }
+  const expectedValidationError = rpcError.code === "P0001"
+    || rpcError.code === "23503"
+    || /usuario (inexistente|no encontrado)|invalid input syntax/i.test(rpcError.message);
+  if (!expectedValidationError) {
+    throw new Error(`reserve_generation_credits devolvió un error inesperado: ${rpcError.message}`);
+  }
+  console.log(`✅ RPC reserve_generation_credits existe y rechaza entrada inválida (${rpcError.code ?? "sin código"})`);
 
-  console.log("\n=== Verificación completada ===");
+  console.log("\n3. Verificando retención de auditoría...");
+  const { data: deleted, error: retentionError } = await supabase.rpc("prune_generation_moderation_events", { p_limit: 1 });
+  if (retentionError) throw new Error(`No se pudo ejecutar la poda de auditoría: ${retentionError.message}`);
+  if (!Number.isInteger(Number(deleted)) || Number(deleted) < 0) {
+    throw new Error(`La poda de auditoría devolvió un resultado inválido: ${String(deleted)}`);
+  }
+  console.log(`✅ RPC de retención operativo (eventos eliminados: ${deleted})`);
+
+  console.log("\n=== Verificación completada sin fallos ===");
+}
+
+async function assertTable(table: string, column: string) {
+  const { error } = await supabase.from(table).select(column).limit(1);
+  if (error) throw new Error(`Tabla ${table} no disponible: ${error.message}`);
 }
 
 verifyPreview().catch((error) => {
-  console.error("❌ Error fatal:", error);
+  console.error("❌ Error fatal:", error instanceof Error ? error.message : error);
   process.exitCode = 1;
 });

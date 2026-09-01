@@ -6,6 +6,10 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import { getGenerationCreditCost } from "@/lib/generation/rates";
 import { reserveGenerationJob, refundGenerationJob, completeGenerationJob } from "@/lib/generation/db";
 
+if (process.env.SUPABASE_E2E_ALLOW_WRITE !== "true") {
+  throw new Error("Define SUPABASE_E2E_ALLOW_WRITE=true para autorizar el E2E temporal de Supabase.");
+}
+
 async function assertQuery<T>(label: string, query: PromiseLike<{ data: T | null; error: { message: string } | null }>) {
   const { data, error } = await query;
   if (error) throw new Error(`${label}: ${error.message}`);
