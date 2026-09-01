@@ -10,8 +10,18 @@ function safeName(name: string) {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    return NextResponse.json({ errorCode: "AUTH_UNAVAILABLE", message: "La autenticación no está disponible temporalmente." }, { status: 503 });
+  }
+  let user;
+  try {
+    ({ data: { user } } = await supabase.auth.getUser());
+  } catch {
+    return NextResponse.json({ errorCode: "AUTH_UNAVAILABLE", message: "La autenticación no está disponible temporalmente." }, { status: 503 });
+  }
   if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 });
 
   const form = await request.formData().catch(() => null);

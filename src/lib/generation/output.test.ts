@@ -59,4 +59,27 @@ describe("persistGenerationOutput", () => {
 
     expect(mockDelete).toHaveBeenCalledWith(expect.stringMatching(/^users\/user-1\/generated\/image\/job-1-/));
   });
+
+  it("preserva el objeto si la fila perdió una carrera de unicidad", async () => {
+    const single = vi.fn().mockResolvedValue({ data: null, error: { code: "23505", message: "duplicate key" } });
+    const maybeSingle = vi.fn()
+      .mockResolvedValueOnce({ data: null, error: null })
+      .mockResolvedValueOnce({ data: null, error: { message: "temporary lookup failure" } });
+    mockUpload.mockResolvedValue("users/user-1/generated/image/job-1.png");
+    mockCreateAdminClient.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ maybeSingle }) }),
+        insert: mockInsert.mockReturnValue({ select: vi.fn().mockReturnValue({ single }) }),
+      }),
+    });
+
+    await expect(persistGenerationOutput({
+      userId: "user-1",
+      jobId: "job-1",
+      kind: "image",
+      result: { contentType: "image/png", bytes: new Uint8Array([1, 2, 3]), filename: "salida.png" },
+    })).rejects.toThrow("duplicate key");
+
+    expect(mockDelete).not.toHaveBeenCalled();
+  });
 });

@@ -4,14 +4,29 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    return NextResponse.json({ errorCode: "AUTH_UNAVAILABLE", message: "La autenticación no está disponible temporalmente." }, { status: 503 });
+  }
+  let user;
+  try {
+    ({ data: { user } } = await supabase.auth.getUser());
+  } catch {
+    return NextResponse.json({ errorCode: "AUTH_UNAVAILABLE", message: "La autenticación no está disponible temporalmente." }, { status: 503 });
+  }
   if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 });
   const parsed = audioProjectSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ errorCode: "INVALID_PROJECT", message: "Revisa la línea de tiempo." }, { status: 422 });
   const input = parsed.data;
   const assetIds = [...new Set([input.sourceVideoAssetId, ...input.tracks.map((track) => track.assetId)].filter(Boolean))] as string[];
-  const admin = createAdminClient();
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch {
+    return NextResponse.json({ errorCode: "DATABASE_UNAVAILABLE", message: "La persistencia no está disponible temporalmente." }, { status: 503 });
+  }
   if (assetIds.length) {
     const { data, error } = await admin.from("assets").select("id").eq("user_id", user.id).in("id", assetIds);
     if (error) return NextResponse.json({ errorCode: "ASSET_LOOKUP_FAILED", message: "No se pudieron verificar los archivos del proyecto." }, { status: 503 });

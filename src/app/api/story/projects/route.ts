@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 
 import { createCreativeProjectSchema, projectListQuerySchema } from "@/lib/story/contracts"
-import { storyErrorResponse, readJson } from "@/lib/story/http"
+import { storyErrorResponse, storySessionErrorResponse, readJson } from "@/lib/story/http"
 import { createCreativeProject, getStorySession, listCreativeProjects } from "@/lib/story/projects"
 
 export async function GET(request: Request) {
-  const { supabase, user } = await getStorySession()
+  let session
+  try { session = await getStorySession() } catch { return storySessionErrorResponse() }
+  const { supabase, user } = session
   if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 })
   try {
     const url = new URL(request.url)
@@ -15,7 +17,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { supabase, user } = await getStorySession()
+  let session
+  try { session = await getStorySession() } catch { return storySessionErrorResponse() }
+  const { supabase, user } = session
   if (!user) return NextResponse.json({ errorCode: "UNAUTHORIZED", message: "No autorizado." }, { status: 401 })
   const json = await readJson(request)
   if (!json.ok) return json.response

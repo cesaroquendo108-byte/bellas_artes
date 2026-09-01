@@ -54,6 +54,7 @@ export async function persistGenerationOutput(input: {
       provenanceSignature: provenance?.signature ?? "unsigned",
     },
   });
+  let preserveUploadedObject = false;
   try {
     const { data, error } = await admin.from("assets").insert({
       user_id: input.userId,
@@ -74,6 +75,7 @@ export async function persistGenerationOutput(input: {
     if (error || !data) {
       // Another worker can win the unique r2_key race while this one is retrying.
       // Reuse its row instead of deleting the shared private object.
+      preserveUploadedObject = error?.code === "23505";
       const { data: concurrentAsset } = await admin
         .from("assets")
         .select("id,user_id")
@@ -84,7 +86,7 @@ export async function persistGenerationOutput(input: {
     }
     return data.id as string;
   } catch (error) {
-    await deletePrivateObject(key).catch(() => undefined);
+    if (!preserveUploadedObject) await deletePrivateObject(key).catch(() => undefined);
     throw error;
   }
 }

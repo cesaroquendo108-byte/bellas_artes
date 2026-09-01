@@ -50,4 +50,30 @@ describe("reserveGenerationJob", () => {
       p_canceled: false,
     });
   });
+
+  it("no modifica ni reembolsa un job devuelto por idempotencia", async () => {
+    const rpc = vi.fn().mockResolvedValueOnce({
+      data: { job_id: "job-existing", status: "queued", reserved_credits: 12, idempotent: true },
+      error: null,
+    });
+    mockedCreateAdminClient.mockReturnValue({ rpc } as never);
+
+    await expect(reserveGenerationJob({
+      userId: "user-1",
+      idempotencyKey: "idempotency-1",
+      kind: "image",
+      route: {
+        publicModel: "flux-schnell",
+        backendModel: "flux-schnell",
+        providerRoute: "vast",
+        workflowVersion: "image/flux-schnell-v1",
+        credits: 12,
+      },
+      request: { prompt: "test" },
+      maxAttempts: 3,
+      billingMode: "shadow",
+    })).resolves.toMatchObject({ job_id: "job-existing", idempotent: true });
+
+    expect(rpc).toHaveBeenCalledOnce();
+  });
 });

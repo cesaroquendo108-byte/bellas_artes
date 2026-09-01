@@ -12,6 +12,10 @@ export function storyErrorResponse(error: unknown) {
   return NextResponse.json({ errorCode: "STORY_PROJECT_ERROR", message: "No se pudo completar la operación." }, { status: 500 })
 }
 
+export function storySessionErrorResponse() {
+  return NextResponse.json({ errorCode: "AUTH_UNAVAILABLE", message: "La autenticación no está disponible temporalmente." }, { status: 503 })
+}
+
 export async function readJson(request: Request) {
   try { return { ok: true as const, body: await request.json() } }
   catch { return { ok: false as const, response: NextResponse.json({ errorCode: "INVALID_JSON", message: "El cuerpo de la solicitud no es JSON válido." }, { status: 400 }) } }

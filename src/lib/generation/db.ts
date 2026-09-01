@@ -61,6 +61,9 @@ export async function reserveGenerationJob(input: {
   });
   if (error) throw rpcError(error);
   const result = data as { job_id: string; status: string; reserved_credits: number; idempotent?: boolean };
+  // An idempotent reservation belongs to the original request. Never rewrite
+  // its billing metadata or compensate/refund it from a repeated request.
+  if (result.idempotent) return result;
   const { error: metadataError } = await admin.rpc("set_generation_billing_metadata", {
     p_job_id: result.job_id,
     p_billing_mode: input.billingMode,

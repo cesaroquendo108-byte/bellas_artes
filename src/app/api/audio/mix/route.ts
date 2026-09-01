@@ -23,14 +23,20 @@ export async function POST(request: Request) {
   }
   const parsed = mixRequestSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ errorCode: "INVALID_MIX_REQUEST", message: "Revisa el proyecto y el formato de salida." }, { status: 422 });
-  const supabase = await createClient();
-  const { data: project, error: projectError } = await supabase
-    .from("audio_projects")
-    .select("id")
-    .eq("id", parsed.data.projectId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (projectError) return NextResponse.json({ errorCode: "PROJECT_LOOKUP_FAILED", message: "No se pudo verificar el proyecto." }, { status: 500 });
+  let project;
+  let projectError;
+  try {
+    const supabase = await createClient();
+    ({ data: project, error: projectError } = await supabase
+      .from("audio_projects")
+      .select("id")
+      .eq("id", parsed.data.projectId)
+      .eq("user_id", user.id)
+      .maybeSingle());
+  } catch {
+    return NextResponse.json({ errorCode: "PROJECT_LOOKUP_FAILED", message: "No se pudo verificar el proyecto." }, { status: 503 });
+  }
+  if (projectError) return NextResponse.json({ errorCode: "PROJECT_LOOKUP_FAILED", message: "No se pudo verificar el proyecto." }, { status: 503 });
   if (!project) return NextResponse.json({ errorCode: "PROJECT_NOT_FOUND", message: "Proyecto no encontrado." }, { status: 404 });
   try {
     const result = await enqueueGeneration({

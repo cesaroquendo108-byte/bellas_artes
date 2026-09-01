@@ -29,6 +29,13 @@ describe("Story projects API", () => {
     expect((await POST(new Request("http://local/api/story/projects", { method: "POST", body: "{}" }))).status).toBe(401)
   })
 
+  it("devuelve 503 si Supabase no puede crear la sesión", async () => {
+    mocks.getStorySession.mockRejectedValue(new Error("Supabase unavailable"))
+    const response = await GET(new Request("http://local/api/story/projects"))
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ errorCode: "AUTH_UNAVAILABLE" })
+  })
+
   it("rechaza JSON inválido y userId enviado por cliente", async () => {
     expect((await POST(new Request("http://local/api/story/projects", { method: "POST", body: "{" }))).status).toBe(400)
     const response = await POST(new Request("http://local/api/story/projects", { method: "POST", body: JSON.stringify({ kind: "story", title: "Mi historia", document, userId: "otro" }) }))
