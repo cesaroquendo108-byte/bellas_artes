@@ -5,10 +5,16 @@ import { cache } from "react";
 import { createClient } from "@/utils/supabase/server";
 
 export const requireUser = cache(async function requireUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let supabase;
+  let user;
+  try {
+    supabase = await createClient();
+    ({
+      data: { user },
+    } = await supabase.auth.getUser());
+  } catch {
+    redirect(`/login?message=${encodeURIComponent("La autenticación no está disponible temporalmente.")}`);
+  }
 
   if (!user) redirect("/login");
 

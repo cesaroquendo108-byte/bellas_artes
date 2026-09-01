@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { PhaseSevenError } from "@/lib/phase7/http"
 
 const mocks = vi.hoisted(() => ({
   createCommunityPost: vi.fn(),
@@ -26,6 +27,13 @@ describe("/api/community/posts", () => {
     const response = await GET(new Request("http://localhost/api/community/posts?limit=12"))
     expect(response.status).toBe(200)
     expect(mocks.listPublishedPosts).toHaveBeenCalledWith(expect.anything(), { limit: 12 })
+  })
+
+  it("devuelve 503 si la autenticación no está disponible", async () => {
+    mocks.getSocialSession.mockRejectedValue(new PhaseSevenError("AUTH_UNAVAILABLE", "auth unavailable"))
+    const response = await GET(new Request("http://localhost/api/community/posts"))
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ errorCode: "AUTH_UNAVAILABLE" })
   })
 
   it("rechaza crear sin sesión", async () => {

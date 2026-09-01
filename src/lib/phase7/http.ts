@@ -12,13 +12,13 @@ export function sessionErrorResponse(status: ApiSessionStatus) {
 }
 
 export class PhaseSevenError extends Error {
-  constructor(public code: "NOT_FOUND" | "FORBIDDEN" | "INVALID_ASSET" | "LIMIT_EXCEEDED" | "DATABASE_ERROR" | "LEGAL_CONSENT_REQUIRED" | "LEGAL_CONSENT_UNAVAILABLE", message: string) { super(message) }
+  constructor(public code: "NOT_FOUND" | "FORBIDDEN" | "INVALID_ASSET" | "LIMIT_EXCEEDED" | "DATABASE_ERROR" | "AUTH_UNAVAILABLE" | "LEGAL_CONSENT_REQUIRED" | "LEGAL_CONSENT_UNAVAILABLE", message: string) { super(message) }
 }
 
 export function phaseSevenErrorResponse(error: unknown) {
   if (error instanceof ZodError) return NextResponse.json({ errorCode: "INVALID_REQUEST", message: "Revisa los campos enviados.", fieldErrors: error.flatten().fieldErrors }, { status: 422 })
   if (error instanceof PhaseSevenError) {
-    const status = error.code === "NOT_FOUND" ? 404 : error.code === "FORBIDDEN" || error.code === "LEGAL_CONSENT_REQUIRED" ? 403 : error.code === "DATABASE_ERROR" || error.code === "LEGAL_CONSENT_UNAVAILABLE" ? 503 : 422
+    const status = error.code === "NOT_FOUND" ? 404 : error.code === "FORBIDDEN" || error.code === "LEGAL_CONSENT_REQUIRED" ? 403 : error.code === "DATABASE_ERROR" || error.code === "AUTH_UNAVAILABLE" || error.code === "LEGAL_CONSENT_UNAVAILABLE" ? 503 : 422
     return NextResponse.json({ errorCode: error.code, message: error.message }, { status })
   }
   return NextResponse.json({ errorCode: "PHASE_SEVEN_ERROR", message: "No se pudo completar la operación." }, { status: 500 })

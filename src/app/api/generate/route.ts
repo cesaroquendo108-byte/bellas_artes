@@ -38,7 +38,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user;
+  try {
+    ({ data: { user } } = await supabase.auth.getUser());
+  } catch {
+    return NextResponse.json(
+      { error: "La autenticación no está disponible temporalmente.", code: "AUTH_UNAVAILABLE", creditsConsumed: 0 },
+      { status: 503 },
+    );
+  }
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   return NextResponse.json(

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { PhaseSevenError } from "@/lib/phase7/http"
 
 const mocks = vi.hoisted(() => ({
   createBrandKit: vi.fn(),
@@ -16,6 +17,13 @@ describe("/api/brand-kits", () => {
   it("protege la colección privada", async () => {
     mocks.getBrandKitSession.mockResolvedValue({ supabase: {}, user: null })
     expect((await GET()).status).toBe(401)
+  })
+
+  it("devuelve 503 si la autenticación no está disponible", async () => {
+    mocks.getBrandKitSession.mockRejectedValue(new PhaseSevenError("AUTH_UNAVAILABLE", "auth unavailable"))
+    const response = await GET()
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ errorCode: "AUTH_UNAVAILABLE" })
   })
 
   it("rechaza JSON inválido", async () => {

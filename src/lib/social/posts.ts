@@ -57,9 +57,13 @@ const getCachedPublishedPosts = unstable_cache(
 )
 
 export async function getSocialSession() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  return { supabase, user }
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return { supabase, user }
+  } catch {
+    throw new PhaseSevenError("AUTH_UNAVAILABLE", "La autenticación no está disponible temporalmente.")
+  }
 }
 
 export async function listPublishedPosts(client: Client, input: unknown) {

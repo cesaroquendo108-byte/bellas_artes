@@ -60,6 +60,17 @@ describe("POST /api/generate legacy", () => {
     expect(response.status).toBe(401);
   });
 
+  it("devuelve 503 si falla la verificación de la sesión", async () => {
+    getUser.mockRejectedValue(new Error("auth unavailable"));
+    const response = await POST(new Request("http://local/api/generate", {
+      method: "POST",
+      body: JSON.stringify({ prompt: "prueba" }),
+    }));
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({ code: "AUTH_UNAVAILABLE", creditsConsumed: 0 });
+  });
+
   it("mantiene retirado el endpoint genérico para usuarios autenticados", async () => {
     getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
     const response = await POST(new Request("http://local/api/generate", {

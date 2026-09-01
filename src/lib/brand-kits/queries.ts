@@ -12,7 +12,15 @@ type KitRow = { id: string; user_id: string; name: string; description: string |
 type LinkRow = { id: string; brand_kit_id: string; asset_id: string; kind: BrandKitAsset["kind"]; sort_order: number }
 const kitColumns = "id,user_id,name,description,colors,typography,guidelines,negative_prompt,metadata,created_at,updated_at"
 
-export async function getBrandKitSession() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); return { supabase, user } }
+export async function getBrandKitSession() {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return { supabase, user }
+  } catch {
+    throw new PhaseSevenError("AUTH_UNAVAILABLE", "La autenticación no está disponible temporalmente.")
+  }
+}
 
 async function mapKits(client: Client, rows: KitRow[]): Promise<BrandKit[]> {
   if (!rows.length) return []
@@ -65,5 +73,19 @@ export async function addBrandKitAsset(client: Client, userId: string, kitId: st
 }
 
 export async function removeBrandKitAsset(client: Client, userId: string, kitId: string, assetId: string) { await getBrandKit(client, userId, kitId); const { error } = await client.from("brand_kit_assets").delete().eq("brand_kit_id", kitId).eq("asset_id", assetId); if (error) throw new PhaseSevenError("DATABASE_ERROR", error.message); return getBrandKit(client, userId, kitId) }
-export async function getBrandKitsForPage() { const { supabase, user } = await getBrandKitSession(); if (!user) return { kits: [], error: "No autorizado." }; try { return { kits: await listBrandKits(supabase, user.id), error: null } } catch { return { kits: [], error: "Los kits de marca no están disponibles en este entorno." } } }
-export async function getBrandKitForPage(id: string) { const { supabase, user } = await getBrandKitSession(); if (!user) return null; try { return await getBrandKit(supabase, user.id, id) } catch { return null } }
+export async function getBrandKitsForPage() {
+  try {
+    const { supabase, user } = await getBrandKitSession()
+    if (!user) return { kits: [], error: "No autorizado." }
+    try { return { kits: await listBrandKits(supabase, user.id), error: null } }
+    catch { return { kits: [], error: "Los kits de marca no están disponibles en este entorno." } }
+  } catch { return { kits: [], error: "La autenticación no está disponible temporalmente." } }
+}
+export async function getBrandKitForPage(id: string) {
+  try {
+    const { supabase, user } = await getBrandKitSession()
+    if (!user) return null
+    try { return await getBrandKit(supabase, user.id, id) }
+    catch { return null }
+  } catch { return null }
+}
