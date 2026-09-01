@@ -14,6 +14,18 @@ Este documento detalla la auditoría de la secuencia de migraciones SQL del proy
 | `202608080002_story_director_projects.sql` | Fase 2 - Story Director | Tabla `creative_projects`, validaciones de escenas/portadas, visibilidad comunitaria y políticas RLS. |
 | `202608080003_social_brand_kits.sql` | Fase 3 - Social Brand Kits | Tablas `brand_kits` y `community_posts`, validación de assets vinculados, moderación y políticas RLS. |
 | `202608080005_phase5_audio_suite.sql` | Fase 5 - Audio Suite | Tablas `audio_voices`, `audio_jobs`, `audio_projects`, `audio_tracks`, RPCs transaccionales de créditos de audio para `service_role` y RLS. |
+| `202608080006_generation_orchestration.sql` | Orquestación de generación | Jobs, intentos, eventos, vínculos de assets y RPCs idempotentes de reserva, reembolso y finalización. |
+| `202608080007_generation_controls.sql` | Controles de generación | Pausa operativa, límites y controles de seguridad de la generación. |
+| `202608080008_vast_only_generation.sql` | Proveedor Vast.ai | Restricción de rutas de generación a Vast.ai y fake de pruebas, sin borrar historial. |
+| `202608080009_generation_telemetry.sql` | Telemetría | Timings, métricas de proveedor y coste estimado por intento. |
+| `202608100010_generation_billing_shadow.sql` | Billing shadow | Metadatos de billing shadow y coste real de ejecución. |
+| `20260810075311_generation_rollout_access.sql` | Acceso gradual | Grants de acceso por nivel y allowlist server-side. |
+| `20260812120000_admin_dashboard_v1.sql` | Dashboard administrativo | Auditoría administrativa, heartbeats y RPCs de operación. |
+| `20260812170000_admin_users_access.sql` | Usuarios y acceso | Roles, grants administrativos y auditoría de cambios. |
+| `20260813150000_vast_admin_gpu_leases.sql` | Leasing Vast.ai | Solicitudes, alquileres, heartbeats y auditoría del ciclo de vida GPU. |
+| `202609010001_legal_consents.sql` | Consentimiento legal | Consentimientos versionados de términos y moderación, con RLS cerrado. |
+| `202609010002_generation_audit_retention.sql` | Retención de auditoría | Vencimiento de 180 días y poda server-side de eventos de moderación. |
+| `202609010003_audio_projects_atomic_save.sql` | Integridad Audio Suite | RPC transaccional para guardar metadata y pistas de proyectos de audio. |
 
 ---
 
