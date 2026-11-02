@@ -1,0 +1,58 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "openjutsu",
+  "name": "Openjutsu",
+  "section": "video",
+  "pack": "openjutsu-h3",
+  "status": "ready",
+  "higgsfield_feature": "Genjutsu / Character Swap",
+  "summary": "Local open-weights character swap using MiniMax H3, SAM 3.1 and Qwen3-VL auto-captioning.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "H3 One-Click Single Swap (DMAD 6 step).json",
+    "comfyui": "0.41.2",
+    "repository": "https://github.com/D3voz/openjutsu"
+  },
+  "outputs": [
+    {
+      "node": "64",
+      "type": "video",
+      "label": "Swapped Video"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "character",
+      "type": "image",
+      "label": "Character Photo",
+      "required": true,
+      "limits": {
+        "max_mb": 20
+      },
+      "help": "Single character reference image",
+      "bind": [
+        {
+          "node": "2",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "motion",
+      "type": "video",
+      "label": "Source Video",
+      "required": true,
+      "limits": {
+        "max_mb": 200,
+        "seconds": [2, 15]
+      },
+      "help": "Driving video clip with the motion to transfer",
+      "bind": [
+        {
+          "node": "5",
+          "field": "file"
+        }
+      ]
+    }
+  ]
+}

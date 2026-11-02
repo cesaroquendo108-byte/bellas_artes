@@ -2,7 +2,8 @@ export type ModelPackId =
   | "wan-scail2-recast"
   | "gesture-portal-flux"
   | "krea-turbo-realtime"
-  | "freefield-cinema-studio";
+  | "freefield-cinema-studio"
+  | "openjutsu-h3";
 
 export interface ModelFileEntry {
   filename: string;
@@ -14,7 +15,10 @@ export interface ModelFileEntry {
     | "clip"
     | "loras"
     | "controlnet"
-    | "sam3";
+    | "sam3"
+    | "text_encoders"
+    | "ultralytics"
+    | "sams";
   sourceUrl: string;
   sizeGbApprox: number;
   isOptional?: boolean;
@@ -159,6 +163,52 @@ export const MODEL_PACKS: Record<ModelPackId, ModelPack> = {
       },
     ],
   },
+  "openjutsu-h3": {
+    id: "openjutsu-h3",
+    name: "Openjutsu MiniMax H3 & Qwen3-VL Character Swap Pack",
+    description:
+      "Suite completa de Openjutsu con MiniMax H3 int8, Qwen3-VL para visión y autodescripción de prompts, y SAM 3.1 para tracking.",
+    vramRequiredGb: 32,
+    recommendedGpu: "RTX 5090 (32GB VRAM) / A100",
+    defaultWorkflow: "openjutsu_simple_h3.json",
+    files: [
+      {
+        filename: "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        targetSubdir: "diffusion_models",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/MiniMax_H3_repackaged/resolve/main/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        sizeGbApprox: 16.5,
+      },
+      {
+        filename: "minimax_h3_video_vae_int8_convrot.safetensors",
+        targetSubdir: "vae",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/MiniMax_H3_repackaged/resolve/main/minimax_h3_video_vae_int8_convrot.safetensors",
+        sizeGbApprox: 1.5,
+      },
+      {
+        filename: "qwen3vl_8b_int8_convrot.safetensors",
+        targetSubdir: "text_encoders",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/Qwen3-VL_repackaged/resolve/main/qwen3vl_8b_int8_convrot.safetensors",
+        sizeGbApprox: 8.5,
+      },
+      {
+        filename: "minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16.safetensors",
+        targetSubdir: "loras",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/MiniMax_H3_repackaged/resolve/main/minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16.safetensors",
+        sizeGbApprox: 1.2,
+      },
+      {
+        filename: "sam3.1_multiplex_fp16.safetensors",
+        targetSubdir: "checkpoints",
+        sourceUrl:
+          "https://huggingface.co/facebook/sam3-video/resolve/main/sam3.1_multiplex_fp16.safetensors",
+        sizeGbApprox: 2.4,
+      },
+    ],
+  },
 };
 
 export function listModelPacks(): ModelPack[] {
@@ -187,7 +237,7 @@ export function generateProvisioningScript(
     "set -euo pipefail",
     `echo "=== Aprovisionando Model Pack: ${pack.name} ==="`,
     `MODELS_DIR="${comfyModelsDir}"`,
-    "mkdir -p \"$MODELS_DIR\"/{checkpoints,diffusion_models,unet,vae,clip,loras,controlnet,sam3}",
+    "mkdir -p \"$MODELS_DIR\"/{checkpoints,diffusion_models,unet,vae,clip,loras,controlnet,sam3,text_encoders,ultralytics,sams}",
     "",
   ];
 
