@@ -13,6 +13,11 @@ import {
   searchFreefieldApps,
 } from "@/lib/freefield/registry";
 import { executeFreefieldApp } from "@/lib/freefield/executor";
+import {
+  composePrompt,
+  composeFromPreset,
+  BUILTIN_PRESETS,
+} from "@/lib/prompt-composer";
 
 function text(value: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -173,6 +178,49 @@ export function createBellasArtesMcpServer(userId: string) {
         success: false,
         errorCode: "FREEFIELD_EXECUTION_ERROR",
         message: error instanceof Error ? error.message : "Error durante la ejecución del workflow.",
+      });
+    }
+  });
+
+  server.registerTool("list_prompt_presets", {
+    title: "List prompt composer presets",
+    description: "Lista los presets disponibles en Prompt Composer (fiduciario, cinematográfico recasting, etc.).",
+    inputSchema: {},
+  }, async () => {
+    return text({
+      presets: BUILTIN_PRESETS.map((p) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        sectionCount: p.sections.length,
+      })),
+    });
+  });
+
+  server.registerTool("compose_prompt", {
+    title: "Compose prompt",
+    description: "Compone un prompt positivo y negativo modular y tipado usando la biblioteca de Prompt Composer.",
+    inputSchema: {
+      presetId: z.string().optional(),
+      basePrompt: z.string().optional(),
+      negativePrompt: z.string().optional(),
+      seed: z.number().int().optional(),
+    },
+  }, async ({ presetId, basePrompt, negativePrompt, seed }) => {
+    try {
+      if (presetId) {
+        const result = composeFromPreset(presetId, { basePrompt, negativePrompt, seed });
+        return text({ success: true, ...result });
+      }
+      return text({
+        success: false,
+        message: "Debe proporcionar un presetId para componer.",
+      });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "PROMPT_COMPOSE_ERROR",
+        message: error instanceof Error ? error.message : "Error al componer el prompt.",
       });
     }
   });
