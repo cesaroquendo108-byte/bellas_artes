@@ -18,6 +18,13 @@ import {
   composeFromPreset,
   BUILTIN_PRESETS,
 } from "@/lib/prompt-composer";
+import {
+  listModelPacks,
+  getModelPack,
+  generateProvisioningScript,
+  type ModelPackId,
+} from "@/lib/generation/model-packs";
+import { listPortalStyles } from "@/lib/gesture-portal/styles";
 
 function text(value: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -223,6 +230,51 @@ export function createBellasArtesMcpServer(userId: string) {
         message: error instanceof Error ? error.message : "Error al componer el prompt.",
       });
     }
+  });
+
+  server.registerTool("list_model_packs", {
+    title: "List GPU model packs",
+    description: "Lista los paquetes de modelos GPU preconfigurados (Wan SCAIL-2, GesturePortal FLUX, Krea Turbo) y genera el script de aprovisionamiento JIT.",
+    inputSchema: {
+      packId: z.string().optional(),
+      generateScript: z.boolean().default(false),
+      modelsDir: z.string().optional(),
+    },
+  }, async ({ packId, generateScript, modelsDir }) => {
+    try {
+      if (packId) {
+        const pack = getModelPack(packId as ModelPackId);
+        if (!pack) {
+          return text({ success: false, message: `El paquete "${packId}" no existe.` });
+        }
+        const script = generateScript ? generateProvisioningScript(packId as ModelPackId, modelsDir) : undefined;
+        return text({ success: true, pack, script });
+      }
+      return text({ success: true, packs: listModelPacks() });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "MODEL_PACKS_ERROR",
+        message: error instanceof Error ? error.message : "Error al consultar paquetes de modelos.",
+      });
+    }
+  });
+
+  server.registerTool("list_portal_styles", {
+    title: "List gesture portal styles",
+    description: "Lista los 9 estilos visuales para GesturePortal (cámara web con ComfyUI) y sus parámetros de inferencia.",
+    inputSchema: {},
+  }, async () => {
+    return text({
+      styles: listPortalStyles().map((s) => ({
+        id: s.id,
+        name: s.name,
+        description: s.description,
+        cfgScale: s.cfgScale,
+        denoiseStrength: s.denoiseStrength,
+        steps: s.steps,
+      })),
+    });
   });
 
   server.registerResource("generation-capabilities", "bellas-artes://capabilities", { mimeType: "application/json" }, async () => ({
