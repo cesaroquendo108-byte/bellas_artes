@@ -50,7 +50,9 @@ presentar módulos incompletos como operativos.
 
 Antes de declarar el entorno operativo:
 
-1. Aplicar las migraciones pendientes en el proyecto Supabase objetivo.
+1. Confirmar que las migraciones requeridas están aplicadas en el proyecto
+   Supabase objetivo; si se trata de otro proyecto, aplicar las pendientes en
+   orden.
 2. Configurar en Vercel sólo las variables propias de la aplicación; Redis y
    las credenciales del worker permanecen fuera de Vercel salvo el gateway
    HTTPS y su HMAC.
@@ -61,6 +63,7 @@ Antes de declarar el entorno operativo:
 
 Runbooks detallados:
 
+- [`docs/operational-closure-checklist.md`](docs/operational-closure-checklist.md)
 - [`docs/worker-deployment.md`](docs/worker-deployment.md)
 - [`infra/vast/README.md`](infra/vast/README.md)
 - [`workflows/README.md`](workflows/README.md)

@@ -1,0 +1,29 @@
+{
+  "voice": {
+    "class_type": "KokoroVoiceLoader",
+    "inputs": {
+      "voice_id": "es_nicole"
+    }
+  },
+  "speed": {
+    "class_type": "KokoroSpeedControl",
+    "inputs": {
+      "speed": 1.0
+    }
+  },
+  "text": {
+    "class_type": "KokoroTTS",
+    "inputs": {
+      "voice": ["voice", 0],
+      "speed": ["speed", 0],
+      "text": "Texto institucional para Bellas Artes"
+    }
+  },
+  "output": {
+    "class_type": "SaveAudio",
+    "inputs": {
+      "audio": ["text", 0],
+      "filename_prefix": "ba_kokoro_tts"
+    }
+  }
+}

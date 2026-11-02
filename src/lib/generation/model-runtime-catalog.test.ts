@@ -71,8 +71,8 @@ describe("model runtime catalog", () => {
     expect(getModelRuntimeEntryForBackendModel("unknown")).toBeNull();
     expect(summarizeModelRuntime()).toMatchObject({
       total: 22,
-      workflowReady: 1,
-      smokeReady: 0,
+      workflowReady: 2,
+      smokeReady: 1,
       replaced: 2,
     });
   });

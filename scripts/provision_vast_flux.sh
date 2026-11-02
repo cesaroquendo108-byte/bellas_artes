@@ -18,8 +18,8 @@ echo "Saldo actual en Vast.ai: \$${BALANCE} USD"
 
 echo "=== [2/3] Verificando instancias en Vast.ai ==="
 INSTANCES="$(vast_api "/api/v1/instances/")"
-INSTANCE_ID=$(echo "$INSTANCES" | grep -o '"id": [0-9]*' | head -n 1 | awk '{print $2}')
-STATUS=$(echo "$INSTANCES" | grep -o '"cur_state": "[^"]*"' | head -n 1 | cut -d'"' -f4)
+INSTANCE_ID=$(echo "$INSTANCES" | { grep -o '"id": [0-9]*' || true; } | head -n 1 | awk '{print $2}')
+STATUS=$(echo "$INSTANCES" | { grep -o '"cur_state": "[^"]*"' || true; } | head -n 1 | cut -d'"' -f4)
 
 echo "Instancia ID: ${INSTANCE_ID:-"No encontrada"}"
 echo "Estado actual: ${STATUS:-"Desconocido"}"

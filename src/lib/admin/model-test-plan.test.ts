@@ -41,8 +41,8 @@ describe("model test plan", () => {
     expect(summarizeModelTestPlan()).toMatchObject({
       total: 22,
       installed: 17,
-      executable: 0,
-      pending: 9,
+      executable: 1,
+      pending: 8,
       researchOnly: 7,
       components: 3,
       replaced: 2,

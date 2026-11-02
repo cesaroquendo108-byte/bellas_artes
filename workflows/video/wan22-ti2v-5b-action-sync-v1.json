@@ -1,0 +1,107 @@
+{
+  "unet": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_ti2v_5B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "clip": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    }
+  },
+  "vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan2.2_vae.safetensors"
+    }
+  },
+  "model_sampling": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": ["unet", 0],
+      "shift": 8
+    }
+  },
+  "source": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "source_subject.png",
+      "url": ""
+    }
+  },
+  "reference": {
+    "class_type": "LoadVideo",
+    "inputs": {
+      "video": "reference_motion.mp4",
+      "url": ""
+    }
+  },
+  "video": {
+    "class_type": "Wan22ImageToVideoLatent",
+    "inputs": {
+      "image": ["source", 0],
+      "vae": ["vae", 0],
+      "width": 1280,
+      "height": 704,
+      "length": 81,
+      "batch_size": 1,
+      "duration": 5,
+      "frames": 81
+    }
+  },
+  "prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": ["clip", 0],
+      "text": "Motion sync action transfer, matching reference motion graphics pace and camera angle"
+    }
+  },
+  "negative": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": ["clip", 0],
+      "text": "static, blurry, bad anatomy, deformed, jitter, low quality"
+    }
+  },
+  "sampler": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["model_sampling", 0],
+      "positive": ["prompt", 0],
+      "negative": ["negative", 0],
+      "latent_image": ["video", 0],
+      "seed": 424242,
+      "steps": 20,
+      "cfg": 5,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1
+    }
+  },
+  "vae_decode": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["sampler", 0],
+      "vae": ["vae", 0]
+    }
+  },
+  "create_video": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": ["vae_decode", 0],
+      "fps": 16
+    }
+  },
+  "output": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": ["create_video", 0],
+      "filename_prefix": "ba_wan22_action_sync"
+    }
+  }
+}

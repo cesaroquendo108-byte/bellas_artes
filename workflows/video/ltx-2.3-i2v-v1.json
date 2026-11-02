@@ -1,0 +1,76 @@
+{
+  "checkpoint": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "ltx-video-2b-v0.9.1.safetensors"
+    }
+  },
+  "source": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "input_frame.png",
+      "url": ""
+    }
+  },
+  "prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": ["checkpoint", 1],
+      "text": "Smooth camera panning, cinematic motion graphics, high fidelity"
+    }
+  },
+  "negative": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": ["checkpoint", 1],
+      "text": "worst quality, blurry, jittery, distorted, low resolution"
+    }
+  },
+  "video": {
+    "class_type": "EmptyLTXVLatentVideo",
+    "inputs": {
+      "width": 768,
+      "height": 512,
+      "length": 49,
+      "batch_size": 1,
+      "duration": 5,
+      "frames": 49
+    }
+  },
+  "sampler": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["checkpoint", 0],
+      "positive": ["prompt", 0],
+      "negative": ["negative", 0],
+      "latent_image": ["video", 0],
+      "seed": 424242,
+      "steps": 20,
+      "cfg": 3.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1.0
+    }
+  },
+  "vae_decode": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["sampler", 0],
+      "vae": ["checkpoint", 2]
+    }
+  },
+  "create_video": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": ["vae_decode", 0],
+      "fps": 24
+    }
+  },
+  "output": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": ["create_video", 0],
+      "filename_prefix": "ba_ltx_video"
+    }
+  }
+}

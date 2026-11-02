@@ -6,6 +6,13 @@ import { resolveImageRoute, resolveVideoRoute } from "@/lib/generation/registry"
 import { enqueueGeneration } from "@/lib/generation/service";
 import { getPrivateObjectUrl } from "@/lib/storage/r2";
 import { createAdminClient } from "@/utils/supabase/admin";
+import {
+  buildFreefieldWorkflow,
+  getFreefieldApp,
+  listFreefieldApps,
+  searchFreefieldApps,
+} from "@/lib/freefield/registry";
+import { executeFreefieldApp } from "@/lib/freefield/executor";
 
 function text(value: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -84,6 +91,90 @@ export function createBellasArtesMcpServer(userId: string) {
       signedUrl: await getPrivateObjectUrl(asset.r2_key).catch(() => null),
     })));
     return text({ assets });
+  });
+
+  server.registerTool("list_freefield_apps", {
+    title: "List Freefield apps",
+    description: "Lista y busca aplicaciones de Freefield (reconstrucción abierta de Higgsfield sobre ComfyUI).",
+    inputSchema: {
+      section: z.enum(["image", "video", "audio", "utility"]).optional(),
+      query: z.string().optional(),
+      limit: z.number().int().min(1).max(120).default(30),
+    },
+  }, async ({ section, query, limit }) => {
+    const apps = query || section ? searchFreefieldApps({ query, section }) : listFreefieldApps();
+    const sliced = apps.slice(0, limit).map((app) => ({
+      id: app.id,
+      name: app.name,
+      section: app.section,
+      higgsfield_feature: app.higgsfield_feature,
+      summary: app.summary,
+      pack: app.pack,
+      vram: app.vram,
+    }));
+    return text({ total: apps.length, returned: sliced.length, apps: sliced });
+  });
+
+  server.registerTool("get_freefield_app", {
+    title: "Get Freefield app details",
+    description: "Obtiene los detalles, inputs y modelos requeridos de una aplicación de Freefield.",
+    inputSchema: {
+      appId: z.string().min(1),
+    },
+  }, async ({ appId }) => {
+    const app = getFreefieldApp(appId);
+    if (!app) return text({ errorCode: "FREEFIELD_APP_NOT_FOUND", message: `La app "${appId}" no existe.` });
+    const { graph: _, ...details } = app;
+    void _;
+    return text({ app: details, hasGraph: Boolean(app.graph) });
+  });
+
+  server.registerTool("build_freefield_workflow", {
+    title: "Build Freefield ComfyUI workflow",
+    description: "Valida parámetros y construye el grafo ejecutable de ComfyUI para una app de Freefield.",
+    inputSchema: {
+      appId: z.string().min(1),
+      inputs: z.record(z.string(), z.unknown()),
+    },
+  }, async ({ appId, inputs }) => {
+    try {
+      const result = buildFreefieldWorkflow(appId, inputs);
+      return text({
+        success: true,
+        appId,
+        appName: result.app.name,
+        resolvedValues: result.resolvedValues,
+        prompt: result.prompt,
+      });
+    } catch (error) {
+      return text({
+        errorCode: "FREEFIELD_BUILD_ERROR",
+        message: error instanceof Error ? error.message : "Error al construir el grafo.",
+      });
+    }
+  });
+
+  server.registerTool("execute_freefield_app", {
+    title: "Execute Freefield ComfyUI workflow",
+    description: "Ejecuta una app de Freefield en ComfyUI (GPU local o remota en Vast.ai), espera los resultados y devuelve los artefactos generados.",
+    inputSchema: {
+      appId: z.string().min(1),
+      inputs: z.record(z.string(), z.unknown()),
+      comfyUrl: z.string().url().optional(),
+      dryRun: z.boolean().default(false),
+      timeoutSeconds: z.number().int().min(10).max(1800).default(900),
+    },
+  }, async ({ appId, inputs, comfyUrl, dryRun, timeoutSeconds }) => {
+    try {
+      const result = await executeFreefieldApp(appId, inputs, { comfyUrl, dryRun, timeoutSeconds });
+      return text(result);
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "FREEFIELD_EXECUTION_ERROR",
+        message: error instanceof Error ? error.message : "Error durante la ejecución del workflow.",
+      });
+    }
   });
 
   server.registerResource("generation-capabilities", "bellas-artes://capabilities", { mimeType: "application/json" }, async () => ({

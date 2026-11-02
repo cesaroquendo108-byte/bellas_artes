@@ -11,6 +11,7 @@ desactualizadas.
 - [Tablero real de tareas](/home/finvecito/Documentos/BellasArtes_Obsidian/04_Ingenieria_de_Software/02_Consolidacion/TABLERO_TAREAS_REAL_2026-08-09.md): estado operativo que prevalece sobre registros históricos.
 - [Plan Maestro y Bitácora](/home/finvecito/Documentos/BellasArtes_Obsidian/00_PLAN_MAESTRO_Y_BITACORA.md): decisiones e historial del proyecto.
 - [Estado de provisionamiento IA](/home/finvecito/Documentos/BellasArtes_Obsidian/03_Infraestructura_IA/Estado_Provisionamiento_IA_Local.md): infraestructura, modelos y evidencia de pruebas.
+- [Checklist de cierre operativo](operational-closure-checklist.md): separación entre trabajo local del agente y acciones externas del propietario.
 
 ## Regla de lectura
 
@@ -20,4 +21,3 @@ esté disponible para clientes.
 
 No se guardan secretos, tokens, credenciales ni URLs privadas en esta
 documentación.
-

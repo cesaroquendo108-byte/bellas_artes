@@ -227,12 +227,27 @@ const manifests: Record<string, WorkflowManifest> = {
     inputMimeTypes: ["audio/wav", "audio/mpeg", "audio/flac", "audio/ogg"],
     outputMimeTypes: ["audio/wav", "audio/mpeg"],
   },
+  "audio/kokoro-82m-v1": {
+    version: "audio/kokoro-82m-v1",
+    kind: "audio",
+    operation: "tts",
+    bindings: [
+      { nodeId: "text", input: "text", source: { type: "request", path: "text" }, required: true },
+      { nodeId: "voice", input: "voice_id", source: { type: "request", path: "voiceId" } },
+      { nodeId: "speed", input: "speed", source: { type: "request", path: "speed" } },
+    ],
+    outputNodes: [{ nodeId: "output", classTypes: ["SaveAudio", "VHS_AudioCombine", "PreviewAudio"] }],
+    limits: { maxDurationSeconds: 180, timeoutSeconds: 60, estimatedBudgetUsd: 0.00, minimumVramGb: 0 },
+    inputMimeTypes: ["text/plain"],
+    outputMimeTypes: ["audio/wav", "audio/mpeg"],
+  },
 };
 
-for (const model of ["hunyuan-8.3b", "hunyuan-13b", "wan22-ti2v-5b", "hunyuan-1.5-8.3b", "hunyuan-original"] as const) {
+for (const model of ["hunyuan-8.3b", "hunyuan-13b", "wan22-ti2v-5b", "hunyuan-1.5-8.3b", "hunyuan-original", "ltx-2.3"] as const) {
   for (const operation of ["t2v", "i2v", "v2v", "action-sync", "effects", "upscale", "lip-sync", "replace-character", "extend"] as const) {
     const version = `video/${model}-${operation}-v1`;
     const premium = model === "hunyuan-13b" || model === "hunyuan-original";
+    const isLightweight = model === "ltx-2.3";
     const sourceRequired = operation !== "t2v";
     const sourceMimeTypes = operation === "i2v"
       ? ["image/png", "image/jpeg", "image/webp"]
@@ -265,11 +280,11 @@ for (const model of ["hunyuan-8.3b", "hunyuan-13b", "wan22-ti2v-5b", "hunyuan-1.
       limits: {
         maxWidth: premium ? 1920 : 1280,
         maxHeight: premium ? 1080 : 720,
-        maxDurationSeconds: premium ? 15 : 10,
-        maxFrames: premium ? 450 : 300,
-        timeoutSeconds: premium ? 1800 : 1200,
-        estimatedBudgetUsd: premium ? 1.5 : 0.75,
-        minimumVramGb: premium ? 80 : 48,
+        maxDurationSeconds: premium ? 15 : isLightweight ? 5 : 10,
+        maxFrames: premium ? 450 : isLightweight ? 125 : 300,
+        timeoutSeconds: isLightweight ? 300 : premium ? 1800 : 1200,
+        estimatedBudgetUsd: isLightweight ? 0.05 : premium ? 1.5 : 0.75,
+        minimumVramGb: isLightweight ? 12 : premium ? 80 : 48,
       },
       assetInputs: [
         ...(sourceRequired ? [{ role: "source" as const, index: 0, required: true, mimeTypes: sourceMimeTypes, maxDurationSeconds: 15 }] : []),
