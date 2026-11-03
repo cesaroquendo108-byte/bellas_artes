@@ -52,6 +52,16 @@ CATALOG = {
     "GOATdTextGenerator": {"cat": "verified_active", "pack": "ComfyUI-GOATd-Universal-Text-Generator"},
     "GOATdSettings": {"cat": "verified_active", "pack": "ComfyUI-GOATd-Universal-Text-Generator"},
     "PromptLibrary": {"cat": "verified_active", "pack": "ComfyUI-Prompt-Library"},
+    "SplitFrame_TimelineCut": {"cat": "verified_active", "pack": "SplitFrame"},
+    "SplitFrame_DirectorPlanner": {"cat": "verified_active", "pack": "SplitFrame"},
+    "SplitFrame_ColorGrade": {"cat": "verified_active", "pack": "SplitFrame"},
+    "SplitFrame_AudioMix": {"cat": "verified_active", "pack": "SplitFrame"},
+    "EmptyLTXLatentVideo": {"cat": "verified_active", "pack": "ComfyUI-LTXVideo"},
+    "JustAE_StoryboardMarker": {"cat": "verified_active", "pack": "JustAE-Flow"},
+    "JustAE_LoadTimelineComp": {"cat": "verified_active", "pack": "JustAE-Flow"},
+    "JustAE_SendToTimeline": {"cat": "verified_active", "pack": "JustAE-Flow"},
+    "JustAE_CompInpaint": {"cat": "verified_active", "pack": "JustAE-Flow"},
+    "EmptyLatentImage": {"cat": "core", "pack": "ComfyUI-Core"},
     "ResolutionSelector": {"cat": "verified_active", "pack": "ComfyUI-Essentials"},
 
     # Absorbed / Obsolete
@@ -70,7 +80,7 @@ def classify(class_type: str) -> Dict[str, Any]:
         return {"class_type": class_type, **CATALOG[class_type]}
     if class_type.startswith(("Save", "Load", "VAE", "CLIP", "KSampler", "Basic", "Sampler", "Random")):
         return {"class_type": class_type, "cat": "core", "pack": "ComfyUI-Core (Inferred)"}
-    if class_type.startswith(("VHS_", "WanVideo_", "SAM3_", "ZenTrainer_", "GOATd", "PromptLibrary")):
+    if class_type.startswith(("VHS_", "WanVideo_", "SAM3_", "ZenTrainer_", "GOATd", "PromptLibrary", "SplitFrame_", "JustAE_")):
         return {"class_type": class_type, "cat": "verified_active", "pack": "Verified Pack"}
     return {
         "class_type": class_type,

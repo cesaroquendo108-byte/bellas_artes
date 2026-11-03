@@ -99,6 +99,15 @@ export const KNOWN_NODES_CATALOG: Record<string, Omit<NodeMetadata, "classType">
   GOATdTextGenerator: { category: "verified_active", packName: "ComfyUI-GOATd-Universal-Text-Generator", repository: "ninjaGurung/ComfyUI-GOATd-Universal-Text-Generator" },
   GOATdSettings: { category: "verified_active", packName: "ComfyUI-GOATd-Universal-Text-Generator", repository: "ninjaGurung/ComfyUI-GOATd-Universal-Text-Generator" },
   PromptLibrary: { category: "verified_active", packName: "ComfyUI-Prompt-Library", repository: "florestefano1975/ComfyUI-Prompt-Library" },
+  SplitFrame_TimelineCut: { category: "verified_active", packName: "SplitFrame", repository: "IronManRox228228/splitframe" },
+  SplitFrame_DirectorPlanner: { category: "verified_active", packName: "SplitFrame", repository: "IronManRox228228/splitframe" },
+  SplitFrame_ColorGrade: { category: "verified_active", packName: "SplitFrame", repository: "IronManRox228228/splitframe" },
+  SplitFrame_AudioMix: { category: "verified_active", packName: "SplitFrame", repository: "IronManRox228228/splitframe" },
+  EmptyLTXLatentVideo: { category: "verified_active", packName: "ComfyUI-LTXVideo", repository: "Lightricks/ComfyUI-LTXVideo" },
+  JustAE_StoryboardMarker: { category: "verified_active", packName: "JustAE-Flow", repository: "HomoLapis/justae-flow" },
+  JustAE_LoadTimelineComp: { category: "verified_active", packName: "JustAE-Flow", repository: "HomoLapis/justae-flow" },
+  JustAE_SendToTimeline: { category: "verified_active", packName: "JustAE-Flow", repository: "HomoLapis/justae-flow" },
+  JustAE_CompInpaint: { category: "verified_active", packName: "JustAE-Flow", repository: "HomoLapis/justae-flow" },
 
   // Absorbed / Obsolete (Absorbidos por el núcleo o reemplazables directamente)
   CR_ImageInputSwitch: {

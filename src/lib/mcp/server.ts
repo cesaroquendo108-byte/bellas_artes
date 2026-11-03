@@ -27,6 +27,15 @@ import { listPortalStyles } from "@/lib/gesture-portal/styles";
 import { auditWorkflowJson } from "@/lib/admin/node-watch";
 import { planSupercomputerPipeline } from "@/lib/generation/supercomputer";
 import { globalPromptContextMemory, type ModelTarget } from "@/lib/prompt-composer/context-memory";
+import {
+  exportStoryToEffectCraftMarkers,
+  exportMarkersToEDL,
+  exportMarkersToCSV,
+} from "@/lib/story/timeline-markers";
+import {
+  planSplitFrameCrew,
+  crewPlanToTimelineMarkers,
+} from "@/lib/story/splitframe-crew";
 
 function text(value: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -419,6 +428,97 @@ export function createBellasArtesMcpServer(userId: string) {
         success: false,
         errorCode: "GOATD_ENHANCE_ERROR",
         message: error instanceof Error ? error.message : "Error al enriquecer el prompt.",
+      });
+    }
+  });
+
+  server.registerTool("splitframe_ai_crew_plan", {
+    title: "SplitFrame AI Crew production planning",
+    description:
+      "Planifica la producción audiovisual coordinando a los 4 agentes del equipo SplitFrame (Director, Editor, Colourist y Audio) con desglose de tomas, CDL/LUT y mezcla sonora.",
+    inputSchema: {
+      projectId: z.string().describe("ID del proyecto."),
+      title: z.string().describe("Título de la pieza."),
+      targetDurationSeconds: z.number().min(2).max(600).default(15),
+      aspectRatio: z.enum(["9:16", "16:9", "1:1"]).default("9:16"),
+      directorVision: z.string().describe("Visión artística y concepto del video."),
+      editorPacing: z.enum(["fast-paced", "cinematic-slow", "commercial-punchy", "documentary"]).optional(),
+      colourPalette: z.enum(["warm-editorial", "cool-corporate", "high-contrast-neon", "monochrome-rich", "natural-film"]).optional(),
+      audioStyle: z.enum(["electronic-ambient", "orchestral-epic", "hip-hop-beat", "acoustic-minimal", "voice-prominent"]).optional(),
+    },
+  }, async ({ projectId, title, targetDurationSeconds, aspectRatio, directorVision, editorPacing, colourPalette, audioStyle }) => {
+    try {
+      const plan = planSplitFrameCrew({
+        projectId,
+        title,
+        targetDurationSeconds,
+        aspectRatio,
+        directorVision,
+        editorPacing,
+        colourPalette,
+        audioStyle,
+      });
+      const markers = crewPlanToTimelineMarkers(plan);
+      return text({ success: true, plan, markers });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "SPLITFRAME_CREW_PLAN_ERROR",
+        message: error instanceof Error ? error.message : "Error al planificar el equipo SplitFrame.",
+      });
+    }
+  });
+
+  server.registerTool("storyboard_export_timeline_markers", {
+    title: "Export Story to EffectCraft timeline markers & EDL",
+    description:
+      "Exporta una secuencia o guion de Bellas Artes a marcadores de línea de tiempo compatibles con EffectCraft / JustAE Flow, archivo EDL CMX 3600 y CSV.",
+    inputSchema: {
+      compositionName: z.string().default("Master_Comp"),
+      width: z.number().int().default(1080),
+      height: z.number().int().default(1920),
+      fps: z.number().default(30),
+      scenes: z.array(z.object({
+        id: z.string(),
+        title: z.string(),
+        order: z.number(),
+        durationSeconds: z.number(),
+        notes: z.string().default(""),
+        shots: z.array(z.object({
+          id: z.string(),
+          title: z.string(),
+          order: z.number(),
+          durationSeconds: z.number(),
+          prompt: z.string(),
+          camera: z.string().nullable().optional(),
+          transition: z.string().nullable().optional(),
+          assetIds: z.array(z.string()).default([]),
+        })),
+      })),
+    },
+  }, async ({ compositionName, width, height, fps, scenes }) => {
+    try {
+      const storyDoc = { version: 1 as const, scenes };
+      const compPayload = exportStoryToEffectCraftMarkers(storyDoc, {
+        compositionName,
+        width,
+        height,
+        fps,
+      });
+      const edlContent = exportMarkersToEDL(compPayload.markers, fps);
+      const csvContent = exportMarkersToCSV(compPayload.markers);
+
+      return text({
+        success: true,
+        payload: compPayload,
+        edl: edlContent,
+        csv: csvContent,
+      });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "TIMELINE_MARKERS_EXPORT_ERROR",
+        message: error instanceof Error ? error.message : "Error al exportar marcadores de línea de tiempo.",
       });
     }
   });

@@ -1,0 +1,124 @@
+{
+  "1": {
+    "inputs": {
+      "ckpt_name": "ltx-video-2b-v0.9.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "LTX-Video Checkpoint Loader"
+    }
+  },
+  "2": {
+    "inputs": {
+      "text": "low quality, blurry, distorted, glitch, cartoon, artifacting",
+      "clip": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative Prompt"
+    }
+  },
+  "3": {
+    "inputs": {
+      "text": "Cinematic vertical shot, smooth camera movement, crisp financial charts in background, 4k photorealistic",
+      "clip": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Director Shot Prompt"
+    }
+  },
+  "4": {
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "length": 120,
+      "aspect_ratio": "9:16 (Vertical)",
+      "duration_seconds": 4,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLTXLatentVideo",
+    "_meta": {
+      "title": "Empty LTX Latent Video"
+    }
+  },
+  "5": {
+    "inputs": {
+      "pacing": "commercial-punchy",
+      "transition_type": "cut"
+    },
+    "class_type": "SplitFrame_TimelineCut",
+    "_meta": {
+      "title": "SplitFrame Editor Cut"
+    }
+  },
+  "6": {
+    "inputs": {
+      "seed": 42,
+      "steps": 25,
+      "cfg": 3.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1.0,
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "2",
+        0
+      ],
+      "latent_image": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler (LTX Video)"
+    }
+  },
+  "7": {
+    "inputs": {
+      "samples": [
+        "6",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "10": {
+    "inputs": {
+      "filename_prefix": "splitframe/render",
+      "fps": 30,
+      "lossless": false,
+      "quality": 85,
+      "method": "default",
+      "images": [
+        "7",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "SplitFrame Save Video"
+    }
+  }
+}

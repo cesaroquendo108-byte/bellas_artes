@@ -113,4 +113,37 @@ describe("Freefield Registry en Bellas Artes", () => {
     expect(result.prompt["2"]?.inputs?.steps).toBe(1200);
     expect(result.prompt["2"]?.inputs?.rank).toBe(32);
   });
+
+  it("construye un flujo ComfyUI vinculado para SplitFrame AI Crew Studio", () => {
+    const result = buildFreefieldWorkflow("splitframe", {
+      prompt: "Cinematic shot of trader looking at multiple monitors",
+      duration: 3.5,
+      pacing: "fast-paced",
+      aspect_ratio: "9:16 (Vertical)",
+      seed: 99,
+    });
+
+    expect(result.app.id).toBe("splitframe");
+    expect(result.prompt["3"]?.inputs?.prompt).toBe("Cinematic shot of trader looking at multiple monitors");
+    expect(result.prompt["4"]?.inputs?.duration_seconds).toBe(3.5);
+    expect(result.prompt["5"]?.inputs?.pacing).toBe("fast-paced");
+    expect(result.prompt["6"]?.inputs?.seed).toBe(99);
+  });
+
+  it("construye un flujo ComfyUI vinculado para EffectCraft Storyboard Studio", () => {
+    const result = buildFreefieldWorkflow("effectcraft", {
+      marker_name: "Shot 02 - Close Up",
+      prompt: "Close up on trading desk terminal",
+      duration: 4,
+      fps: 30,
+      seed: 77,
+    });
+
+    expect(result.app.id).toBe("effectcraft");
+    expect(result.prompt["1"]?.inputs?.marker_name).toBe("Shot 02 - Close Up");
+    expect(result.prompt["1"]?.inputs?.duration_seconds).toBe(4);
+    expect(result.prompt["3"]?.inputs?.prompt).toBe("Close up on trading desk terminal");
+    expect(result.prompt["10"]?.inputs?.fps).toBe(30);
+    expect(result.prompt["6"]?.inputs?.seed).toBe(77);
+  });
 });

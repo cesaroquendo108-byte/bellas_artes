@@ -5,7 +5,9 @@ export type ModelPackId =
   | "freefield-cinema-studio"
   | "openjutsu-h3"
   | "directors-cut-h3-qwen"
-  | "zentrainer-flux-lora";
+  | "zentrainer-flux-lora"
+  | "splitframe-ltx-crew"
+  | "effectcraft-justae";
 
 export interface ModelFileEntry {
   filename: string;
@@ -284,6 +286,46 @@ export const MODEL_PACKS: Record<ModelPackId, ModelPack> = {
         sourceUrl:
           "https://huggingface.co/Comfy-Org/Qwen3-VL_repackaged/resolve/main/qwen3vl_8b_int8_convrot.safetensors",
         sizeGbApprox: 8.5,
+      },
+    ],
+  },
+  "splitframe-ltx-crew": {
+    id: "splitframe-ltx-crew",
+    name: "SplitFrame LTX-Video 2.5 & ACE-Step Crew Pack",
+    description:
+      "Suite para edición y generación local en SplitFrame con LTX-Video 2.5 para video cinematográfico y ACE-Step 1.5 para diseño y mezcla de audio.",
+    vramRequiredGb: 16,
+    recommendedGpu: "RTX 4080 (16GB) / RTX 4090 (24GB)",
+    defaultWorkflow: "splitframe_ltx_crew.api.json",
+    files: [
+      {
+        filename: "ltx-video-2b-v0.9.safetensors",
+        targetSubdir: "checkpoints",
+        sourceUrl: "https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.safetensors",
+        sizeGbApprox: 4.8,
+      },
+      {
+        filename: "ace_step_1.5_audio.safetensors",
+        targetSubdir: "checkpoints",
+        sourceUrl: "https://huggingface.co/Comfy-Org/ACE-Step_repackaged/resolve/main/ace_step_1.5_audio.safetensors",
+        sizeGbApprox: 2.1,
+      },
+    ],
+  },
+  "effectcraft-justae": {
+    id: "effectcraft-justae",
+    name: "EffectCraft JustAE Storyboard Marker Pack",
+    description:
+      "Model pack para storyboard y composición en EffectCraft con integración JustAE Flow sobre marcadores de timeline.",
+    vramRequiredGb: 16,
+    recommendedGpu: "RTX 4080 / RTX 4090",
+    defaultWorkflow: "justae_flow_storyboard.api.json",
+    files: [
+      {
+        filename: "ltx-video-2b-v0.9.safetensors",
+        targetSubdir: "checkpoints",
+        sourceUrl: "https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.safetensors",
+        sizeGbApprox: 4.8,
       },
     ],
   },

@@ -1,0 +1,106 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "effectcraft",
+  "name": "EffectCraft Storyboard & Timeline Studio",
+  "section": "video",
+  "pack": "effectcraft-justae",
+  "status": "ready",
+  "higgsfield_feature": "Timeline Markers & ComfyUI Storyboard",
+  "summary": "Integración de EffectCraft y JustAE Flow para generar tomas multi-modelo directamente vinculadas a marcadores y capas de la línea de tiempo.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "justae_flow_storyboard.api.json",
+    "comfyui": "0.42.0",
+    "repository": "https://github.com/HomoLapis/justae-flow"
+  },
+  "outputs": [
+    {
+      "node": "10",
+      "type": "video",
+      "label": "EffectCraft Storyboard Render"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "marker_name",
+      "type": "text",
+      "label": "Timeline Marker Label",
+      "required": true,
+      "default": "Scene 01 - Hero Shot",
+      "help": "Nombre o etiqueta identificadora del marcador en la línea de tiempo de EffectCraft",
+      "bind": [
+        {
+          "node": "1",
+          "field": "marker_name"
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Shot Prompt",
+      "required": true,
+      "default": "Cinematic wide angle, bustling Caracas financial district, golden hour sunlight reflecting off skyscrapers, hyperrealistic 8k",
+      "help": "Prompt específico asignado a este intervalo de tiempo / marcador",
+      "bind": [
+        {
+          "node": "3",
+          "field": "prompt"
+        }
+      ]
+    },
+    {
+      "id": "duration",
+      "type": "slider",
+      "label": "Marker Duration (Seconds)",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "step": 0.5,
+      "bind": [
+        {
+          "node": "1",
+          "field": "duration_seconds"
+        }
+      ]
+    },
+    {
+      "id": "fps",
+      "type": "select",
+      "label": "Composition Frame Rate",
+      "default": 30,
+      "options": [
+        {
+          "value": 24,
+          "label": "24 FPS (Cinemático Clásico)"
+        },
+        {
+          "value": 30,
+          "label": "30 FPS (Estándar Digital)"
+        },
+        {
+          "value": 60,
+          "label": "60 FPS (Ultra Fluido)"
+        }
+      ],
+      "bind": [
+        {
+          "node": "10",
+          "field": "fps"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": -1,
+      "bind": [
+        {
+          "node": "6",
+          "field": "seed"
+        }
+      ]
+    }
+  ]
+}
