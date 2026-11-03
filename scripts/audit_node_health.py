@@ -46,6 +46,12 @@ CATALOG = {
     "SAM3_Multiplex": {"cat": "verified_active", "pack": "ComfyUI-SAM3"},
     "MiniMaxH3ReferenceToVideo": {"cat": "verified_active", "pack": "ComfyUI-MiniMax-H3"},
     "MiniMaxH3SigmaShift": {"cat": "verified_active", "pack": "ComfyUI-MiniMax-H3"},
+    "ZenTrainer_Train": {"cat": "verified_active", "pack": "ZenTrainer"},
+    "ZenTrainer_Dataset": {"cat": "verified_active", "pack": "ZenTrainer"},
+    "ZenTrainer_SaveLora": {"cat": "verified_active", "pack": "ZenTrainer"},
+    "GOATdTextGenerator": {"cat": "verified_active", "pack": "ComfyUI-GOATd-Universal-Text-Generator"},
+    "GOATdSettings": {"cat": "verified_active", "pack": "ComfyUI-GOATd-Universal-Text-Generator"},
+    "PromptLibrary": {"cat": "verified_active", "pack": "ComfyUI-Prompt-Library"},
     "ResolutionSelector": {"cat": "verified_active", "pack": "ComfyUI-Essentials"},
 
     # Absorbed / Obsolete
@@ -64,7 +70,7 @@ def classify(class_type: str) -> Dict[str, Any]:
         return {"class_type": class_type, **CATALOG[class_type]}
     if class_type.startswith(("Save", "Load", "VAE", "CLIP", "KSampler", "Basic", "Sampler", "Random")):
         return {"class_type": class_type, "cat": "core", "pack": "ComfyUI-Core (Inferred)"}
-    if class_type.startswith(("VHS_", "WanVideo_", "SAM3_")):
+    if class_type.startswith(("VHS_", "WanVideo_", "SAM3_", "ZenTrainer_", "GOATd", "PromptLibrary")):
         return {"class_type": class_type, "cat": "verified_active", "pack": "Verified Pack"}
     return {
         "class_type": class_type,

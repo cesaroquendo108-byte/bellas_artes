@@ -93,6 +93,12 @@ export const KNOWN_NODES_CATALOG: Record<string, Omit<NodeMetadata, "classType">
   MiniMaxH3ReferenceToVideo: { category: "verified_active", packName: "ComfyUI-MiniMax-H3", repository: "Comfy-Org/MiniMax_H3_repackaged" },
   MiniMaxH3SigmaShift: { category: "verified_active", packName: "ComfyUI-MiniMax-H3", repository: "Comfy-Org/MiniMax_H3_repackaged" },
   WanVideoModelLoader: { category: "verified_active", packName: "ComfyUI-WanVideo", repository: "Kijai/ComfyUI-WanVideo" },
+  ZenTrainer_Train: { category: "verified_active", packName: "ZenTrainer", repository: "Nynxz/ZenTrainer" },
+  ZenTrainer_Dataset: { category: "verified_active", packName: "ZenTrainer", repository: "Nynxz/ZenTrainer" },
+  ZenTrainer_SaveLora: { category: "verified_active", packName: "ZenTrainer", repository: "Nynxz/ZenTrainer" },
+  GOATdTextGenerator: { category: "verified_active", packName: "ComfyUI-GOATd-Universal-Text-Generator", repository: "ninjaGurung/ComfyUI-GOATd-Universal-Text-Generator" },
+  GOATdSettings: { category: "verified_active", packName: "ComfyUI-GOATd-Universal-Text-Generator", repository: "ninjaGurung/ComfyUI-GOATd-Universal-Text-Generator" },
+  PromptLibrary: { category: "verified_active", packName: "ComfyUI-Prompt-Library", repository: "florestefano1975/ComfyUI-Prompt-Library" },
 
   // Absorbed / Obsolete (Absorbidos por el núcleo o reemplazables directamente)
   CR_ImageInputSwitch: {
@@ -183,7 +189,14 @@ export function classifyNode(classType: string): NodeMetadata {
     };
   }
 
-  if (classType.startsWith("VHS_") || classType.startsWith("WanVideo_") || classType.startsWith("SAM3_")) {
+  if (
+    classType.startsWith("VHS_") ||
+    classType.startsWith("WanVideo_") ||
+    classType.startsWith("SAM3_") ||
+    classType.startsWith("ZenTrainer_") ||
+    classType.startsWith("GOATd") ||
+    classType.startsWith("PromptLibrary")
+  ) {
     return {
       classType,
       category: "verified_active",

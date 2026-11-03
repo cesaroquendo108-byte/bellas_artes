@@ -4,7 +4,8 @@ export type ModelPackId =
   | "krea-turbo-realtime"
   | "freefield-cinema-studio"
   | "openjutsu-h3"
-  | "directors-cut-h3-qwen";
+  | "directors-cut-h3-qwen"
+  | "zentrainer-flux-lora";
 
 export interface ModelFileEntry {
   filename: string;
@@ -253,6 +254,36 @@ export const MODEL_PACKS: Record<ModelPackId, ModelPack> = {
         sourceUrl:
           "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/vae/qwen_image_2.1_vae_bf16.safetensors",
         sizeGbApprox: 0.5,
+      },
+    ],
+  },
+  "zentrainer-flux-lora": {
+    id: "zentrainer-flux-lora",
+    name: "ZenTrainer FLUX & Qwen LoRA Training Pack",
+    description:
+      "Suite completa de entrenamiento de LoRAs en ComfyUI con ZenTrainer, soporte para auto-captioning Qwen-VL y cuantizacion int8/fp8.",
+    vramRequiredGb: 24,
+    recommendedGpu: "RTX 5090 (32GB VRAM) / RTX 4090",
+    defaultWorkflow: "zentrainer_flux_lora.api.json",
+    files: [
+      {
+        filename: "flux1-dev-fp8.safetensors",
+        targetSubdir: "unet",
+        sourceUrl: "https://huggingface.co/Kijai/flux-fp8/resolve/main/flux1-dev-fp8.safetensors",
+        sizeGbApprox: 11.9,
+      },
+      {
+        filename: "ae.safetensors",
+        targetSubdir: "vae",
+        sourceUrl: "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors",
+        sizeGbApprox: 0.35,
+      },
+      {
+        filename: "qwen3vl_8b_int8_convrot.safetensors",
+        targetSubdir: "text_encoders",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/Qwen3-VL_repackaged/resolve/main/qwen3vl_8b_int8_convrot.safetensors",
+        sizeGbApprox: 8.5,
       },
     ],
   },

@@ -25,6 +25,8 @@ import {
 } from "@/lib/generation/model-packs";
 import { listPortalStyles } from "@/lib/gesture-portal/styles";
 import { auditWorkflowJson } from "@/lib/admin/node-watch";
+import { planSupercomputerPipeline } from "@/lib/generation/supercomputer";
+import { globalPromptContextMemory, type ModelTarget } from "@/lib/prompt-composer/context-memory";
 
 function text(value: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -341,6 +343,84 @@ export function createBellasArtesMcpServer(userId: string) {
       success: true,
       prompt: lines.join("\n"),
     });
+  });
+
+  server.registerTool("supercomputer_plan_pipeline", {
+    title: "Plan Supercomputer generative pipeline",
+    description:
+      "Planifica un pipeline audiovisual completo de múltiples tomas con desglose de guion, consistencia de personajes (Director's Cut/Wan SCAIL-2), enrutamiento a Freefield y estimación de coste GPU en Vast.ai.",
+    inputSchema: {
+      projectId: z.string().describe("Identificador único del proyecto."),
+      title: z.string().describe("Título o concepto de la producción."),
+      targetDurationSeconds: z.number().int().min(5).max(60).default(15),
+      aspectRatio: z.enum(["16:9", "9:16", "1:1"]).default("16:9"),
+      coreMessage: z.string().describe("Tesis o mensaje principal que debe comunicar el video."),
+      cast: z.array(z.object({
+        handle: z.string().describe("Handle único del personaje, ej. @cesar"),
+        name: z.string(),
+        roleDescription: z.string(),
+      })).optional(),
+    },
+  }, async ({ projectId, title, targetDurationSeconds, aspectRatio, coreMessage, cast }) => {
+    try {
+      const plan = planSupercomputerPipeline({
+        projectId,
+        title,
+        targetDurationSeconds,
+        aspectRatio,
+        coreMessage,
+        cast,
+      });
+      return text({ success: true, plan });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "SUPERCOMPUTER_PLAN_ERROR",
+        message: error instanceof Error ? error.message : "Error al planificar el pipeline.",
+      });
+    }
+  });
+
+  server.registerTool("goatd_enhance_prompt", {
+    title: "Enhance prompt with GOAT'd context memory",
+    description:
+      "Optimiza y expande un prompt utilizando la memoria contextual multi-turno (GOAT'd) y la sintaxis formal del modelo objetivo (MiniMax H3, Qwen 2.1, Wan 2.1, FLUX).",
+    inputSchema: {
+      sessionId: z.string().describe("ID de la sesión para preservar memoria conversacional."),
+      userPrompt: z.string().describe("Instrucción o prompt base del usuario."),
+      modelTarget: z.enum(["minimax-h3", "qwen-2.1", "wan-2.1", "flux-dev", "flux-schnell"]).default("minimax-h3"),
+      dialogue: z.string().optional().describe("Diálogo opcional para generar formato <d>[Idioma] texto</d>."),
+      subjects: z.record(z.string(), z.string()).optional().describe("Diccionario de sujetos e identidades a preservar."),
+    },
+  }, async ({ sessionId, userPrompt, modelTarget, dialogue, subjects }) => {
+    try {
+      const formatted = globalPromptContextMemory.formatWithModelGuide(
+        modelTarget as ModelTarget,
+        userPrompt,
+        { dialogue, subjects },
+      );
+      const turn = globalPromptContextMemory.recordTurn(sessionId, {
+        userInstruction: userPrompt,
+        targetModel: modelTarget as ModelTarget,
+        generatedPrompt: formatted,
+        subjects,
+      });
+      const contextSummary = globalPromptContextMemory.buildContextSummary(sessionId);
+
+      return text({
+        success: true,
+        turnId: turn.id,
+        enhancedPrompt: formatted,
+        estimatedTokens: turn.estimatedTokens,
+        contextSummary,
+      });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "GOATD_ENHANCE_ERROR",
+        message: error instanceof Error ? error.message : "Error al enriquecer el prompt.",
+      });
+    }
   });
 
   server.registerResource("generation-capabilities", "bellas-artes://capabilities", { mimeType: "application/json" }, async () => ({

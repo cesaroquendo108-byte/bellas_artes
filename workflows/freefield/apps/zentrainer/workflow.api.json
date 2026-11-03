@@ -1,0 +1,46 @@
+{
+  "1": {
+    "inputs": {
+      "folder": "input/dataset",
+      "resolution": 1024,
+      "auto_caption": true
+    },
+    "class_type": "ZenTrainer_Dataset",
+    "_meta": {
+      "title": "ZenTrainer Dataset Loader"
+    }
+  },
+  "2": {
+    "inputs": {
+      "dataset": [
+        "1",
+        0
+      ],
+      "model_type": "flux-dev",
+      "trigger_word": "ohwx_cesar",
+      "steps": 800,
+      "learning_rate": 0.0001,
+      "rank": 16,
+      "training_dtype": "bf16",
+      "gradient_checkpointing": true,
+      "seed": 42
+    },
+    "class_type": "ZenTrainer_Train",
+    "_meta": {
+      "title": "ZenTrainer LoRA Trainer"
+    }
+  },
+  "3": {
+    "inputs": {
+      "lora": [
+        "2",
+        0
+      ],
+      "filename_prefix": "loras/zentrainer"
+    },
+    "class_type": "ZenTrainer_SaveLora",
+    "_meta": {
+      "title": "ZenTrainer Save LoRA"
+    }
+  }
+}

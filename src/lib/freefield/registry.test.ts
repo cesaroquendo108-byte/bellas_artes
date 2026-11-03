@@ -96,4 +96,21 @@ describe("Freefield Registry en Bellas Artes", () => {
     expect(result.prompt["115"]?.inputs?.aspect_ratio).toBe("9:16 (Vertical)");
     expect(result.prompt["132"]?.inputs?.value).toBe(6);
   });
+
+  it("construye un flujo ComfyUI vinculado para ZenTrainer LoRA Studio", () => {
+    const result = buildFreefieldWorkflow("zentrainer", {
+      dataset_folder: "/workspace/datasets/cesar_portraits",
+      trigger_word: "cesar_suit",
+      model_type: "flux-dev",
+      steps: 1200,
+      learning_rate: 0.0001,
+      rank: 32,
+    });
+
+    expect(result.app.id).toBe("zentrainer");
+    expect(result.prompt["1"]?.inputs?.folder).toBe("/workspace/datasets/cesar_portraits");
+    expect(result.prompt["2"]?.inputs?.trigger_word).toBe("cesar_suit");
+    expect(result.prompt["2"]?.inputs?.steps).toBe(1200);
+    expect(result.prompt["2"]?.inputs?.rank).toBe(32);
+  });
 });

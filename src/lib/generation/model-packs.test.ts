@@ -10,12 +10,13 @@ import {
 describe("Model Packs Engine", () => {
   it("lists all available model packs", () => {
     const packs = listModelPacks();
-    expect(packs.length).toBeGreaterThanOrEqual(5);
+    expect(packs.length).toBeGreaterThanOrEqual(6);
     expect(packs.some((p) => p.id === "wan-scail2-recast")).toBe(true);
     expect(packs.some((p) => p.id === "gesture-portal-flux")).toBe(true);
     expect(packs.some((p) => p.id === "krea-turbo-realtime")).toBe(true);
     expect(packs.some((p) => p.id === "openjutsu-h3")).toBe(true);
     expect(packs.some((p) => p.id === "directors-cut-h3-qwen")).toBe(true);
+    expect(packs.some((p) => p.id === "zentrainer-flux-lora")).toBe(true);
   });
 
   it("retrieves a pack by id", () => {

@@ -1,0 +1,156 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "zentrainer",
+  "name": "ZenTrainer LoRA Studio",
+  "section": "utility",
+  "pack": "zentrainer-flux-lora",
+  "status": "ready",
+  "higgsfield_feature": "LoRA Trainer / Fine-Tuning",
+  "summary": "Estudio open-source de entrenamiento de LoRAs para FLUX, Qwen y SDXL directamente en ComfyUI con auto-captioning y loss tracking.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "zentrainer_flux_lora.api.json",
+    "comfyui": "0.42.0",
+    "repository": "https://github.com/Nynxz/ZenTrainer"
+  },
+  "outputs": [
+    {
+      "node": "3",
+      "type": "file",
+      "label": "Trained LoRA Weights"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "dataset_folder",
+      "type": "text",
+      "label": "Dataset Folder Path",
+      "required": true,
+      "default": "input/dataset",
+      "help": "Directorio con las 15-40 imagenes para el entrenamiento del LoRA",
+      "bind": [
+        {
+          "node": "1",
+          "field": "folder"
+        }
+      ]
+    },
+    {
+      "id": "trigger_word",
+      "type": "text",
+      "label": "Trigger Word",
+      "required": true,
+      "default": "ohwx_cesar",
+      "help": "Palabra clave o token desencadenante para invocar al sujeto o estilo",
+      "bind": [
+        {
+          "node": "2",
+          "field": "trigger_word"
+        }
+      ]
+    },
+    {
+      "id": "model_type",
+      "type": "select",
+      "label": "Base Model",
+      "default": "flux-dev",
+      "options": [
+        {
+          "value": "flux-dev",
+          "label": "FLUX.1 Dev (Alta Fidelidad)"
+        },
+        {
+          "value": "qwen-image-2-1",
+          "label": "Qwen-Image 2.1"
+        },
+        {
+          "value": "sdxl",
+          "label": "SDXL Base"
+        }
+      ],
+      "bind": [
+        {
+          "node": "2",
+          "field": "model_type"
+        }
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "slider",
+      "label": "Training Steps",
+      "default": 800,
+      "min": 200,
+      "max": 3000,
+      "step": 50,
+      "bind": [
+        {
+          "node": "2",
+          "field": "steps"
+        }
+      ]
+    },
+    {
+      "id": "learning_rate",
+      "type": "number",
+      "label": "Learning Rate",
+      "default": 0.0001,
+      "bind": [
+        {
+          "node": "2",
+          "field": "learning_rate"
+        }
+      ]
+    },
+    {
+      "id": "rank",
+      "type": "select",
+      "label": "LoRA Rank",
+      "default": 16,
+      "options": [
+        {
+          "value": 8,
+          "label": "Rank 8 (Ligero)"
+        },
+        {
+          "value": 16,
+          "label": "Rank 16 (Equilibrado)"
+        },
+        {
+          "value": 32,
+          "label": "Rank 32 (Maximo Detalle)"
+        }
+      ],
+      "bind": [
+        {
+          "node": "2",
+          "field": "rank"
+        }
+      ]
+    },
+    {
+      "id": "auto_caption",
+      "type": "toggle",
+      "label": "Auto-Captioning con Qwen-VL",
+      "default": true,
+      "bind": [
+        {
+          "node": "1",
+          "field": "auto_caption"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Seed",
+      "default": 42,
+      "bind": [
+        {
+          "node": "2",
+          "field": "seed"
+        }
+      ]
+    }
+  ]
+}
