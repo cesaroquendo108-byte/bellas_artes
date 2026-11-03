@@ -57,6 +57,40 @@ describe("MCP HTTP endpoint", () => {
     expect(names).toContain("list_freefield_apps");
     expect(names).toContain("get_freefield_app");
     expect(names).toContain("build_freefield_workflow");
+    expect(names).toContain("audit_comfy_workflow_nodes");
+    expect(names).toContain("directors_cut_compose_prompt");
+  });
+
+  it("permite invocar audit_comfy_workflow_nodes a través de MCP", async () => {
+    process.env.MCP_API_KEY = "mcp-secret-with-at-least-32-characters";
+    process.env.MCP_USER_ID = userId;
+    process.env.MCP_ALLOWED_ORIGIN = "https://bellasartes-xi.vercel.app";
+    const sampleWorkflow = JSON.stringify({
+      "1": { class_type: "LoadImage" },
+      "2": { class_type: "SaveVideo" },
+    });
+
+    const response = await POST(new Request("http://localhost/api/mcp", {
+      method: "POST",
+      headers: {
+        authorization: "Bearer mcp-secret-with-at-least-32-characters",
+        accept: "application/json, text/event-stream",
+        "content-type": "application/json",
+        origin: "https://bellasartes-xi.vercel.app",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 4,
+        method: "tools/call",
+        params: {
+          name: "audit_comfy_workflow_nodes",
+          arguments: { workflowJson: sampleWorkflow },
+        },
+      }),
+    }));
+    expect(response.status).toBe(200);
+    const payload = await response.json() as { result?: { content?: Array<{ text: string }> } };
+    expect(payload.result?.content?.[0]?.text).toContain("HEALTHY");
   });
 
   it("permite invocar list_freefield_apps a través de MCP", async () => {

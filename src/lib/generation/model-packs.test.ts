@@ -10,10 +10,12 @@ import {
 describe("Model Packs Engine", () => {
   it("lists all available model packs", () => {
     const packs = listModelPacks();
-    expect(packs.length).toBeGreaterThanOrEqual(4);
+    expect(packs.length).toBeGreaterThanOrEqual(5);
     expect(packs.some((p) => p.id === "wan-scail2-recast")).toBe(true);
     expect(packs.some((p) => p.id === "gesture-portal-flux")).toBe(true);
     expect(packs.some((p) => p.id === "krea-turbo-realtime")).toBe(true);
+    expect(packs.some((p) => p.id === "openjutsu-h3")).toBe(true);
+    expect(packs.some((p) => p.id === "directors-cut-h3-qwen")).toBe(true);
   });
 
   it("retrieves a pack by id", () => {
@@ -21,6 +23,12 @@ describe("Model Packs Engine", () => {
     expect(pack).toBeDefined();
     expect(pack?.vramRequiredGb).toBe(24);
     expect(pack?.files.length).toBeGreaterThan(0);
+
+    const directorsCut = getModelPack("directors-cut-h3-qwen");
+    expect(directorsCut).toBeDefined();
+    expect(directorsCut?.vramRequiredGb).toBe(32);
+    expect(directorsCut?.files.some((f) => f.filename.includes("minimax_h3"))).toBe(true);
+    expect(directorsCut?.files.some((f) => f.filename.includes("qwen_image"))).toBe(true);
   });
 
   it("throws when pack does not exist", () => {

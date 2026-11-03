@@ -77,4 +77,23 @@ describe("Freefield Registry en Bellas Artes", () => {
     expect(result.prompt["30"]?.inputs?.image).toBe("https://r2.bellasartes.com/characters/cesar_portrait.png");
     expect(result.prompt["213:3"]?.inputs?.text).toBe("Un hombre caminando por el parque, luz natural");
   });
+
+  it("construye un flujo ComfyUI vinculado para Director's Cut Studio", () => {
+    const result = buildFreefieldWorkflow("directors-cut", {
+      character: "https://r2.bellasartes.com/cast/cesar.jpg",
+      wardrobe: "https://r2.bellasartes.com/wardrobe/suit.jpg",
+      location: "https://r2.bellasartes.com/loc/bank.jpg",
+      prompt: "subject_definitions:\n<Subject 1> is Cesar...",
+      aspect_ratio: "9:16 (Vertical)",
+      duration: 6,
+    });
+
+    expect(result.app.id).toBe("directors-cut");
+    expect(result.prompt["139"]?.inputs?.image).toBe("https://r2.bellasartes.com/cast/cesar.jpg");
+    expect(result.prompt["137"]?.inputs?.image).toBe("https://r2.bellasartes.com/wardrobe/suit.jpg");
+    expect(result.prompt["147"]?.inputs?.image).toBe("https://r2.bellasartes.com/loc/bank.jpg");
+    expect(result.prompt["138"]?.inputs?.value).toBe("subject_definitions:\n<Subject 1> is Cesar...");
+    expect(result.prompt["115"]?.inputs?.aspect_ratio).toBe("9:16 (Vertical)");
+    expect(result.prompt["132"]?.inputs?.value).toBe(6);
+  });
 });

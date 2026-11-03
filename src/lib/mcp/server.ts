@@ -14,7 +14,6 @@ import {
 } from "@/lib/freefield/registry";
 import { executeFreefieldApp } from "@/lib/freefield/executor";
 import {
-  composePrompt,
   composeFromPreset,
   BUILTIN_PRESETS,
 } from "@/lib/prompt-composer";
@@ -25,6 +24,7 @@ import {
   type ModelPackId,
 } from "@/lib/generation/model-packs";
 import { listPortalStyles } from "@/lib/gesture-portal/styles";
+import { auditWorkflowJson } from "@/lib/admin/node-watch";
 
 function text(value: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -274,6 +274,72 @@ export function createBellasArtesMcpServer(userId: string) {
         denoiseStrength: s.denoiseStrength,
         steps: s.steps,
       })),
+    });
+  });
+
+  server.registerTool("audit_comfy_workflow_nodes", {
+    title: "Audit ComfyUI workflow nodes",
+    description:
+      "Audita la salud de dependencias de un workflow ComfyUI con NodeWatch. Detecta nodos obsoletos, riesgos de rotura (>12 meses sin commits) y sugiere alternativas nativas del núcleo.",
+    inputSchema: {
+      workflowJson: z.string().describe("Contenido JSON del flujo ComfyUI en formato API."),
+    },
+  }, async ({ workflowJson }) => {
+    try {
+      const report = auditWorkflowJson(workflowJson);
+      return text({ success: true, report });
+    } catch (error) {
+      return text({
+        success: false,
+        errorCode: "NODE_WATCH_AUDIT_ERROR",
+        message: error instanceof Error ? error.message : "Error al auditar el flujo de ComfyUI.",
+      });
+    }
+  });
+
+  server.registerTool("directors_cut_compose_prompt", {
+    title: "Compose Director's Cut H3 prompt",
+    description:
+      "Construye un prompt estructurado fiduciario para MiniMax H3 REF2VA según el estándar de Director's Cut (subject_definitions, summary, retention_analysis, detailed_description, dialogue, soundscape).",
+    inputSchema: {
+      characterSubject: z.string().describe("Definición de <Subject 1> vinculado a <Picture 1>."),
+      wardrobeSubject: z.string().optional().describe("Definición opcional de <Subject 2> (vestuario o coprotagonista)."),
+      locationSubject: z.string().optional().describe("Definición opcional de <Subject 3> (locación/fondo)."),
+      summary: z.string().describe("Resumen de 1-2 oraciones del plano o escena."),
+      detailedDescription: z.string().describe("Descripción de movimiento de cámara, iluminación y acción."),
+      dialogue: z.string().optional().describe("Diálogo fonético opcional con formato <d>[Idioma] texto</d>."),
+      soundscape: z.string().default("Quiet ambient room tone and realistic foley."),
+    },
+  }, async ({ characterSubject, wardrobeSubject, locationSubject, summary, detailedDescription, dialogue, soundscape }) => {
+    const lines: string[] = ["subject_definitions:"];
+    lines.push(`<Subject 1> is ${characterSubject}`);
+    if (wardrobeSubject) lines.push(`<Subject 2> is ${wardrobeSubject}`);
+    if (locationSubject) lines.push(`<Subject 3> is ${locationSubject}`);
+    lines.push("");
+    lines.push("summary:");
+    lines.push(`[reference generation] ${summary}`);
+    lines.push("");
+    lines.push("retention_analysis:");
+    lines.push("<Subject 1> appears throughout the scene: preserve identity, facial features and proportions.");
+    if (wardrobeSubject) lines.push("<Subject 2> appears throughout: preserve clothing, textures and style.");
+    if (locationSubject) lines.push("<Subject 3> appears as environment: preserve lighting and architecture.");
+    lines.push("");
+    lines.push("detailed_description:");
+    lines.push(detailedDescription);
+    if (dialogue) {
+      lines.push(dialogue);
+    }
+    lines.push("");
+    lines.push("overall_soundscape:");
+    lines.push(soundscape);
+    lines.push("");
+    lines.push("non_diegetic_music:");
+    lines.push("N/A. No music.");
+    lines.push("");
+
+    return text({
+      success: true,
+      prompt: lines.join("\n"),
     });
   });
 

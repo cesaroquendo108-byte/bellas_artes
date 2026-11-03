@@ -1,0 +1,140 @@
+{
+  "$schema": "../../schema/app.schema.json",
+  "id": "directors-cut",
+  "name": "Director's Cut Studio",
+  "section": "video",
+  "pack": "directors-cut-h3-qwen",
+  "status": "ready",
+  "higgsfield_feature": "Filmmaking Studio / Cast Consistency",
+  "summary": "Estudio de cine open source con consistencia fiduciaria de reparto (cast), vestuario y locación usando MiniMax H3 REF2VA 8-step y Qwen 2.1.",
+  "workflow": "workflow.api.json",
+  "source": {
+    "template": "FastH3_OmniRef_8step.api.json",
+    "comfyui": "0.42.0",
+    "repository": "https://github.com/leonardofrito/Directors-Cut"
+  },
+  "outputs": [
+    {
+      "node": "92",
+      "type": "video",
+      "label": "Master Film Cut"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "character",
+      "type": "image",
+      "label": "Character Reference",
+      "required": true,
+      "limits": {
+        "max_mb": 20
+      },
+      "help": "Retrato de referencia del personaje para mantener consistencia facial y corporal (Subject 1/2)",
+      "bind": [
+        {
+          "node": "139",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "wardrobe",
+      "type": "image",
+      "label": "Wardrobe / Secondary Cast",
+      "required": false,
+      "limits": {
+        "max_mb": 20
+      },
+      "help": "Imagen de vestuario o segundo personaje acompañante",
+      "bind": [
+        {
+          "node": "137",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "location",
+      "type": "image",
+      "label": "Location / Scene Background",
+      "required": false,
+      "limits": {
+        "max_mb": 20
+      },
+      "help": "Foto de la locación o entorno arquitectónico donde transcurre la toma",
+      "bind": [
+        {
+          "node": "147",
+          "field": "image"
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "type": "textarea",
+      "label": "Director's REF2VA Prompt",
+      "required": true,
+      "default": "subject_definitions:\n<Subject 1> is the character from <Picture 1>. Preserve facial features, hair, and posture.\n<Subject 2> is the wardrobe and style from <Picture 2>.\n<Subject 3> is the setting from <Picture 3>.\n\nsummary:\n[reference generation] A five-second cinematic shot with clear character action and natural performance.\n\nretention_analysis:\n<Subject 1> appears throughout the frame.\n\ndetailed_description:\nMedium cinematic shot. Natural motion, stable camera framing.\n\noverall_soundscape:\nNatural room acoustics and ambient sound.\n\nnon_diegetic_music:\nN/A. No music.\n",
+      "help": "Estructura fiduciaria de Director's Cut con subject_definitions, summary, retention_analysis, detailed_description, soundscape",
+      "bind": [
+        {
+          "node": "138",
+          "field": "value"
+        }
+      ]
+    },
+    {
+      "id": "aspect_ratio",
+      "type": "select",
+      "label": "Aspect Ratio",
+      "default": "16:9 (Widescreen)",
+      "options": [
+        {
+          "value": "16:9 (Widescreen)",
+          "label": "16:9 (Horizontal Cine)"
+        },
+        {
+          "value": "9:16 (Vertical)",
+          "label": "9:16 (Vertical Reels/TikTok)"
+        },
+        {
+          "value": "1:1 (Square)",
+          "label": "1:1 (Cuadrado)"
+        }
+      ],
+      "bind": [
+        {
+          "node": "115",
+          "field": "aspect_ratio"
+        }
+      ]
+    },
+    {
+      "id": "duration",
+      "type": "slider",
+      "label": "Duration (Seconds)",
+      "default": 5,
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "bind": [
+        {
+          "node": "132",
+          "field": "value"
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "type": "seed",
+      "label": "Noise Seed",
+      "default": -1,
+      "bind": [
+        {
+          "node": "129",
+          "field": "noise_seed"
+        }
+      ]
+    }
+  ]
+}

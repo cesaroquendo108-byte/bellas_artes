@@ -3,7 +3,8 @@ export type ModelPackId =
   | "gesture-portal-flux"
   | "krea-turbo-realtime"
   | "freefield-cinema-studio"
-  | "openjutsu-h3";
+  | "openjutsu-h3"
+  | "directors-cut-h3-qwen";
 
 export interface ModelFileEntry {
   filename: string;
@@ -206,6 +207,52 @@ export const MODEL_PACKS: Record<ModelPackId, ModelPack> = {
         sourceUrl:
           "https://huggingface.co/facebook/sam3-video/resolve/main/sam3.1_multiplex_fp16.safetensors",
         sizeGbApprox: 2.4,
+      },
+    ],
+  },
+  "directors-cut-h3-qwen": {
+    id: "directors-cut-h3-qwen",
+    name: "Director's Cut FastH3 OmniRef & Qwen 2.1 Pack",
+    description:
+      "Suite completa de filmmaking de Director's Cut con MiniMax H3 REF2VA 8-step, Qwen-Image 2.1 y Qwen 3.5 prompt enhancer para consistencia fiduciaria de personajes.",
+    vramRequiredGb: 32,
+    recommendedGpu: "RTX 5090 (32GB VRAM) / A100",
+    defaultWorkflow: "FastH3_OmniRef_8step.api.json",
+    files: [
+      {
+        filename: "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        targetSubdir: "diffusion_models",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/MiniMax_H3_repackaged/resolve/main/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        sizeGbApprox: 16.5,
+      },
+      {
+        filename: "minimax_h3_video_vae_int8_convrot.safetensors",
+        targetSubdir: "vae",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/MiniMax_H3_repackaged/resolve/main/minimax_h3_video_vae_int8_convrot.safetensors",
+        sizeGbApprox: 1.5,
+      },
+      {
+        filename: "qwen_image_2.1_bf16.safetensors",
+        targetSubdir: "diffusion_models",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_bf16.safetensors",
+        sizeGbApprox: 15.4,
+      },
+      {
+        filename: "qwen3.5_9b_qwen_image_2.1_pe_t2i.int8_convrot.safetensors",
+        targetSubdir: "text_encoders",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/text_encoders/qwen3.5_9b_qwen_image_2.1_pe_t2i.int8_convrot.safetensors",
+        sizeGbApprox: 9.2,
+      },
+      {
+        filename: "qwen_image_2.1_vae_bf16.safetensors",
+        targetSubdir: "vae",
+        sourceUrl:
+          "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/vae/qwen_image_2.1_vae_bf16.safetensors",
+        sizeGbApprox: 0.5,
       },
     ],
   },
